@@ -13,17 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('code')->unique();
             $table->string('about')->nullable();
             $table->date('start');
             $table->date('end');
-            $table->enum('status', [
-                Status::PLANNING,
-                Status::ONGOING,
-                Status::FINISHED,
-            ]);
+            $table->enum('status', Status::cases());
             $table->foreignUuid('customer_id')->constrained();
             $table->timestamps();
         });

@@ -14,24 +14,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('path');
             $table->string('mime');
             $table->integer('version');
-            $table->enum('type', [
-                Type::BLUEPRINT,
-                Type::MANUAL,
-                Type::TECHNICAL,
-            ])->nullable();
-            $table->enum('category', [
-                Category::SET,
-                Category::DETAIL,
-                Category::TO_BUILD,
-                Category::AS_BUILT,
-                Category::OPERATION,
-                Category::MAINTENANCE,
-            ])->nullable();
+            $table->enum('type', Type::cases())->nullable();
+            $table->enum('category', Category::cases())->nullable();
             $table->uuidMorphs('documentable');
             $table->foreignUuid('user_id')->constrained();
             $table->timestamps();
