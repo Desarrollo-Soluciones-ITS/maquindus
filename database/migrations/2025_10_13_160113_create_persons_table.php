@@ -19,8 +19,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('address');
             $table->string('position');
-            $table->foreignUuid('supplier_id')->nullable();
-            $table->foreignUuid('customer_id')->nullable();
+            $table->morphs('personable');
             $table->foreignUuid('state_id')->constrained();
             $table->foreignUuid('city_id')->constrained();
             $table->timestamps();

@@ -32,11 +32,7 @@ return new class extends Migration
                 Category::OPERATION,
                 Category::MAINTENANCE,
             ])->nullable();
-            // TODO -> morph this three
-            $table->foreignUuid('project_id');
-            $table->foreignUuid('equipment_id');
-            $table->foreignUuid('part_id');
-            // this three
+            $table->uuidMorphs('documentable');
             $table->foreignUuid('user_id')->constrained();
             $table->timestamps();
         });
