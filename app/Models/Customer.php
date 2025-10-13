@@ -18,7 +18,7 @@ class Customer extends Model
         return $this->hasMany(Project::class);
     }
 
-    public function persons(): MorphMany
+    public function people(): MorphMany
     {
         return $this->morphMany(Person::class, 'personable');
     }

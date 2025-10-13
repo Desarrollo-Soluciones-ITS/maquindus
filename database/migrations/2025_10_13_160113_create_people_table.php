@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('persons', function (Blueprint $table) {
+        Schema::create('people', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('surname');
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('address');
             $table->string('position');
-            $table->morphs('personable');
+            $table->uuidMorphs('personable');
             $table->foreignUuid('state_id')->constrained();
             $table->foreignUuid('city_id')->constrained();
             $table->timestamps();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('persons');
+        Schema::dropIfExists('people');
     }
 };

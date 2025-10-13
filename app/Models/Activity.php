@@ -12,7 +12,7 @@ class Activity extends Model
 {
     use HasFactory, HasUuids;
 
-    public function persons(): HasMany
+    public function people(): HasMany
     {
         return $this->hasMany(Person::class);
     }

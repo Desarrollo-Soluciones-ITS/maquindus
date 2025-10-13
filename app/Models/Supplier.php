@@ -23,7 +23,7 @@ class Supplier extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function persons(): MorphMany
+    public function people(): MorphMany
     {
         return $this->morphMany(Person::class, 'personable');
     }
