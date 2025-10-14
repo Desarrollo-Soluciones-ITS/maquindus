@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Filament\Resources\People\Tables;
+
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class PeopleTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('fullname')
+                    ->label('Nombre')
+                    ->searchable(),
+                TextColumn::make('email')
+                    ->label('Correo electrónico')
+                    ->searchable(),
+                TextColumn::make('phone')
+                    ->label('Teléfono')
+                    ->searchable(),
+                TextColumn::make('position')
+                    ->label('Cargo')
+                    ->default('N/A')
+                    ->searchable(),
+                TextColumn::make('personable.name')
+                    ->label('Empresa')
+                    ->default('N/A')
+                    ->searchable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

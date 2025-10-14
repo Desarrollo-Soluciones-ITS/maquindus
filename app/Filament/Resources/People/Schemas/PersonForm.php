@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Filament\Resources\People\Schemas;
+
+use App\Models\Customer;
+use App\Models\Supplier;
+use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Schema;
+
+class PersonForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->label('Nombre')
+                    ->placeholder('Mario')
+                    ->required(),
+                TextInput::make('surname')
+                    ->label('Apellido')
+                    ->placeholder('Gómez')
+                    ->required(),
+                TextInput::make('email')
+                    ->label('Correo electrónico')
+                    ->placeholder('contacto@correo.com')
+                    ->email()
+                    ->required(),
+                TextInput::make('phone')
+                    ->label('Teléfono')
+                    ->placeholder('04128029102')
+                    ->tel()
+                    ->required(),
+                Group::make()
+                    ->columns(3)
+                    ->columnSpanFull()
+                    ->schema([
+                        Select::make('state_id')
+                            ->label('Estado')
+                            ->relationship('state', 'name')
+                            ->required(),
+                        Select::make('city_id')
+                            ->label('Ciudad')
+                            ->relationship('city', 'name')
+                            ->required(),
+                        TextInput::make('address')
+                            ->label('Dirección')
+                            ->placeholder('Calle 48, Avenida FG')
+                            ->required(),
+                    ]),
+                Group::make()
+                    ->columns(2)
+                    ->columnSpanFull()
+                    ->schema([
+                        MorphToSelect::make('personable')
+                            ->label('Empresa relacionada')
+                            ->native(false)
+                            ->types([
+                                MorphToSelect\Type::make(Supplier::class)
+                                    ->label('Proveedor')
+                                    ->titleAttribute('name'),
+                                MorphToSelect\Type::make(Customer::class)
+                                    ->label('Cliente')
+                                    ->titleAttribute('name'),
+                            ]),
+                        TextInput::make('position')
+                            ->label('Cargo')
+                            ->placeholder('Responsable de ventas'),
+                    ])
+            ]);
+    }
+}
