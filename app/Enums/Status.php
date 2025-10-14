@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum Status: string
 {
-    case PLANNING = 'Planificación';
-    case ONGOING = 'En curso';
-    case FINISHED = 'Finalizado';
+    case Planning = 'Planificación';
+    case Ongoing = 'En curso';
+    case Finished = 'Finalizado';
 }
