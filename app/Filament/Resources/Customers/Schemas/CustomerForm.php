@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Customers\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class CustomerForm
 {
@@ -33,10 +35,16 @@ class CustomerForm
                 Select::make('state_id')
                     ->label('Estado')
                     ->relationship('state', 'name')
+                    ->live()
                     ->required(),
                 Select::make('city_id')
                     ->label('Ciudad')
-                    ->relationship('city', 'name')
+                    ->relationship(
+                        name: 'city',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query, Get $get) =>
+                            $query->where('state_id', '=', $get('state_id'))
+                    )
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')
