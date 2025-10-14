@@ -26,6 +26,7 @@ class CustomerInfolist
                 TextEntry::make('address')
                     ->label('Dirección'),
                 TextEntry::make('about')
+                    ->default('N/A')
                     ->label('Descripción'),
             ]);
     }

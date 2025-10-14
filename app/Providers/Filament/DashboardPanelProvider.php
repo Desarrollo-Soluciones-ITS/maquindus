@@ -31,6 +31,8 @@ class DashboardPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->resourceEditPageRedirect('index')
+            ->resourceCreatePageRedirect('index')
             ->sidebarWidth('15rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
