@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('address');
-            $table->string('position');
-            $table->uuidMorphs('personable');
+            $table->string('position')->nullable();
+            $table->nullableUuidMorphs('personable');
             $table->foreignUuid('state_id')->constrained();
             $table->foreignUuid('city_id')->constrained();
             $table->timestamps();

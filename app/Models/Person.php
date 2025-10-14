@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,5 +37,10 @@ class Person extends Model
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
+    }
+
+    protected function fullname(): Attribute
+    {
+        return Attribute::make(get: fn() => "$this->name $this->surname");
     }
 }
