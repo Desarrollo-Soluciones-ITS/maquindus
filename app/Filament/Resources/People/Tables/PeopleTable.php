@@ -19,7 +19,7 @@ class PeopleTable
             ->columns([
                 TextColumn::make('fullname')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable(['name', 'surname']),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
                     ->searchable(),
