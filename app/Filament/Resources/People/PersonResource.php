@@ -28,6 +28,8 @@ class PersonResource extends Resource
 
     protected static ?string $modelLabel = 'contacto';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Schema $schema): Schema
     {
         return PersonForm::configure($schema);

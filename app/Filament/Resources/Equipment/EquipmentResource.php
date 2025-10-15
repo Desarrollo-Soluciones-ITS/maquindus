@@ -26,6 +26,8 @@ class EquipmentResource extends Resource
 
     protected static ?string $modelLabel = 'equipo';
 
+    // protected static ?int $navigationSort;
+
     public static function form(Schema $schema): Schema
     {
         return EquipmentForm::configure($schema);
