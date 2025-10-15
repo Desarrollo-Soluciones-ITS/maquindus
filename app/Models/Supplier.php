@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -28,13 +29,13 @@ class Supplier extends Model
         return $this->morphMany(Person::class, 'personable');
     }
 
-    public function equipment(): HasMany
+    public function equipment(): BelongsToMany
     {
-        return $this->hasMany(Equipment::class);
+        return $this->belongsToMany(Equipment::class);
     }
 
-    public function parts(): HasMany
+    public function parts(): BelongsToMany
     {
-        return $this->hasMany(Part::class);
+        return $this->belongsToMany(Part::class);
     }
 }

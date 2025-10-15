@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Person extends Model
@@ -29,14 +29,14 @@ class Person extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function activities(): HasMany
+    public function activities(): BelongsToMany
     {
-        return $this->hasMany(Activity::class);
+        return $this->belongsToMany(Activity::class);
     }
 
-    public function projects(): HasMany
+    public function projects(): BelongsToMany
     {
-        return $this->hasMany(Project::class);
+        return $this->belongsToMany(Project::class);
     }
 
     protected function fullname(): Attribute

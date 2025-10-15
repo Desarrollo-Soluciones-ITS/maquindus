@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Project extends Model
@@ -31,19 +31,19 @@ class Project extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function equipment(): HasMany
+    public function equipment(): BelongsToMany
     {
-        return $this->hasMany(Equipment::class);
+        return $this->belongsToMany(Equipment::class);
     }
 
-    public function parts(): HasMany
+    public function parts(): BelongsToMany
     {
-        return $this->hasMany(Part::class);
+        return $this->belongsToMany(Part::class);
     }
 
-    public function people(): HasMany
+    public function people(): BelongsToMany
     {
-        return $this->hasMany(Person::class);
+        return $this->belongsToMany(Person::class);
     }
 
     public function document(): MorphMany
