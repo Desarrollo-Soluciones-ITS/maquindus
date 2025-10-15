@@ -59,27 +59,22 @@ class PersonForm
                             ->placeholder('Calle 48, Avenida FG')
                             ->required(),
                     ]),
-                Group::make()
-                    ->columns(2)
-                    ->columnSpanFull()
-                    ->schema([
-                        MorphToSelect::make('personable')
-                            ->label('Empresa relacionada')
-                            ->types([
-                                MorphToSelect\Type::make(Supplier::class)
-                                    ->label('Proveedor')
-                                    ->titleAttribute('name'),
-                                MorphToSelect\Type::make(Customer::class)
-                                    ->label('Cliente')
-                                    ->titleAttribute('name'),
-                            ])
-                            ->modifyTypeSelectUsing(
-                                fn (Select $select) => $select->placeholder('Ninguna')
-                            ),
-                        TextInput::make('position')
-                            ->label('Cargo')
-                            ->placeholder('Responsable de ventas'),
-                    ])
+                    MorphToSelect::make('personable')
+                        ->label('Empresa relacionada')
+                        ->types([
+                            MorphToSelect\Type::make(Supplier::class)
+                                ->label('Proveedor')
+                                ->titleAttribute('name'),
+                            MorphToSelect\Type::make(Customer::class)
+                                ->label('Cliente')
+                                ->titleAttribute('name'),
+                        ])
+                        ->modifyTypeSelectUsing(
+                            fn (Select $select) => $select->placeholder('Ninguna')
+                        ),
+                    TextInput::make('position')
+                        ->label('Cargo')
+                        ->placeholder('Responsable de ventas'),
             ]);
     }
 }
