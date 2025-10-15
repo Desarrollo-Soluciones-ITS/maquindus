@@ -65,7 +65,6 @@ class PersonForm
                     ->schema([
                         MorphToSelect::make('personable')
                             ->label('Empresa relacionada')
-                            ->native(false)
                             ->types([
                                 MorphToSelect\Type::make(Supplier::class)
                                     ->label('Proveedor')
@@ -73,7 +72,10 @@ class PersonForm
                                 MorphToSelect\Type::make(Customer::class)
                                     ->label('Cliente')
                                     ->titleAttribute('name'),
-                            ]),
+                            ])
+                            ->modifyTypeSelectUsing(
+                                fn (Select $select) => $select->placeholder('Ninguna')
+                            ),
                         TextInput::make('position')
                             ->label('Cargo')
                             ->placeholder('Responsable de ventas'),
