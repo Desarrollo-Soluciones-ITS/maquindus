@@ -9,3 +9,7 @@
 
 - Los contactos pueden pertenecer a un cliente, a un proveedor, a un proyecto. ¿Pueden ser también las personas de Maquindus?
 - Historial de procura: ¿que exactamente se debe guardar para formar dicho historial? ¿Seguimiento de pedidos de equipos/repuestos? ¿Orientado a proyectos? ¿O visto desde el punto de vista de equipos/repuestos?
+
+# Ideas
+
+- Part y Equipment son basicamente iguales, la unica diferencia es a nivel conceptual, pero los campos y relaciones son exactamente los mismos

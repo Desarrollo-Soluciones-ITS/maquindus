@@ -3,21 +3,33 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use App\Models\Part;
+use App\Models\Equipment;
+use App\Models\Supplier;
 
 class PartSeeder extends Seeder
 {
     public function run(): void
     {
         $parts = [
-            ['id' => (string) Str::uuid(), 'name' => 'Filtro principal', 'code' => 'PT-FLT-01', 'about' => 'Filtro de aceite', 'details' => json_encode(['material' => 'acero', 'diameter' => '50mm']), 'created_at' => now(), 'updated_at' => now()],
-            ['id' => (string) Str::uuid(), 'name' => 'Bomba hidráulica', 'code' => 'PT-BMP-02', 'about' => 'Bomba de transferencia', 'details' => json_encode(['flow' => '120L/min', 'model' => 'BMP-120']), 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Filtro principal', 'code' => 'PT-FLT-01', 'about' => 'Filtro de aceite', 'details' => json_encode(['material' => 'acero', 'diameter' => '50mm']), 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Bomba hidráulica', 'code' => 'PT-BMP-02', 'about' => 'Bomba de transferencia', 'details' => json_encode(['flow' => '120L/min', 'model' => 'BMP-120']), 'created_at' => now(), 'updated_at' => now()],
         ];
 
         foreach ($parts as $p) {
-            Part::create($p);
+            $part = Part::create($p);
+
+            // Asociar a equipment si existe
+            $equipment = Equipment::first();
+            if ($equipment) {
+                $part->equipment()->syncWithoutDetaching([$equipment->id]);
+            }
+
+            // Asociar a supplier si existe
+            $supplier = Supplier::first();
+            if ($supplier) {
+                $supplier->parts()->syncWithoutDetaching([$part->id]);
+            }
         }
     }
 }

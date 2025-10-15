@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use App\Models\State;
 use App\Models\City;
@@ -21,7 +19,6 @@ class CustomerSeeder extends Seeder
 
         $customers = [
             [
-                'id' => (string) Str::uuid(),
                 'rif' => 'J-12345678-1',
                 'name' => 'Industrias Vega S.A.',
                 'email' => 'contacto@vega.com',
@@ -32,7 +29,6 @@ class CustomerSeeder extends Seeder
                 'city_id' => $libertador->id,
             ],
             [
-                'id' => (string) Str::uuid(),
                 'rif' => 'J-87654321-0',
                 'name' => 'Construcciones López C.A.',
                 'email' => 'info@clopez.com',

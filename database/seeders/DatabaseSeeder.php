@@ -27,12 +27,12 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             UserSeeder::class,
             CustomerSeeder::class,
-            SupplierSeeder::class,
-            EquipmentSeeder::class,
             PartSeeder::class,
-            PersonSeeder::class,
+            EquipmentSeeder::class,
+            SupplierSeeder::class,
             ProjectSeeder::class,
             ActivitySeeder::class,
+            PersonSeeder::class,
             DocumentSeeder::class,
         ]);
     }

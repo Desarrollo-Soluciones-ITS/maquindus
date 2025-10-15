@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use App\Models\Supplier;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Equipment;
+use App\Models\Part;
 
 class SupplierSeeder extends Seeder
 {
@@ -18,7 +18,6 @@ class SupplierSeeder extends Seeder
 
         $suppliers = [
             [
-                'id' => (string) Str::uuid(),
                 'rif' => 'J-10101010-2',
                 'name' => 'Suministros Técnicos S.A.',
                 'email' => 'ventas@suministros.com',
@@ -31,7 +30,19 @@ class SupplierSeeder extends Seeder
         ];
 
         foreach ($suppliers as $s) {
-            Supplier::create($s);
+            $supplier = Supplier::create($s);
+
+            // Asociar equipment si existe
+            $equipment = Equipment::first();
+            if ($equipment) {
+                $supplier->equipment()->syncWithoutDetaching([$equipment->id]);
+            }
+
+            // Asociar part si existe
+            $part = Part::first();
+            if ($part) {
+                $supplier->parts()->syncWithoutDetaching([$part->id]);
+            }
         }
     }
 }
