@@ -22,7 +22,7 @@ class PersonResource extends Resource
 {
     protected static ?string $model = Person::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Identification;
 
     protected static ?string $recordTitleAttribute = 'fullname';
 
