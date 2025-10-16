@@ -7,7 +7,6 @@ use App\Models\Person;
 use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\State;
-use App\Models\City;
 use App\Models\Activity;
 use App\Models\Project;
 
@@ -17,8 +16,8 @@ class PersonSeeder extends Seeder
     {
         $customer = Customer::first();
         $supplier = Supplier::first();
-        $state = State::first();
-        $city = City::first();
+        $state = State::with('cities')->first();
+        $city = $state->cities[0];
 
         $people = [
             ['name' => 'Carlos', 'surname' => 'Pérez', 'email' => 'carlos.perez@vega.com', 'phone' => '04141234567', 'address' => 'Oficina 12', 'position' => 'Gerente de Planta', 'personable_type' => 'App\\Models\\Customer', 'personable_id' => $customer->id, 'state_id' => $state->id, 'city_id' => $city->id],

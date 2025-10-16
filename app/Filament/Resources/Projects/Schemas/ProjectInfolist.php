@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\Status;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
 
 class ProjectInfolist
@@ -24,6 +23,7 @@ class ProjectInfolist
                     ->date(),
                 TextEntry::make('end')
                     ->label('Fecha de finalización')
+                    ->placeholder('N/A')
                     ->date(),
                 TextEntry::make('status')
                     ->label('Estado')
@@ -35,7 +35,7 @@ class ProjectInfolist
                     }),
                 TextEntry::make('about')
                     ->label('Descripción')
-                    ->default('N/A'),
+                    ->placeholder('N/A'),
             ]);
     }
 }

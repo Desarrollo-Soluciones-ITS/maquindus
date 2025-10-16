@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('about')->nullable();
             $table->date('start');
-            $table->date('end');
+            $table->date('end')->nullable();
             $table->enum('status', Status::cases());
             $table->foreignUuid('customer_id')->constrained();
             $table->timestamps();

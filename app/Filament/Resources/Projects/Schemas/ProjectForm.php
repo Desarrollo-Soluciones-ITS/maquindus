@@ -28,8 +28,7 @@ class ProjectForm
                     ->label('Fecha de inicio')
                     ->required(),
                 DatePicker::make('end')
-                    ->label('Fecha de finalización')
-                    ->required(),
+                    ->label('Fecha de finalización'),
                 Select::make('status')
                     ->label('Estado')
                     ->options(
