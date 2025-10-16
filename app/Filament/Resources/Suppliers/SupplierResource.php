@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Suppliers;
 
+use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
 use App\Filament\Resources\Suppliers\Pages\EditSupplier;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
@@ -46,7 +47,7 @@ class SupplierResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'parts' => PartsRelationManager::class,
         ];
     }
 

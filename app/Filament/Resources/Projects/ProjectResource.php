@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects;
 
+use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
@@ -44,7 +45,7 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'parts' => PartsRelationManager::class,
         ];
     }
 

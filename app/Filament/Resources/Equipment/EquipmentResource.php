@@ -6,6 +6,7 @@ use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
 use App\Filament\Resources\Equipment\Pages\ViewEquipment;
+use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
 use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
@@ -26,8 +27,6 @@ class EquipmentResource extends Resource
 
     protected static ?string $modelLabel = 'equipo';
 
-    // protected static ?int $navigationSort;
-
     public static function form(Schema $schema): Schema
     {
         return EquipmentForm::configure($schema);
@@ -46,7 +45,7 @@ class EquipmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'parts' => PartsRelationManager::class
         ];
     }
 
