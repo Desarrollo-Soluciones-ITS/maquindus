@@ -14,8 +14,8 @@ class ActivitySeeder extends Seeder
         $project = Project::first();
 
         $activities = [
-            ['comment' => 'Instalación de equipo principal', 'project_id' => $project->id],
-            ['comment' => 'Pruebas de carga y calibración', 'project_id' => $project->id],
+            ['title' => 'Instalación de equipo principal', 'comment' => 'Se inició la instalación del equipo principal del proyecto en el área designada.', 'project_id' => $project->id],
+            ['title' => 'Pruebas de carga y calibración', 'comment' => 'Se realizaron las diferentes pruebas de carga y calibración con los procedimientos necesarios.', 'project_id' => $project->id],
         ];
 
         foreach ($activities as $a) {

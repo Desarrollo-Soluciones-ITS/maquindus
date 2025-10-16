@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_v4()'));
+            $table->string('title');
             $table->string('comment');
             $table->foreignUuid('project_id')->constrained();
             $table->timestamps();
