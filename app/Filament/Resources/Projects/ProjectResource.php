@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects;
 
+use App\Filament\RelationManagers\ActivitiesRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
@@ -46,6 +47,7 @@ class ProjectResource extends Resource
     {
         return [
             'parts' => PartsRelationManager::class,
+            'activities' => ActivitiesRelationManager::class,
         ];
     }
 
