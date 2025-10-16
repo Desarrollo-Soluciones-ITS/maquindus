@@ -26,7 +26,7 @@ class SupplierInfolist
                 TextEntry::make('address')
                     ->label('Dirección'),
                 TextEntry::make('about')
-                    ->default('N/A')
+                    ->placeholder('N/A')
                     ->label('Descripción'),
             ]);
     }

@@ -28,11 +28,11 @@ class PeopleTable
                     ->searchable(),
                 TextColumn::make('position')
                     ->label('Cargo')
-                    ->default('N/A')
+                    ->placeholder('N/A')
                     ->searchable(),
                 TextColumn::make('personable.name')
                     ->label('Empresa')
-                    ->default('N/A')
+                    ->placeholder('N/A')
                     ->searchable(),
             ])
             ->filters([

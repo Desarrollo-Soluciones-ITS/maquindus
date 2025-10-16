@@ -19,10 +19,10 @@ class PersonInfolist
                     ->label('Teléfono'),
                 TextEntry::make('personable.name')
                     ->label('Empresa relacionada')
-                    ->default('N/A'),
+                    ->placeholder('N/A'),
                 TextEntry::make('position')
                     ->label('Cargo')
-                    ->default('N/A'),
+                    ->placeholder('N/A'),
                 TextEntry::make('state.name')
                     ->label('Estado'),
                 TextEntry::make('city.name')
