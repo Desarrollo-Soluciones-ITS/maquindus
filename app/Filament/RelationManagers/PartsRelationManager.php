@@ -8,7 +8,9 @@ use App\Filament\Resources\Parts\Tables\PartsTable;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -43,6 +45,12 @@ class PartsRelationManager extends RelationManager
                     ViewAction::make(),
                     EditAction::make(),
                     DetachAction::make(),
+                ])
+            ])
+            ->toolbarActions([
+                ActionGroup::make([
+                    DeleteBulkAction::make(),
+                    DetachBulkAction::make(),
                 ])
             ]);
     }

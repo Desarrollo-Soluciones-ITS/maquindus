@@ -38,9 +38,11 @@ class ActivitiesRelationManager extends RelationManager
             ->components([
                 TextInput::make('title')
                     ->label('Título')
+                    ->placeholder('Instalación de equipo principal')
                     ->required(),
                 Textarea::make('comment')
                     ->label('Comentario')
+                    ->placeholder('Se inició la instalación del equipo principal en el proyecto')
                     ->required(),
                 Select::make('people')
                     ->label('Participantes')
