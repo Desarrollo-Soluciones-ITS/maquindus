@@ -1,11 +1,9 @@
 <?php
 
-use App\Enums\Category;
-use App\Enums\Type;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -14,12 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_v4()'));
-            $table->string('name');
-            $table->enum('type', Type::cases())->nullable();
-            $table->enum('category', Category::cases())->nullable();
-            $table->uuidMorphs('documentable');
+            $table->string('path');
+            $table->string('mime');
+            $table->integer('version');
+            $table->foreignUuid('document_id')->constrained();
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('files');
     }
 };

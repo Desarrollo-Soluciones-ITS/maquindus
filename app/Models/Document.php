@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Document extends Model
@@ -17,8 +17,8 @@ class Document extends Model
         return $this->morphTo();
     }
 
-    public function user(): BelongsTo
+    public function files(): HasMany
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(File::class);
     }
 }
