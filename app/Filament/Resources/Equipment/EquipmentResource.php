@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Equipment;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
@@ -45,7 +46,8 @@ class EquipmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            'parts' => PartsRelationManager::class
+            'parts' => PartsRelationManager::class,
+            'documents' => DocumentsRelationManager::class,
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,5 +21,12 @@ class Document extends Model
     public function files(): HasMany
     {
         return $this->hasMany(File::class);
+    }
+
+    public function current(): Attribute
+    {
+        return Attribute::make(get: function () {
+            return $this->files()->latest()->first();
+        });
     }
 }
