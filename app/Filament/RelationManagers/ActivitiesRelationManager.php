@@ -81,9 +81,11 @@ class ActivitiesRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
-                    ->label('Título'),
+                    ->label('Título')
+                    ->searchable(),
                 TextColumn::make('comment')
                     ->label('Comentario')
+                    ->searchable()
                     ->formatStateUsing(
                         fn (string $state) => str($state)
                             ->limit(limit: 70, preserveWords: true)

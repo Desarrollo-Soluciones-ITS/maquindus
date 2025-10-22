@@ -54,7 +54,7 @@ class Project extends Model
         return $this->hasMany(Activity::class);
     }
 
-    public function document(): MorphMany
+    public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
     }

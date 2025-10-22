@@ -7,6 +7,7 @@ use App\Filament\Resources\Parts\Schemas\PartInfolist;
 use App\Filament\Resources\Parts\Tables\PartsTable;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
@@ -48,7 +49,7 @@ class PartsRelationManager extends RelationManager
                 ])
             ])
             ->toolbarActions([
-                ActionGroup::make([
+                BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     DetachBulkAction::make(),
                 ])
