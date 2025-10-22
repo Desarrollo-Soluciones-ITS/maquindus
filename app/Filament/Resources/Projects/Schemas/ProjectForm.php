@@ -8,8 +8,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
-use function Illuminate\Log\log;
-
 class ProjectForm
 {
     public static function configure(Schema $schema): Schema
@@ -31,12 +29,7 @@ class ProjectForm
                     ->label('Fecha de finalización'),
                 Select::make('status')
                     ->label('Estado')
-                    ->options(
-                        collect(Status::cases())
-                            ->mapWithKeys(fn ($case) => [
-                                $case->value => $case->value
-                            ])
-                    )
+                    ->options(Status::options())
                     ->required(),
                 Select::make('customer_id')
                     ->label('Cliente')

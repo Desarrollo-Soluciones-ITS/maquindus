@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             ActivitySeeder::class,
             PersonSeeder::class,
             DocumentSeeder::class,
+            FileSeeder::class,
             ImageSeeder::class,
         ]);
     }
