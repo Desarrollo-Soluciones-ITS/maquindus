@@ -39,8 +39,13 @@ class Equipment extends Model
         return $this->belongsToMany(Supplier::class);
     }
 
-    public function document(): MorphMany
+    public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

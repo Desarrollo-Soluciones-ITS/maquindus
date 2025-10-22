@@ -4,7 +4,8 @@ namespace App\Enums;
 
 enum Type: string
 {
-    case Blueprint = 'Plano';
-    case Manual = 'Manual';
-    case Technical = 'Hoja Técnica';
+    case Blueprint = 'Planos';
+    case Manual = 'Manuales';
+    case Report = 'Reportes';
+    case Specs = 'Especificaciones Técnicas';
 }

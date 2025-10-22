@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_v4()'));
             $table->string('name');
-            $table->enum('type', Type::cases())->nullable();
+            $table->enum('type', Type::cases());
             $table->enum('category', Category::cases())->nullable();
             $table->uuidMorphs('documentable');
             $table->timestamps();
