@@ -11,6 +11,8 @@ class State extends Model
 {
     use HasFactory, HasUuids;
 
+    public $timestamps = false;
+
     public function cities(): HasMany
     {
         return $this->hasMany(City::class);

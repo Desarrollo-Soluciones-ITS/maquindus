@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\State;
 use App\Models\City;
+use Str;
 
 class CitySeeder extends Seeder
 {
@@ -15,13 +16,13 @@ class CitySeeder extends Seeder
         $cities = [];
         foreach ($states as $state) {
             if ($state->name === 'Caracas') {
-                $cities[] = ['name' => 'Libertador', 'state_id' => $state->id];
-                $cities[] = ['name' => 'Chacao', 'state_id' => $state->id];
+                $cities[] = ['id' => Str::uuid(), 'name' => 'Libertador', 'state_id' => $state->id];
+                $cities[] = ['id' => Str::uuid(), 'name' => 'Chacao', 'state_id' => $state->id];
             } elseif ($state->name === 'Miranda') {
-                $cities[] = ['name' => 'Charallave', 'state_id' => $state->id];
-                $cities[] = ['name' => 'Petare', 'state_id' => $state->id];
+                $cities[] = ['id' => Str::uuid(), 'name' => 'Charallave', 'state_id' => $state->id];
+                $cities[] = ['id' => Str::uuid(), 'name' => 'Petare', 'state_id' => $state->id];
             } else {
-                $cities[] = ['name' => 'Maracay', 'state_id' => $state->id];
+                $cities[] = ['id' => Str::uuid(), 'name' => 'Maracay', 'state_id' => $state->id];
             }
         }
 

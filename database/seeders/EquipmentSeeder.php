@@ -6,14 +6,15 @@ use Illuminate\Database\Seeder;
 use App\Models\Equipment;
 use App\Models\Part;
 use App\Models\Supplier;
+use Str;
 
 class EquipmentSeeder extends Seeder
 {
     public function run(): void
     {
         $equipment = [
-            ['name' => 'Compresor Atlas', 'code' => 'EQ-AT-001', 'about' => 'Compresor centrífugo', 'details' => ['Potencia' => '50HP', 'Modelo' => 'AT-500'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Generador Perkins', 'code' => 'EQ-GP-002', 'about' => 'Generador diésel', 'details' => ['Potencia' => '200kW', 'Modelo' => 'GP-200'], 'created_at' => now(), 'updated_at' => now()],
+            ['id' => Str::uuid(), 'name' => 'Compresor Atlas', 'code' => 'EQ-AT-001', 'about' => 'Compresor centrífugo', 'details' => ['Potencia' => '50HP', 'Modelo' => 'AT-500'], 'created_at' => now(), 'updated_at' => now()],
+            ['id' => Str::uuid(), 'name' => 'Generador Perkins', 'code' => 'EQ-GP-002', 'about' => 'Generador diésel', 'details' => ['Potencia' => '200kW', 'Modelo' => 'GP-200'], 'created_at' => now(), 'updated_at' => now()],
         ];
 
         foreach ($equipment as $e) {
