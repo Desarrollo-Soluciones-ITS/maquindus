@@ -5,8 +5,8 @@ Software de gestión de equipos industriales.
 ## Stack
 
 - Laravel 12
-- MariaDB
+- MariaDB 11.8
 - Livewire
 - Alpine
-- TailwindCSS
-- FilamentPHP
+- TailwindCSS 4.0
+- FilamentPHP 4.1

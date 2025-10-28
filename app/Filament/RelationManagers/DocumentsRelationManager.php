@@ -4,7 +4,6 @@ namespace App\Filament\RelationManagers;
 
 use App\Enums\Category;
 use App\Enums\Type;
-use App\Models\Document;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -28,7 +27,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use PhpParser\Node\Stmt\TryCatch;
 
 class DocumentsRelationManager extends RelationManager
 {
