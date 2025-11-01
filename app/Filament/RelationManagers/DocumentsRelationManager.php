@@ -64,7 +64,7 @@ class DocumentsRelationManager extends RelationManager
                         }
                     )
                     ->getUploadedFileNameForStorageUsing(
-                        function (TemporaryUploadedFile $file, Get $get ) {
+                        function (TemporaryUploadedFile $file, Get $get) {
                             $extension = $file->getClientOriginalExtension();
                             return str($get('name'))->append('.', $extension);
                         }
@@ -126,20 +126,17 @@ class DocumentsRelationManager extends RelationManager
                         function (array $data, RelationManager $livewire): Model {
                             $data = collect($data);
                             $path = $data->get('path');
-                            
                             $mime = Storage::mimeType($path);
-                            
+
                             $document = $livewire->getOwnerRecord()
                                 ->documents()
                                 ->create($data->except('path')->all());
 
-                            $document->files()->create([
+                            return $document->files()->create([
                                 'path' => $path,
                                 'mime' => $mime,
                                 'version' => 1,
                             ]);
-                            
-                            return $document;
                         }
                     ),
             ])

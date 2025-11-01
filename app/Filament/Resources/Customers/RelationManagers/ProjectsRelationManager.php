@@ -1,18 +1,13 @@
 <?php
 
-namespace App\Filament\RelationManagers;
+namespace App\Filament\Resources\Customers\RelationManagers;
 
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -44,21 +39,15 @@ class ProjectsRelationManager extends RelationManager
         return ProjectsTable::configure($table)
             ->headerActions([
                 CreateAction::make(),
-                AttachAction::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                    DetachAction::make(),
-                    DeleteAction::make(),
                 ])
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                    DeleteBulkAction::make(),
-                ])
+                BulkActionGroup::make([])
             ]);
     }
 }

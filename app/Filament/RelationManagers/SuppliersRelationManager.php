@@ -2,13 +2,14 @@
 
 namespace App\Filament\RelationManagers;
 
-use App\Filament\Resources\Parts\Schemas\PartForm;
-use App\Filament\Resources\Parts\Schemas\PartInfolist;
-use App\Filament\Resources\Parts\Tables\PartsTable;
+use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
+use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
+use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
@@ -18,49 +19,49 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
-class PartsRelationManager extends RelationManager
+class SuppliersRelationManager extends RelationManager
 {
-    protected static string $relationship = 'parts';
+    protected static string $relationship = 'suppliers';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $title = 'Partes';
+    protected static ?string $title = 'Proveedores';
 
-    protected static ?string $modelLabel = 'parte';
+    protected static ?string $modelLabel = 'proveedor';
 
     public function form(Schema $schema): Schema
     {
-        return PartForm::configure($schema);
+        return SupplierForm::configure($schema);
     }
 
     public function infolist(Schema $schema): Schema
     {
-        return PartInfolist::configure($schema);
+        return SupplierInfolist::configure($schema);
     }
 
     public function table(Table $table): Table
     {
-        return PartsTable::configure($table)
+        return SuppliersTable::configure($table)
             ->filters([
                 //
             ])
             ->headerActions([
                 CreateAction::make(),
-                AttachAction::make()
-                    ->preloadRecordSelect(),
+                AttachAction::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
                     DetachAction::make(),
+                    DeleteAction::make(),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
                     DetachBulkAction::make(),
-                ])
+                    DeleteBulkAction::make(),
+                ]),
             ]);
     }
 }

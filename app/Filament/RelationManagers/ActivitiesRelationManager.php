@@ -7,7 +7,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -49,7 +48,7 @@ class ActivitiesRelationManager extends RelationManager
                     ->multiple()
                     ->relationship()
                     ->searchable(['name', 'surname'])
-                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->fullname)
+                    ->getOptionLabelFromRecordUsing(fn($record) => $record->fullname)
             ]);
     }
 
@@ -78,7 +77,6 @@ class ActivitiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
                     ->label('Título')
@@ -87,7 +85,7 @@ class ActivitiesRelationManager extends RelationManager
                     ->label('Comentario')
                     ->searchable()
                     ->formatStateUsing(
-                        fn (string $state) => str($state)
+                        fn(string $state) => str($state)
                             ->limit(limit: 70, preserveWords: true)
                     ),
             ])
@@ -106,7 +104,6 @@ class ActivitiesRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DissociateBulkAction::make(),
                     DeleteBulkAction::make(),
                 ]),
             ]);

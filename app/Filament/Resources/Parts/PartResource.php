@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Parts;
 
+use App\Filament\RelationManagers\EquipmentRelationManager;
+use App\Filament\RelationManagers\ImagesRelationManager;
+use App\Filament\RelationManagers\ProjectsRelationManager;
+use App\Filament\RelationManagers\SuppliersRelationManager;
 use App\Filament\Resources\Parts\Pages\CreatePart;
 use App\Filament\Resources\Parts\Pages\EditPart;
 use App\Filament\Resources\Parts\Pages\ListParts;
@@ -44,7 +48,10 @@ class PartResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'equipment' => EquipmentRelationManager::class,
+            'projects' => ProjectsRelationManager::class,
+            'suppliers' => SuppliersRelationManager::class,
+            'images' => ImagesRelationManager::class
         ];
     }
 
