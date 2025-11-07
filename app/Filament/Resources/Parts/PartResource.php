@@ -30,6 +30,8 @@ class PartResource extends Resource
 
     protected static ?string $modelLabel = 'parte';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Schema $schema): Schema
     {
         return PartForm::configure($schema);
