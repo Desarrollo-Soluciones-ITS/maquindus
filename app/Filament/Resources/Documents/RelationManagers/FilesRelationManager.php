@@ -38,9 +38,6 @@ class FilesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                // TextInput::make('version')
-                //     ->required()
-                //     ->numeric(),
                 FileUpload::make('path')
                     ->label('Nueva Versión')
                     ->disk('local')
@@ -60,8 +57,10 @@ class FilesRelationManager extends RelationManager
 
                             $extension = $file->getClientOriginalExtension();
                             $baseName = str($document->name);
+                            $timestamp = now()->format('Ymd_His');
 
-                            return str("V{$nextVersion}_")->append($baseName, '.', $extension);
+                            return str("V{$nextVersion}_")
+                                ->append($timestamp, '_', $baseName, '.', $extension);
                         }
                     )
                     ->required()
@@ -81,7 +80,8 @@ class FilesRelationManager extends RelationManager
                             ->numeric(),
                         TextEntry::make('mime')
                             ->label('Tipo de archivo')
-                            ->badge(),
+                            ->badge()
+                            ->formatStateUsing(fn(string $state): string => mime_type($state)),
                         TextEntry::make('created_at')
                             ->label('Subido el')
                             ->date('d/m/Y - g:i A')
@@ -106,7 +106,8 @@ class FilesRelationManager extends RelationManager
                     ->numeric(),
                 TextColumn::make('mime')
                     ->label('Tipo de archivo')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => mime_type($state)),
                 TextColumn::make('created_at')
                     ->label('Subido el')
                     ->date('d/m/Y - g:i A')
@@ -151,24 +152,24 @@ class FilesRelationManager extends RelationManager
                             }
                         }),
                     ViewAction::make(),
-                    EditAction::make()
-                        ->using(function (Model $record, array $data): Model {
-                            $oldPath = $record->path;
-                            $newPath = $data['path'];
-                            $newMime = $record->mime;
+                    // EditAction::make()
+                    //     ->using(function (Model $record, array $data): Model {
+                    //         $oldPath = $record->path;
+                    //         $newPath = $data['path'];
+                    //         $newMime = $record->mime;
 
-                            if ($oldPath !== $newPath) {
-                                Storage::delete($oldPath);
-                                $newMime = Storage::mimeType($newPath);
-                            }
+                    //         if ($oldPath !== $newPath) {
+                    //             Storage::delete($oldPath);
+                    //             $newMime = Storage::mimeType($newPath);
+                    //         }
 
-                            $record->update([
-                                'path' => $newPath,
-                                'mime' => $newMime,
-                            ]);
+                    //         $record->update([
+                    //             'path' => $newPath,
+                    //             'mime' => $newMime,
+                    //         ]);
 
-                            return $record;
-                        }),
+                    //         return $record;
+                    //     }),
                     DeleteAction::make()
                         ->using(function (Model $record) {
                             Storage::delete($record->path);

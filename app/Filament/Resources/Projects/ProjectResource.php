@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Projects;
 
 use App\Filament\RelationManagers\ActivitiesRelationManager;
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\ImagesRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
@@ -55,6 +56,7 @@ class ProjectResource extends Resource
             'parts' => PartsRelationManager::class,
             'people' => PeopleRelationManager::class,
             'activities' => ActivitiesRelationManager::class,
+            'documents' => DocumentsRelationManager::class,
             'images' => ImagesRelationManager::class
         ];
     }

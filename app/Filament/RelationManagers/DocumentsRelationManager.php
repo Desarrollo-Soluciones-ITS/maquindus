@@ -25,6 +25,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -44,6 +45,7 @@ class DocumentsRelationManager extends RelationManager
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
+                    ->placeholder('Manual de Operación de la Bomba P-5')
                     ->required(),
                 Select::make('type')
                     ->label('Tipo')
@@ -66,7 +68,11 @@ class DocumentsRelationManager extends RelationManager
                     ->getUploadedFileNameForStorageUsing(
                         function (TemporaryUploadedFile $file, Get $get) {
                             $extension = $file->getClientOriginalExtension();
-                            return str($get('name'))->append('.', $extension);
+                            $initialVersion = 1;
+                            $timestamp = now()->format('Ymd_His');
+
+                            return str("V{$initialVersion}_")
+                                ->append($timestamp, '_', $get('name'), '.', $extension);
                         }
                     )
                     ->required(),
@@ -156,14 +162,73 @@ class DocumentsRelationManager extends RelationManager
                             }
                         }),
                     ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    EditAction::make()
+                        ->using(function (Model $record, array $data): Model {
+                            $data = collect($data);
+                            $oldName = $record->name;
+                            $newName = $data['name'];
+                            $oldType = $record->type;
+                            $newType = $data['type'];
+
+                            if ($oldName !== $newName || $oldType !== $newType) {
+                                $documentable = $record->documentable;
+                                $parent = str($documentable::class)->explode('\\')->pop();
+                                $newFolder = collect([$parent, $documentable->name, $newType])->join('/');
+
+                                $record->files()->each(function ($file) use ($oldName, $newName, $newFolder) {
+                                    $oldPath = $file->path;
+                                    $oldFilename = basename($oldPath);
+
+                                    $newFilename = self::generateNewFilename($oldFilename, $oldName, $newName);
+                                    $newPath = $newFolder . '/' . $newFilename;
+
+                                    if (Storage::exists($oldPath)) {
+                                        Storage::move($oldPath, $newPath);
+                                        $file->update(['path' => $newPath]);
+                                    }
+                                });
+                            }
+
+                            $record->update($data->all());
+
+                            return $record;
+                        }),
+                    DeleteAction::make()
+                        ->using(function (Model $record) {
+                            $record->files()->each(function ($record) {
+                                Storage::delete($record->path);
+                                $record->delete();
+                            });
+
+                            $record->delete();
+                        }),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->using(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->files()->each(function ($record) {
+                                    Storage::delete($record->path);
+                                    $record->delete();
+                                });
+
+                                $record->delete();
+                            });
+                        }),
                 ]),
             ]);
+    }
+
+    private static function generateNewFilename(string $oldFilename, string $oldName, string $newName): string
+    {
+        $position = strpos($oldFilename, $oldName);
+
+        if ($position !== false) {
+            return substr_replace($oldFilename, $newName, $position, strlen($oldName));
+        }
+
+        return $oldFilename;
     }
 }

@@ -63,7 +63,8 @@ class ImagesRelationManager extends RelationManager
                             ->label('Imagen'),
                         TextEntry::make('mime')
                             ->label('Tipo de archivo')
-                            ->badge(),
+                            ->badge()
+                            ->formatStateUsing(fn(string $state): string => mime_type($state)),
                         TextEntry::make('created_at')
                             ->label('Subido el')
                             ->date('d/m/Y - g:i A')
@@ -109,7 +110,8 @@ class ImagesRelationManager extends RelationManager
                     ->label('Imagen'),
                 TextColumn::make('mime')
                     ->label('Tipo de archivo')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => mime_type($state)),
                 TextColumn::make('created_at')
                     ->label('Subido el')
                     ->date('d/m/Y - g:i A')

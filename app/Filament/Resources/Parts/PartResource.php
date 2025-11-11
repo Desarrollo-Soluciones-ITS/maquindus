@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Parts;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\ImagesRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
@@ -53,6 +54,7 @@ class PartResource extends Resource
             'equipment' => EquipmentRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
+            'documents' => DocumentsRelationManager::class,
             'images' => ImagesRelationManager::class
         ];
     }
