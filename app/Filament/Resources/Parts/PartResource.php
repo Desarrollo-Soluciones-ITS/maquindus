@@ -10,6 +10,7 @@ use App\Filament\RelationManagers\SuppliersRelationManager;
 use App\Filament\Resources\Parts\Pages\CreatePart;
 use App\Filament\Resources\Parts\Pages\EditPart;
 use App\Filament\Resources\Parts\Pages\ListParts;
+use App\Filament\Resources\Parts\Pages\PartGallery;
 use App\Filament\Resources\Parts\Pages\ViewPart;
 use App\Filament\Resources\Parts\Schemas\PartForm;
 use App\Filament\Resources\Parts\Schemas\PartInfolist;
@@ -66,6 +67,7 @@ class PartResource extends Resource
             'create' => CreatePart::route('/create'),
             'view' => ViewPart::route('/{record}'),
             'edit' => EditPart::route('/{record}/edit'),
+            'gallery' => PartGallery::route('/{record}/gallery'),
         ];
     }
 }

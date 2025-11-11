@@ -2,6 +2,9 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Resources\Equipment\EquipmentResource;
+use App\Filament\Resources\Parts\PartResource;
+use App\Filament\Resources\Projects\ProjectResource;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -125,6 +128,24 @@ class ImagesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                Action::make('viewGallery')
+                    ->label('Ver Galería')
+                    ->icon(Heroicon::Photo)
+                    ->url(function (): string {
+                        $ownerRecord = $this->getOwnerRecord();
+                        $modelClass = get_class($ownerRecord);
+
+                        $resourceClass = match ($modelClass) {
+                            \App\Models\Equipment::class => EquipmentResource::class,
+                            \App\Models\Part::class => PartResource::class,
+                            \App\Models\Project::class => ProjectResource::class,
+                            default => null,
+                        };
+
+                        return $resourceClass
+                            ? $resourceClass::getUrl('gallery', ['record' => $ownerRecord])
+                            : '#';
+                    }),
                 CreateAction::make()
                     ->label('Subir Imagen')
                     ->using(

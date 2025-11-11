@@ -11,6 +11,7 @@ use App\Filament\Resources\Equipment\Pages\ViewEquipment;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
 use App\Filament\RelationManagers\SuppliersRelationManager;
+use App\Filament\Resources\Equipment\Pages\EquipmentGallery;
 use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
 use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
@@ -66,6 +67,7 @@ class EquipmentResource extends Resource
             'create' => CreateEquipment::route('/create'),
             'view' => ViewEquipment::route('/{record}'),
             'edit' => EditEquipment::route('/{record}/edit'),
+            'gallery' => EquipmentGallery::route('/{record}/gallery'),
         ];
     }
 }
