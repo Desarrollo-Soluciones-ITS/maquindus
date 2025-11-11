@@ -32,3 +32,23 @@ if (! function_exists('mime_type')) {
     };
   }
 }
+
+if (! function_exists('model_to_folder')) {
+    function model_name_to_spanish_plural(string $model) {
+        return match ($model) {
+            'Activity' => 'Actividades',
+            'City' => 'Ciudades',
+            'Customer' => 'Clientes',
+            'Document' => 'Documentos',
+            'Equipment' => 'Equipos',
+            'File' => 'Archivos',
+            'Image' => 'Imágenes',
+            'Part' => 'Repuestos',
+            'Person' => 'Contactos',
+            'Project' => 'Proyectos',
+            'State' => 'Estados',
+            'Supplier' => 'Proveedor',
+            'User' => 'Usuarios',
+        };
+    }
+}

@@ -61,7 +61,8 @@ class DocumentsRelationManager extends RelationManager
                             $parent = str($documentable::class)
                                 ->explode('\\')
                                 ->pop();
-                            return collect([$parent, $documentable->name, $get('type')])
+                            $folder = model_name_to_spanish_plural($parent);
+                            return collect([$folder, $documentable->name, $get('type')])
                                 ->join('/');
                         }
                     )
@@ -69,10 +70,10 @@ class DocumentsRelationManager extends RelationManager
                         function (TemporaryUploadedFile $file, Get $get) {
                             $extension = $file->getClientOriginalExtension();
                             $initialVersion = 1;
-                            $timestamp = now()->format('Ymd_His');
+                            // $timestamp = now()->format('Ymd_His');
 
-                            return str("V{$initialVersion}_")
-                                ->append($timestamp, '_', $get('name'), '.', $extension);
+                            return str($get('name'))
+                                ->append(" - V{$initialVersion}", '.', $extension);
                         }
                     )
                     ->required(),

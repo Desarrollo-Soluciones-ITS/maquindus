@@ -45,7 +45,8 @@ class FilesRelationManager extends RelationManager
                         function (RelationManager $livewire) {
                             $document = $livewire->getOwnerRecord();
                             $parent = str($document->documentable::class)->explode('\\')->pop();
-                            return collect([$parent, $document->documentable->name, $document->type->value])
+                            $folder = model_name_to_spanish_plural($parent);
+                            return collect([$folder, $document->documentable->name, $document->type->value])
                                 ->join('/');
                         }
                     )
@@ -57,10 +58,10 @@ class FilesRelationManager extends RelationManager
 
                             $extension = $file->getClientOriginalExtension();
                             $baseName = str($document->name);
-                            $timestamp = now()->format('Ymd_His');
+                            // $timestamp = now()->format('Ymd_His');
 
-                            return str("V{$nextVersion}_")
-                                ->append($timestamp, '_', $baseName, '.', $extension);
+                            return str($baseName)
+                                ->append(" - V{$nextVersion}", '.', $extension);
                         }
                     )
                     ->required()
