@@ -53,8 +53,9 @@ class DocumentsTable
                     ->formatStateUsing(function (Model $record, $state) {
                         $fullClass = $record->documentable_type;
 
+                        // TODO -> centralizar junto con función helper model_name_to_spanish_name()
                         $spanishName = match ($fullClass) {
-                            Part::class      => 'Parte',
+                            Part::class      => 'Repuesto',
                             Equipment::class => 'Equipo',
                             Project::class   => 'Proyecto',
                             default          => 'Relacionado',

@@ -30,7 +30,7 @@ class PartResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $modelLabel = 'parte';
+    protected static ?string $modelLabel = 'repuesto';
 
     protected static ?int $navigationSort = 2;
 

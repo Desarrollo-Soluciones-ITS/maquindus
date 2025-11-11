@@ -24,9 +24,9 @@ class PartsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $title = 'Partes';
+    protected static ?string $title = 'Repuestos';
 
-    protected static ?string $modelLabel = 'parte';
+    protected static ?string $modelLabel = 'repuesto';
 
     public function form(Schema $schema): Schema
     {
