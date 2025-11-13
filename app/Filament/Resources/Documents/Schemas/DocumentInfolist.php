@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Documents\Schemas;
 
-use App\Enums\Category;
 use App\Enums\Type;
 use App\Models\Equipment;
 use App\Models\Part;
@@ -28,18 +27,6 @@ class DocumentInfolist
                         Type::Report => 'success',
                         Type::Specs => 'gray',
                     }),
-                TextEntry::make('category')
-                    ->label('Categoría')
-                    ->badge()
-                    ->color(fn($state): string => match ($state) {
-                        Category::Set => 'gray',
-                        Category::Detail => 'primary',
-                        Category::ToBuild => 'warning',
-                        Category::AsBuilt => 'success',
-                        Category::Operation => 'info',
-                        Category::Maintenance => 'danger',
-                    })
-                    ->placeholder('N/A'),
                 TextEntry::make('documentable.name')
                     ->label('Pertenece a')
                     ->formatStateUsing(function (Model $record, $state) {

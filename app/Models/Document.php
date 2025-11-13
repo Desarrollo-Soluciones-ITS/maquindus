@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Category;
 use App\Enums\Type;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -24,7 +23,6 @@ class Document extends Model
     {
         return [
             'type' => Type::class,
-            'category' => Category::class,
         ];
     }
 

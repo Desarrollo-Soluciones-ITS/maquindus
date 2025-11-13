@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Documents\Tables;
 
-use App\Enums\Category;
 use App\Enums\Type;
 use App\Models\Equipment;
 use App\Models\Part;
@@ -36,23 +35,10 @@ class DocumentsTable
                         Type::Report => 'success',
                         Type::Specs => 'gray',
                     }),
-                TextColumn::make('category')
-                    ->label('Categoría')
-                    ->badge()
-                    ->color(fn($state): string => match ($state) {
-                        Category::Set => 'gray',
-                        Category::Detail => 'primary',
-                        Category::ToBuild => 'warning',
-                        Category::AsBuilt => 'success',
-                        Category::Operation => 'info',
-                        Category::Maintenance => 'danger',
-                    })
-                    ->placeholder('N/A'),
                 TextColumn::make('documentable.name')
                     ->label('Pertenece a')
                     ->formatStateUsing(function (Model $record, $state) {
                         $fullClass = $record->documentable_type;
-
                         // TODO -> centralizar junto con función helper model_name_to_spanish_name()
                         $spanishName = match ($fullClass) {
                             Part::class      => 'Repuesto',

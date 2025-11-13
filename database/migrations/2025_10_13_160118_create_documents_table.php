@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Category;
 use App\Enums\Type;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,7 +15,6 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->enum('type', Type::cases());
-            $table->enum('category', Category::cases())->nullable();
             $table->uuidMorphs('documentable');
             $table->timestamps();
         });

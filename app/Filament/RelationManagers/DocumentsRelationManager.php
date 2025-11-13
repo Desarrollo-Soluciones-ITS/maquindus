@@ -2,8 +2,8 @@
 
 namespace App\Filament\RelationManagers;
 
-use App\Enums\Category;
 use App\Enums\Type;
+use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -15,7 +15,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
@@ -77,32 +76,12 @@ class DocumentsRelationManager extends RelationManager
                         }
                     )
                     ->required(),
-                Select::make('category')
-                    ->label('Categoría')
-                    ->placeholder('Ninguna')
-                    ->options(Category::options())
-                    ->default(null),
             ]);
     }
 
     public function infolist(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextEntry::make('name')
-                    ->label('Nombre'),
-                TextEntry::make('type')
-                    ->label('Tipo')
-                    ->badge(),
-                TextEntry::make('category')
-                    ->label('Categoría')
-                    ->badge()
-                    ->placeholder('N/A'),
-                TextEntry::make('current.created_at')
-                    ->label('Última versión')
-                    ->date('d/m/Y - g:i A')
-                    ->timezone('America/Caracas')
-            ]);
+        return DocumentInfolist::configure($schema);
     }
 
     public function table(Table $table): Table
@@ -115,10 +94,6 @@ class DocumentsRelationManager extends RelationManager
                 TextColumn::make('type')
                     ->label('Tipo')
                     ->badge(),
-                TextColumn::make('category')
-                    ->label('Categoría')
-                    ->badge()
-                    ->placeholder('N/A'),
                 TextColumn::make('current.created_at')
                     ->label('Última versión')
                     ->date('d/m/Y - g:i A')

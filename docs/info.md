@@ -18,7 +18,8 @@
 ## Preguntas y respuestas
 
 - Los contactos pueden pertenecer a un cliente, a un proveedor, a un proyecto. ¿Pueden ser también las personas de Maquindus? R: Sí, el personal de Maquindus son contactos
-- Historial de procura: ¿que exactamente se debe guardar para formar dicho historial? ¿Seguimiento de pedidos de equipos/repuestos? ¿Orientado a proyectos? ¿O visto desde el punto de vista de equipos/repuestos?
+- Historial de procura: ¿que exactamente se debe guardar para formar dicho historial? ¿Seguimiento de pedidos de equipos/repuestos? ¿Orientado a proyectos? ¿O visto desde el punto de vista de equipos/repuestos? R: Por ahora ignorar, más adelante
+
 
 ## Ideas
 

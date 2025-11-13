@@ -9,7 +9,7 @@ enum Type: string
     case Blueprint = 'Planos';
     case Manual = 'Manuales';
     case Report = 'Reportes';
-    case Specs = 'Especificaciones Técnicas';
+    case Specs = 'Fichas Técnicas';
 
     public function color(): string
     {
