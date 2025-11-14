@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Type;
+use App\Filament\Actions\OpenFolderAction;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -19,6 +20,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -123,10 +125,15 @@ class DocumentsRelationManager extends RelationManager
                     ),
             ])
             ->recordActions([
+                OpenFolderAction::make(),
                 ActionGroup::make([
+                    ViewAction::make()
+                        ->label('Versiones')
+                        ->icon(Heroicon::ListBullet),
                     Action::make('download')
                         ->label('Descargar')
                         ->icon(Heroicon::ArrowDown)
+                        ->color(Color::Blue)
                         ->action(function ($record) {
                             try {
                                 return Storage::download($record->current->path);
@@ -137,8 +144,8 @@ class DocumentsRelationManager extends RelationManager
                                     ->send();
                             }
                         }),
-                    ViewAction::make(),
                     EditAction::make()
+                        ->color(Color::Amber)
                         ->using(function (Model $record, array $data): Model {
                             $data = collect($data);
                             $oldName = $record->name;

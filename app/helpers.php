@@ -52,3 +52,10 @@ if (! function_exists('model_to_folder')) {
         };
     }
 }
+
+if (! function_exists('is_local')) {
+    function is_localhost_request() {
+        return collect(['127.0.0.1', '::1'])
+            ->doesntContain(request()->ip());
+    }
+}
