@@ -13,6 +13,11 @@ class Supplier extends Model
 {
     use HasFactory, HasUuids;
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);

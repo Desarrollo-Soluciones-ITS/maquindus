@@ -18,8 +18,9 @@ return new class extends Migration {
             $table->string('phone')->unique();
             $table->string('about')->nullable();
             $table->string('address');
-            $table->foreignUuid('state_id')->constrained();
-            $table->foreignUuid('city_id')->constrained();
+            $table->foreignUuid('country_id')->constrained();
+            $table->foreignUuid('state_id')->nullable()->constrained();
+            $table->foreignUuid('city_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

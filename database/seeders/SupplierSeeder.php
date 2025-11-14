@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Supplier;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\Equipment;
 use App\Models\Part;
 
@@ -13,6 +14,8 @@ class SupplierSeeder extends Seeder
 {
     public function run(): void
     {
+        $venezuela = Country::where('name', 'Venezuela')->first();
+
         $aragua = State::where('name', 'Aragua')->first();
         $maracay = City::where('name', 'Maracay')->first();
 
@@ -24,6 +27,7 @@ class SupplierSeeder extends Seeder
                 'phone' => '02441234567',
                 'about' => 'Proveedor de repuestos y equipos',
                 'address' => 'Parque Industrial',
+                'country_id' => $venezuela->id,
                 'state_id' => $aragua->id,
                 'city_id' => $maracay->id,
             ],
