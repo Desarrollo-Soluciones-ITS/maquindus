@@ -3,31 +3,26 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Type;
-use App\Filament\Actions\OpenFolderAction;
+use App\Filament\Actions\Documents\CreateDocumentAction;
+use App\Filament\Actions\Documents\DeleteDocumentAction;
+use App\Filament\Actions\Documents\DeleteDocumentsBulkAction;
+use App\Filament\Actions\Documents\OpenFolderAction;
+use App\Filament\Actions\Documents\DownloadAction;
+use App\Filament\Actions\Documents\EditDocumentAction;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class DocumentsRelationManager extends RelationManager
@@ -71,7 +66,6 @@ class DocumentsRelationManager extends RelationManager
                         function (TemporaryUploadedFile $file, Get $get) {
                             $extension = $file->getClientOriginalExtension();
                             $initialVersion = 1;
-                            // $timestamp = now()->format('Ymd_His');
 
                             return str($get('name'))
                                 ->append(" - V{$initialVersion}", '.', $extension);
@@ -105,113 +99,27 @@ class DocumentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->using(
-                        function (array $data, RelationManager $livewire): Model {
-                            $data = collect($data);
-                            $path = $data->get('path');
-                            $mime = Storage::mimeType($path);
-
-                            $document = $livewire->getOwnerRecord()
-                                ->documents()
-                                ->create($data->except('path')->all());
-
-                            return $document->files()->create([
-                                'path' => $path,
-                                'mime' => $mime,
-                                'version' => 1,
-                            ]);
-                        }
-                    ),
+                CreateDocumentAction::make(),
             ])
             ->recordActions([
-                OpenFolderAction::make(),
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->label('Versiones')
-                        ->icon(Heroicon::ListBullet),
-                    Action::make('download')
-                        ->label('Descargar')
-                        ->icon(Heroicon::ArrowDown)
-                        ->color(Color::Blue)
-                        ->action(function ($record) {
-                            try {
-                                return Storage::download($record->current->path);
-                            } catch (\Throwable $th) {
-                                Notification::make()
-                                    ->title('No se encontró el documento.')
-                                    ->danger()
-                                    ->send();
-                            }
-                        }),
-                    EditAction::make()
-                        ->color(Color::Amber)
-                        ->using(function (Model $record, array $data): Model {
-                            $data = collect($data);
-                            $oldName = $record->name;
-                            $newName = $data['name'];
-                            $oldType = $record->type;
-                            $newType = $data['type'];
-
-                            if ($oldName !== $newName || $oldType !== $newType) {
-                                $documentable = $record->documentable;
-                                $parent = str($documentable::class)->explode('\\')->pop();
-                                $newFolder = collect([$parent, $documentable->name, $newType])->join('/');
-
-                                $record->files()->each(function ($file) use ($oldName, $newName, $newFolder) {
-                                    $oldPath = $file->path;
-                                    $oldFilename = basename($oldPath);
-
-                                    $newFilename = self::generateNewFilename($oldFilename, $oldName, $newName);
-                                    $newPath = $newFolder . '/' . $newFilename;
-
-                                    if (Storage::exists($oldPath)) {
-                                        Storage::move($oldPath, $newPath);
-                                        $file->update(['path' => $newPath]);
-                                    }
-                                });
-                            }
-
-                            $record->update($data->all());
-
-                            return $record;
-                        }),
-                    DeleteAction::make()
-                        ->using(function (Model $record) {
-                            $record->files()->each(function ($record) {
-                                Storage::delete($record->path);
-                                $record->delete();
-                            });
-
-                            $record->delete();
-                        }),
+                    ActionGroup::make([
+                        OpenFolderAction::make(),
+                        DownloadAction::make(),
+                    ])->dropdown(false),
+                    ActionGroup::make([
+                        ViewAction::make()
+                            ->label('Versiones')
+                            ->icon(Heroicon::ListBullet),
+                        EditDocumentAction::make(),
+                        DeleteDocumentAction::make(),
+                    ])->dropdown(false),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->using(function (Collection $records) {
-                            $records->each(function ($record) {
-                                $record->files()->each(function ($record) {
-                                    Storage::delete($record->path);
-                                    $record->delete();
-                                });
-
-                                $record->delete();
-                            });
-                        }),
+                    DeleteDocumentsBulkAction::make(),
                 ]),
             ]);
-    }
-
-    private static function generateNewFilename(string $oldFilename, string $oldName, string $newName): string
-    {
-        $position = strpos($oldFilename, $oldName);
-
-        if ($position !== false) {
-            return substr_replace($oldFilename, $newName, $position, strlen($oldName));
-        }
-
-        return $oldFilename;
     }
 }

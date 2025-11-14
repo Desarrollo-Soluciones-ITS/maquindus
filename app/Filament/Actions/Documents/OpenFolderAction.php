@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Filament\Actions;
+namespace App\Filament\Actions\Documents;
 
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,7 +14,6 @@ class OpenFolderAction
         return Action::make('folder')
             ->label('Abrir carpeta')
             ->icon(Heroicon::FolderOpen)
-            ->color(Color::Gray)
             ->hidden(is_localhost_request())
             ->action(function ($record) {
                 $segments = str($record->current->path)

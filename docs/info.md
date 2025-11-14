@@ -12,8 +12,6 @@
 
 - Se debe tener un historial de versiones de los documentos (planos, manuales, etc).
 - Estándar de carpetas y nombres con código para archivos (ej. MAN-Nombre = Manual).
-- Categorías de manuales: de operacion, de mantenimiento.
-- Categorías de planos: conjunto, detalle, para construir, ya construido.
 
 ## Preguntas y respuestas
 
@@ -23,5 +21,10 @@
 
 ## Ideas
 
-- Part y Equipment son basicamente iguales, la unica diferencia es a nivel conceptual, pero los campos y relaciones son exactamente los mismos
 - Para que no se pierda el trabajo hecho hasta ahora en la organización de los documentos, se plantea hacer un script que lea el estado de los directorios y cargue automáticamente estos archivos a la DB, sin embargo esto podría ser complicado, así que queda como una posible idea
+- Migración masiva de archivos con tareas bloqueantes (caso de archivar, renombrar o restaurar algún documentable con muchos archivos anidados)
+  - Mover por detrás en un queue
+  - Simplementar mostrar un indicador de que se está haciendo
+  - Mientras se hace, bloquear un nueva modificación del mismo elemento
+  - Cuando terminé, notificar al usuario y desbloquear
+- Al crear Document se debe verificar no duplicidad del nombre dentro de la carpeta que lo contiene, igualmente al momento de editar o restaurar (existe un nuevo archivo con el nombre del archivo que se quiere "Restaurar" o "Editar").
