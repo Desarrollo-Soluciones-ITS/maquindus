@@ -9,8 +9,10 @@ if (! function_exists('mime_type')) {
   {
     return match ($mime) {
       'application/pdf' => 'PDF',
-      'image/jpeg', 'image/jpg' => 'JPEG',
-      'image/png' => 'PNG',
+      'image/jpeg'=> 'Imagen',
+      'image/jpg' => 'Imagen',
+      'image/png' => 'Imagen',
+      'image/webp' => 'Imagen',
       'image/gif' => 'GIF',
       'application/msword' => 'Word',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'Word',
@@ -42,7 +44,6 @@ if (! function_exists('model_to_folder')) {
             'Document' => 'Documentos',
             'Equipment' => 'Equipos',
             'File' => 'Archivos',
-            'Image' => 'Imágenes',
             'Part' => 'Repuestos',
             'Person' => 'Contactos',
             'Project' => 'Proyectos',

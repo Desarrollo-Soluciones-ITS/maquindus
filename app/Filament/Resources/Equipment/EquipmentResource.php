@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Equipment;
 
 use App\Filament\RelationManagers\DocumentsRelationManager;
-use App\Filament\RelationManagers\ImagesRelationManager;
+// use App\Filament\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
@@ -56,7 +56,7 @@ class EquipmentResource extends Resource
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
             'documents' => DocumentsRelationManager::class,
-            'images' => ImagesRelationManager::class
+            // 'images' => ImagesRelationManager::class
         ];
     }
 

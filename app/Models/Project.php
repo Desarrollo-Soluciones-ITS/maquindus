@@ -58,9 +58,4 @@ class Project extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
-
-    public function images(): MorphMany
-    {
-        return $this->morphMany(Image::class, 'imageable');
-    }
 }

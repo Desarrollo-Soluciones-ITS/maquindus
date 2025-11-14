@@ -35,7 +35,6 @@ class DatabaseSeeder extends Seeder
             PersonSeeder::class,
             DocumentSeeder::class,
             FileSeeder::class,
-            ImageSeeder::class,
         ]);
     }
 }
