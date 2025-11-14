@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Customers\Pages;
 
 use App\Filament\Resources\Customers\CustomerResource;
+use App\Models\Country;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -17,5 +18,15 @@ class EditCustomer extends EditRecord
             ViewAction::make(),
             DeleteAction::make(),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if ($data['country_id'] !== Country::venezuela()->id) {
+            $data['state_id'] = null;
+            $data['city_id'] = null;
+        }
+        
+        return $data;
     }
 }

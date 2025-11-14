@@ -19,10 +19,14 @@ class SupplierInfolist
                     ->label('Correo electrónico'),
                 TextEntry::make('phone')
                     ->label('Teléfono'),
+                TextEntry::make('country.name')
+                    ->label('País'),
                 TextEntry::make('state.name')
-                    ->label('Estado'),
+                    ->label('Estado')
+                    ->placeholder('N/A'),
                 TextEntry::make('city.name')
-                    ->label('Ciudad'),
+                    ->label('Ciudad')
+                    ->placeholder('N/A'),
                 TextEntry::make('address')
                     ->label('Dirección'),
                 TextEntry::make('about')
