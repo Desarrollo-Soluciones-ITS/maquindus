@@ -14,7 +14,7 @@ class SupplierSeeder extends Seeder
 {
     public function run(): void
     {
-        $venezuela = Country::where('name', 'Venezuela')->first();
+        $venezuela = Country::venezuela();
 
         $aragua = State::where('name', 'Aragua')->first();
         $maracay = City::where('name', 'Maracay')->first();

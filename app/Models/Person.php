@@ -19,6 +19,11 @@ class Person extends Model
         return $this->morphTo();
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);

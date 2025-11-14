@@ -19,8 +19,9 @@ return new class extends Migration {
             $table->string('address');
             $table->string('position')->nullable();
             $table->nullableUuidMorphs('personable');
-            $table->foreignUuid('state_id')->constrained();
-            $table->foreignUuid('city_id')->constrained();
+            $table->foreignUuid('country_id')->constrained();
+            $table->foreignUuid('state_id')->nullable()->constrained();
+            $table->foreignUuid('city_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

@@ -23,10 +23,14 @@ class PersonInfolist
                 TextEntry::make('position')
                     ->label('Cargo')
                     ->placeholder('N/A'),
+                TextEntry::make('country.name')
+                    ->label('País'),
                 TextEntry::make('state.name')
-                    ->label('Estado'),
+                    ->label('Estado')
+                    ->placeholder('N/A'),
                 TextEntry::make('city.name')
-                    ->label('Ciudad'),
+                    ->label('Ciudad')
+                    ->placeholder('N/A'),
                 TextEntry::make('address')
                     ->label('Dirección'),
             ]);

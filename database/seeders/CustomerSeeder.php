@@ -12,7 +12,7 @@ class CustomerSeeder extends Seeder
 {
     public function run(): void
     {
-        $venezuela = Country::where('name', 'Venezuela')->first();
+        $venezuela = Country::venezuela();
 
         $caracas = State::where('name', 'Caracas')->first();
         $miranda = State::where('name', 'Miranda')->first();
