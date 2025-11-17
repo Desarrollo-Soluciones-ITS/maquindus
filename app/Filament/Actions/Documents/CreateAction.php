@@ -3,16 +3,16 @@
 namespace App\Filament\Actions\Documents;
 
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
+use Filament\Actions\CreateAction as FilamentCreateAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class CreateDocumentAction
+class CreateAction
 {
     public static function make(): Action
     {
-        return CreateAction::make()
+        return FilamentCreateAction::make()
             ->using(
                 function (array $data, RelationManager $livewire): Model {
                     $data = collect($data);

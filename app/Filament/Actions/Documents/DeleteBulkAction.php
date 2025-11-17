@@ -3,15 +3,15 @@
 namespace App\Filament\Actions\Documents;
 
 use Filament\Actions\Action;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteBulkAction as FilamentDeleteBulkAction;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-class DeleteDocumentsBulkAction
+class DeleteBulkAction
 {
     public static function make(): Action
     {
-        return DeleteBulkAction::make()
+        return FilamentDeleteBulkAction::make()
             ->using(function (Collection $records) {
                 $records->each(function ($record) {
                     $record->files()->each(function ($record) {

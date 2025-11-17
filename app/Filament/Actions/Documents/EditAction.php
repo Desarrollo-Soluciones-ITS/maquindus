@@ -3,17 +3,16 @@
 namespace App\Filament\Actions\Documents;
 
 use Filament\Actions\Action;
-use Filament\Actions\EditAction;
+use Filament\Actions\EditAction as FilamentEditAction;
 use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class EditDocumentAction
+class EditAction
 {
     public static function make(): Action
     {
-        return EditAction::make()
-            ->color(Color::Amber)
+        return FilamentEditAction::make()
             ->using(function (Model $record, array $data): Model {
                 $data = collect($data);
                 $oldName = $record->name;

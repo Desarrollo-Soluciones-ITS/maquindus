@@ -5,18 +5,17 @@ namespace App\Filament\Actions\Documents;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Storage;
 
-class DownloadAction
+class PreviewAction
 {
     public static function make(): Action
     {
-        return Action::make('download')
-            ->label('Descargar')
-            ->icon(Heroicon::ArrowDownTray)
+        return Action::make('preview')
+            ->label('Previsualizar')
+            ->icon(Heroicon::OutlinedEye)
             ->action(function ($record) {
                 try {
-                    return Storage::download($record->current->path);
+                    dd('Previewing');
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')

@@ -3,25 +3,26 @@
 namespace App\Filament\Resources\Documents\Tables;
 
 use App\Enums\Type;
+use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\Documents\DownloadAction;
+use App\Filament\Actions\Documents\EditAction;
+use App\Filament\Actions\Documents\OpenFolderAction;
+use App\Filament\Actions\Documents\PreviewAction;
+use App\Filament\Actions\Documents\ViewAction;
 use App\Models\Equipment;
 use App\Models\Part;
 use App\Models\Project;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Notifications\Notification;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class DocumentsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->recordAction('preview')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
@@ -59,28 +60,14 @@ class DocumentsTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('download')
-                        ->label('Descargar')
-                        ->icon(Heroicon::ArrowDown)
-                        ->action(function (Model $record) {
-                            try {
-                                return Storage::download($record->current->path);
-                            } catch (\Throwable $th) {
-                                Notification::make()
-                                    ->title('No se encontró el documento.')
-                                    ->danger()
-                                    ->send();
-                            }
-                        }),
-                    ViewAction::make(),
-                    DeleteAction::make()->using(function (Model $record) {
-                        $record->files()->each(function ($record) {
-                            Storage::delete($record->path);
-                            $record->delete();
-                        });
-
-                        $record->delete();
-                    }),
+                    ActionGroup::make([
+                        ViewAction::make(),
+                        OpenFolderAction::make(),
+                        DownloadAction::make(),
+                        PreviewAction::make(),
+                    ])->dropdown(false),
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ])
             ]);
     }

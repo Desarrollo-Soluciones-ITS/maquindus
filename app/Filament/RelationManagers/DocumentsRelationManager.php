@@ -3,16 +3,17 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Type;
-use App\Filament\Actions\Documents\CreateDocumentAction;
-use App\Filament\Actions\Documents\DeleteDocumentAction;
-use App\Filament\Actions\Documents\DeleteDocumentsBulkAction;
+use App\Filament\Actions\Documents\CreateAction;
+use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\Documents\DeleteBulkAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\DownloadAction;
-use App\Filament\Actions\Documents\EditDocumentAction;
+use App\Filament\Actions\Documents\EditAction;
+use App\Filament\Actions\Documents\PreviewAction;
+use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +21,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -84,6 +84,7 @@ class DocumentsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('name')
+            ->recordAction('preview')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre'),
@@ -99,26 +100,23 @@ class DocumentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateDocumentAction::make(),
+                CreateAction::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
+                        ViewAction::make(),
                         OpenFolderAction::make(),
                         DownloadAction::make(),
+                        PreviewAction::make(),
                     ])->dropdown(false),
-                    ActionGroup::make([
-                        ViewAction::make()
-                            ->label('Versiones')
-                            ->icon(Heroicon::ListBullet),
-                        EditDocumentAction::make(),
-                        DeleteDocumentAction::make(),
-                    ])->dropdown(false),
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteDocumentsBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
