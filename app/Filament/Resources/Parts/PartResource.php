@@ -52,10 +52,10 @@ class PartResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'documents' => DocumentsRelationManager::class,
             'equipment' => EquipmentRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
-            'documents' => DocumentsRelationManager::class,
             // 'images' => ImagesRelationManager::class
         ];
     }

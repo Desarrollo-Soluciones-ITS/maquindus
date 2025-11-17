@@ -53,11 +53,11 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'documents' => DocumentsRelationManager::class,
             'equipment' => EquipmentRelationManager::class,
             'parts' => PartsRelationManager::class,
             'people' => PeopleRelationManager::class,
             'activities' => ActivitiesRelationManager::class,
-            'documents' => DocumentsRelationManager::class,
             // 'images' => ImagesRelationManager::class
         ];
     }

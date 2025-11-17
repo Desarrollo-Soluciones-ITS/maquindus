@@ -52,10 +52,10 @@ class EquipmentResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'documents' => DocumentsRelationManager::class,
             'parts' => PartsRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
-            'documents' => DocumentsRelationManager::class,
             // 'images' => ImagesRelationManager::class
         ];
     }
