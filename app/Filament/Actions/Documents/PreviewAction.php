@@ -13,6 +13,7 @@ class PreviewAction
         return Action::make('preview')
             ->label('Abrir archivo')
             ->icon(Heroicon::OutlinedEye)
+            ->hidden(is_not_localhost())
             ->action(function ($record) {
                 try {
                     $mime = mime_type($record->current->mime);

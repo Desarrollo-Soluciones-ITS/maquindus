@@ -85,7 +85,7 @@ class DocumentsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->recordUrl(null)
-            ->recordAction('preview')
+            ->recordAction(is_not_localhost() ? 'download' : 'preview')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre'),

@@ -22,7 +22,8 @@ class DocumentsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->recordAction('preview')
+            ->recordUrl(null)
+            ->recordAction(is_not_localhost() ? 'download' : 'preview')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
