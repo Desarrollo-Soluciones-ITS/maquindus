@@ -11,11 +11,23 @@ class PreviewAction
     public static function make(): Action
     {
         return Action::make('preview')
-            ->label('Previsualizar')
+            ->label('Abrir archivo')
             ->icon(Heroicon::OutlinedEye)
             ->action(function ($record) {
                 try {
-                    dd('Previewing');
+                    $mime = mime_type($record->current->mime);
+                    $path = path($record->current->path);
+                    
+                    $app = match ($mime) {
+                        'Excel' => 'excel',
+                        'Word' => 'winword',
+                        'PowerPoint' => 'powerpnt',
+                        default => "\"\"",
+                    };
+
+                    $command = "start $app \"$path\"";
+
+                    exec($command);
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')

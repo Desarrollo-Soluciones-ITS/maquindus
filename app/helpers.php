@@ -21,6 +21,8 @@ if (! function_exists('mime_type')) {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'Word',
       'application/vnd.ms-excel' => 'Excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'Excel',
+      'application/vnd.ms-powerpoint' => 'PowerPoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'PowerPoint',
       'application/zip' => 'ZIP',
       'text/plain' => 'Texto',
       'text/csv' => 'CSV',

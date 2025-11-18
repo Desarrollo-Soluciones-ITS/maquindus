@@ -28,18 +28,18 @@ class FilesRelationManager extends RelationManager
 {
     protected static string $relationship = 'files';
 
-    protected static ?string $recordTitleAttribute = 'version';
+    protected static ?string $recordTitleAttribute = 'versión';
 
     protected static ?string $title = 'Versiones';
 
-    protected static ?string $modelLabel = 'archivo';
+    protected static ?string $modelLabel = 'versión';
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 FileUpload::make('path')
-                    ->label('Nueva Versión')
+                    ->label('Nueva versión')
                     ->disk('local')
                     ->directory(
                         function (RelationManager $livewire) {
@@ -123,7 +123,10 @@ class FilesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Subir Nueva Versión')
+                    ->label('Añadir versión')
+                    ->modalHeading('Añadir versión')
+                    ->modalSubmitActionLabel('Añadir')
+                    ->createAnother(false)
                     ->using(function (array $data, RelationManager $livewire): Model {
                         $document = $livewire->getOwnerRecord();
                         $latestVersion = $document->files()->max('version') ?? 0;

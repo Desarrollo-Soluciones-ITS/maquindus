@@ -61,10 +61,10 @@ class DocumentsTable
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        ViewAction::make(),
+                        PreviewAction::make(),
                         OpenFolderAction::make(),
                         DownloadAction::make(),
-                        PreviewAction::make(),
+                        ViewAction::make(),
                     ])->dropdown(false),
                     EditAction::make(),
                     DeleteAction::make(),

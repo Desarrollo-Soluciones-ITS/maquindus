@@ -21,6 +21,10 @@ class RoleResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
 
     protected static ?string $recordTitleAttribute = 'name';
+    
+    protected static ?string $modelLabel = 'rol';
+
+    protected static ?string $pluralModelLabel = 'roles';
 
     protected static ?int $navigationSort = 9;
 

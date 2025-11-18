@@ -11,13 +11,13 @@ class OpenFolderAction
     public static function make(): Action
     {
         return Action::make('folder')
-            ->label('Abrir carpeta')
+            ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
             ->hidden(is_localhost_request())
             ->action(function ($record) {
                 try {
-                    $path = path($record->current->path, asFolder: true);
-                    exec("explorer \"$path\"");
+                    $path = path($record->current->path);
+                    exec("explorer /select,\"$path\"");
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')
