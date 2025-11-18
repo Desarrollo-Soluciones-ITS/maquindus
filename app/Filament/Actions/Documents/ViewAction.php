@@ -13,12 +13,12 @@ class ViewAction
     {
         return FilamentViewAction::make('view')
             ->label('Versiones')
+            ->icon(Heroicon::ListBullet)
             ->url(function ($record) {
                 return DocumentResource::getUrl('view', [
                     'record' => $record->id
                 ]);
-            })
-            ->icon(Heroicon::ListBullet);
+            });
     }
 }
 

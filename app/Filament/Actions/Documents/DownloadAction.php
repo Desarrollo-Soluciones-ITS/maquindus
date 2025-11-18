@@ -16,7 +16,8 @@ class DownloadAction
             ->icon(Heroicon::ArrowDownTray)
             ->action(function ($record) {
                 try {
-                    return Storage::download($record->current->path);
+                    $file = $record->current ?? $record;
+                    return Storage::download($file->path);
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')

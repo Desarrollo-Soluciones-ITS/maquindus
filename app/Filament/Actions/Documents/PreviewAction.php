@@ -15,9 +15,10 @@ class PreviewAction
             ->icon(Heroicon::OutlinedEye)
             ->hidden(is_not_localhost())
             ->action(function ($record) {
+                $file = $record->current ?? $record;
                 try {
-                    $mime = mime_type($record->current->mime);
-                    $path = path($record->current->path);
+                    $mime = mime_type($file->mime);
+                    $path = path($file->path);
                     
                     $app = match ($mime) {
                         'Excel' => 'excel',

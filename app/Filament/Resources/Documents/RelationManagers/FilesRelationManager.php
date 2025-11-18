@@ -2,25 +2,22 @@
 
 namespace App\Filament\Resources\Documents\RelationManagers;
 
-use Filament\Actions\Action;
+use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\Documents\DeleteBulkAction;
+use App\Filament\Actions\Documents\DownloadAction;
+use App\Filament\Actions\Documents\OpenFolderAction;
+use App\Filament\Actions\Documents\PreviewAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -110,13 +107,10 @@ class FilesRelationManager extends RelationManager
                     ->badge()
                     ->formatStateUsing(fn(string $state): string => mime_type($state)),
                 TextColumn::make('created_at')
-                    ->label('Subido el')
-                    ->date('d/m/Y - g:i A')
-                    ->timezone('America/Caracas'),
-                TextColumn::make('updated_at')
-                    ->label('Última actualización')
+                    ->label('Fecha de creación')
                     ->date('d/m/Y - g:i A')
                     ->timezone('America/Caracas')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -142,54 +136,17 @@ class FilesRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('download')
-                        ->label('Descargar')
-                        ->icon(Heroicon::ArrowDown)
-                        ->action(function (Model $record) {
-                            try {
-                                return Storage::download($record->path);
-                            } catch (\Throwable $th) {
-                                Notification::make()
-                                    ->title('No se encontró la versión.')
-                                    ->danger()
-                                    ->send();
-                            }
-                        }),
-                    ViewAction::make(),
-                    // EditAction::make()
-                    //     ->using(function (Model $record, array $data): Model {
-                    //         $oldPath = $record->path;
-                    //         $newPath = $data['path'];
-                    //         $newMime = $record->mime;
-
-                    //         if ($oldPath !== $newPath) {
-                    //             Storage::delete($oldPath);
-                    //             $newMime = Storage::mimeType($newPath);
-                    //         }
-
-                    //         $record->update([
-                    //             'path' => $newPath,
-                    //             'mime' => $newMime,
-                    //         ]);
-
-                    //         return $record;
-                    //     }),
-                    DeleteAction::make()
-                        ->using(function (Model $record) {
-                            Storage::delete($record->path);
-                            $record->delete();
-                        }),
-                ])
+                    ActionGroup::make([
+                        PreviewAction::make(),
+                        OpenFolderAction::make(),
+                        DownloadAction::make(),
+                    ])->dropdown(false),
+                    DeleteAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->using(function (Collection $records) {
-                            $records->each(function ($record) {
-                                Storage::delete($record->path);
-                                $record->delete();
-                            });
-                        })
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

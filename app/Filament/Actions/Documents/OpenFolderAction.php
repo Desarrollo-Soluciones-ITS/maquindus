@@ -15,8 +15,9 @@ class OpenFolderAction
             ->icon(Heroicon::FolderOpen)
             ->hidden(is_not_localhost())
             ->action(function ($record) {
+                $file = $record->current ?? $record;
                 try {
-                    $path = path($record->current->path);
+                    $path = path($file->path);
                     exec("explorer /select,\"$path\"");
                 } catch (\Throwable $th) {
                     Notification::make()

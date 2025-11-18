@@ -147,7 +147,7 @@ class ImagesRelationManager extends RelationManager
                             : '#';
                     }),
                 CreateAction::make()
-                    ->label('Subir Imagen')
+                    ->label('Añadir imagen')
                     ->using(
                         function (array $data, RelationManager $livewire): Model {
                             $data = collect($data);
