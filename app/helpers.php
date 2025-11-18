@@ -4,6 +4,9 @@
  * @param string $mime El tipo MIME completo del archivo (ej: 'image/png').
  * @return string Una etiqueta de texto amigable (ej: 'PNG', 'Word', 'Archivo').
  */
+
+use Illuminate\Support\Facades\Storage;
+
 if (! function_exists('mime_type')) {
   function mime_type(string $mime): string
   {
@@ -60,3 +63,29 @@ if (! function_exists('is_local')) {
             ->doesntContain(request()->ip());
     }
 }
+
+if (! function_exists('path')) {
+    function path(string $path, $asFolder = false) {
+        $segments = str($path)
+            ->explode('/');
+
+        if ($asFolder) {
+            $segments->pop();
+        }
+
+        $folder = $segments->join('\\');
+
+        if ($asFolder && Storage::directoryMissing($folder)) {
+            throw new Error('path() helper error: directory is missing');
+        }
+        
+        if (!$asFolder && Storage::fileMissing($folder)) {
+            throw new Error('path() helper error: file is missing');
+        }
+
+        return str(Storage::path($folder))
+            ->replace('/', DIRECTORY_SEPARATOR)
+            ->replace('\\',DIRECTORY_SEPARATOR);
+    }
+}
+
