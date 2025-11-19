@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\Roles;
 
-use App\Filament\Resources\Roles\Pages\CreateRole;
-use App\Filament\Resources\Roles\Pages\EditRole;
 use App\Filament\Resources\Roles\Pages\ListRoles;
 use App\Filament\Resources\Roles\Schemas\RoleForm;
 use App\Filament\Resources\Roles\Tables\RolesTable;
 use App\Models\Role;
+use Auth;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,7 +20,7 @@ class RoleResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
 
     protected static ?string $recordTitleAttribute = 'name';
-    
+
     protected static ?string $modelLabel = 'rol';
 
     protected static ?string $pluralModelLabel = 'roles';
@@ -49,8 +48,11 @@ class RoleResource extends Resource
     {
         return [
             'index' => ListRoles::route('/'),
-            // 'create' => CreateRole::route('/create'),
-            // 'edit' => EditRole::route('/{record}/edit'),
         ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return Auth::user()->email === 'admin@example.com';
     }
 }

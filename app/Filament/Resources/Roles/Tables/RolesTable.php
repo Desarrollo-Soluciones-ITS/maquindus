@@ -19,7 +19,8 @@ class RolesTable
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->searchable(),
                 TextColumn::make('users_count')
                     ->label('Usuarios')
                     ->counts(relationships: 'users')
@@ -36,63 +37,71 @@ class RolesTable
                     ->hidden(fn(Role $record) => $record->name === 'Administrador'),
                 Action::make('Asignar')
                     ->icon(Heroicon::Tag)
-                    ->form(function ($form, Role $record) {
-                        return $form->schema([
-                            Select::make('users')
-                                ->label('Usuarios')
-                                ->placeholder('Selecciona los usuarios para añadir este rol')
-                                ->options(
-                                    User::query()
-                                        ->where('email', '!=', 'admin@example.com')
-                                        ->where(function ($query) use ($record) {
-                                            $query->whereNull('role_id')
-                                                ->orWhere('role_id', '!=', $record->id);
-                                        })
-                                        ->select(['id', 'name'])
-                                        ->get()
-                                        ->pluck('name', 'id')
-                                )
-                                ->multiple()
-                                ->searchable()
-                                ->preload()
-                                ->rules([
-                                    'required',
-                                    'array',
-                                    'min:1'
-                                ])
-                                ->getSearchResultsUsing(function (string $search, Role $record) {
-                                    return User::query()
-                                        ->where('email', '!=', 'admin@example.com')
-                                        ->where(function ($query) use ($record) {
-                                            $query->whereNull('role_id')
-                                                ->orWhere('role_id', '!=', $record->id);
-                                        })
-                                        ->where('name', 'like', "%{$search}%")
-                                        ->select(['id', 'name'])
-                                        ->limit(50)
-                                        ->get()
-                                        ->pluck('name', 'id');
-                                })
-                        ]);
-                    })
+                    ->fillForm(fn(Role $record): array => [
+                        'users' => $record->users()
+                            ->where('email', '!=', 'admin@example.com')
+                            ->pluck('id')
+                            ->toArray(),
+                    ])
+                    ->form([
+                        Select::make('users')
+                            ->label('Usuarios')
+                            ->multiple()
+                            ->searchable(['name', 'email'])
+                            ->required()
+                            ->placeholder('Seleccionar usuarios')
+                            ->loadingMessage('Cargando usuarios...')
+                            ->noSearchResultsMessage('No se encontraron usuarios con este nombre.')
+                            ->searchPrompt('Busque uno o varios usuarios por su nombre...')
+                            ->searchingMessage('Buscando usuarios...')
+                            ->getSearchResultsUsing(function (string $search, Role $record) {
+                                return User::query()
+                                    ->where('email', '!=', 'admin@example.com')
+                                    ->where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                                    ->limit(50)
+                                    ->pluck('name', 'id');
+                            })
+                            ->getOptionLabelsUsing(function (array $values, Role $record): array {
+                                return User::query()
+                                    ->whereIn('id', $values)
+                                    ->where('email', '!=', 'admin@example.com')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                    ])
                     ->action(function (Role $record, array $data) {
-                        self::handleAssignAction($record, $data);
+                        $selectedUserIds = $data['users'] ?? [];
+
+                        $adminEmail = 'admin@example.com';
+
+                        $currentUserIds = User::where('role_id', $record->id)
+                            ->where('email', '!=', $adminEmail)
+                            ->pluck('id')
+                            ->toArray();
+
+                        $toAdd = array_diff($selectedUserIds, $currentUserIds);
+
+                        $toRemove = array_diff($currentUserIds, $selectedUserIds);
+
+                        if (!empty($toRemove)) {
+                            User::whereIn('id', $toRemove)
+                                ->where('email', '!=', $adminEmail)
+                                ->update(['role_id' => null]);
+                        }
+
+                        if (!empty($toAdd)) {
+                            User::whereIn('id', $toAdd)
+                                ->where('email', '!=', $adminEmail)
+                                ->update(['role_id' => $record->id]);
+                        }
                     })
-                    ->hidden(fn(Role $record) => $record->name === 'Administrador')
+                    ->hidden(fn(Role $r) => $r->name === 'Administrador')
+                    ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados')
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    protected static function handleAssignAction(Role $record, array $data): void
-    {
-        if (isset($data['users']) && !empty($data['users'])) {
-            User::whereIn('id', $data['users'])
-                ->where('email', '!=', 'admin@example.com')
-                ->update(['role_id' => $record->id]);
-        }
     }
 }
