@@ -42,4 +42,9 @@ class Supplier extends Model
     {
         return $this->belongsToMany(Part::class);
     }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }
