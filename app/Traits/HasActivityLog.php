@@ -2,7 +2,6 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 
 trait HasActivityLog
@@ -13,16 +12,16 @@ trait HasActivityLog
     public function getActivitylogOptions(): LogOptions
     {
         $spanishPlural = model_to_spanish($this::class, plural: true);
+        $spanishSingular = model_to_spanish($this::class);
 
         return LogOptions::defaults()
             ->useLogName($spanishPlural)
             ->logAll()
-            ->logExcept(['id', 'updated_at'])
+            ->logExcept(['id', 'created_at', 'updated_at'])
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(function (string $eventName) use ($spanishPlural) {
+            ->setDescriptionForEvent(function (string $eventName) use ($spanishSingular) {
                 $translatedEvent = translate_activity_verb($eventName);
-                $singular = Str::singular($spanishPlural);
-                return "Un {$singular} fue {$translatedEvent} en el sistema.";
+                return "Un {$spanishSingular} fue {$translatedEvent} en el sistema.";
             })
             ->logOnlyDirty();
     }
