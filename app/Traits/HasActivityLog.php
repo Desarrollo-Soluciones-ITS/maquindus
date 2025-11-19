@@ -13,7 +13,7 @@ trait HasActivityLog
     public function getActivitylogOptions(): LogOptions
     {
         $modelName = class_basename($this);
-        $spanishPlural = model_name_to_spanish_plural($modelName);
+        $spanishPlural = model_to_spanish($modelName, plural: true);
 
         return LogOptions::defaults()
             ->useLogName($spanishPlural)
