@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Category;
 use Illuminate\Database\Seeder;
-use App\Enums\Type;
 use App\Models\Document;
 use App\Models\Project;
 use App\Models\Equipment;
@@ -18,13 +18,13 @@ class DocumentSeeder extends Seeder
         $documents = [
             [
                 'name' => 'Plano de conjunto',
-                'type' => Type::Blueprint->value,
+                'category' => Category::Blueprint->value,
                 'documentable_type' => Project::class,
                 'documentable_id' => $project->id
             ],
             [
                 'name' => 'Manual de operación',
-                'type' => Type::Manual->value,
+                'category' => Category::Manual->value,
                 'documentable_type' => Equipment::class,
                 'documentable_id' => $equipment->id
             ],

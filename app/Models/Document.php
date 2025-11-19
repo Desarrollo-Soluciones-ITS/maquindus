@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Type;
+use App\Enums\Category;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +22,7 @@ class Document extends Model
     protected function casts(): array
     {
         return [
-            'type' => Type::class,
+            'category' => Category::class,
         ];
     }
 

@@ -1,12 +1,23 @@
 <?php
 
+use App\Models\Activity;
+use App\Models\City;
+use App\Models\Customer;
+use App\Models\Document;
+use App\Models\Equipment;
+use App\Models\File;
+use App\Models\Part;
+use App\Models\Person;
+use App\Models\Project;
+use App\Models\State;
+use App\Models\Supplier;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+
 /**
  * @param string $mime El tipo MIME completo del archivo (ej: 'image/png').
  * @return string Una etiqueta de texto amigable (ej: 'PNG', 'Word', 'Archivo').
  */
-
-use Illuminate\Support\Facades\Storage;
-
 if (! function_exists('mime_type')) {
   function mime_type(string $mime): string
   {
@@ -40,22 +51,30 @@ if (! function_exists('mime_type')) {
   }
 }
 
-if (! function_exists('model_to_folder')) {
-    function model_name_to_spanish_plural(string $model) {
-        return match ($model) {
-            'Activity' => 'Actividades',
-            'City' => 'Ciudades',
-            'Customer' => 'Clientes',
-            'Document' => 'Documentos',
-            'Equipment' => 'Equipos',
-            'File' => 'Archivos',
-            'Part' => 'Repuestos',
-            'Person' => 'Contactos',
-            'Project' => 'Proyectos',
-            'State' => 'Estados',
-            'Supplier' => 'Proveedor',
-            'User' => 'Usuarios',
+if (! function_exists('model_to_spanish')) {
+    function model_to_spanish(string $model, $plural = false) {
+        $spanish = match ($model) {
+            Activity::class => 'Actividad',
+            City::class => 'Ciudad',
+            Customer::class => 'Cliente',
+            Document::class => 'Documento',
+            Equipment::class => 'Equipo',
+            File::class => 'Archivo',
+            Part::class => 'Repuesto',
+            Person::class => 'Contacto',
+            Project::class => 'Proyecto',
+            State::class => 'Estado',
+            Supplier::class => 'Proveedor',
+            User::class => 'Usuario',
         };
+
+        if (!$spanish) return null;
+        if (!$plural) return $spanish;
+
+        $str = str($spanish);
+        $last = $str->charAt($str->length() - 1);
+        $suffix = $last === 'd' || $last === 'r' ? 'es' : 's';
+        return $str->append($suffix);
     }
 }
 

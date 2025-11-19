@@ -2,7 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
-use App\Enums\Type;
+use App\Enums\Category;
 use App\Filament\Actions\Documents\CreateAction;
 use App\Filament\Actions\Documents\DeleteAction;
 use App\Filament\Actions\Documents\DeleteBulkAction;
@@ -12,6 +12,9 @@ use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\PreviewAction;
 use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
+use App\Filament\Resources\Documents\Tables\DocumentsTable;
+use App\Models\Equipment;
+use App\Models\Part;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\FileUpload;
@@ -21,7 +24,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -43,10 +45,16 @@ class DocumentsRelationManager extends RelationManager
                     ->label('Nombre')
                     ->placeholder('Manual de Operación de la Bomba P-5')
                     ->required(),
-                Select::make('type')
-                    ->label('Tipo')
-                    ->options(Type::options())
-                    ->required(),
+                Select::make('category')
+                    ->label('Categoría')
+                    ->options(Category::options())
+                    ->placeholder('Ninguna')
+                    ->visible(function (RelationManager $livewire) {
+                        $documentable = $livewire->getOwnerRecord();
+
+                        return $documentable instanceof Equipment
+                            || $documentable instanceof Part;
+                    }),
                 FileUpload::make('path')
                     ->label('Archivo')
                     ->disk('local')
@@ -54,12 +62,19 @@ class DocumentsRelationManager extends RelationManager
                     ->directory(
                         function (Get $get, RelationManager $livewire) {
                             $documentable = $livewire->getOwnerRecord();
-                            $parent = str($documentable::class)
-                                ->explode('\\')
-                                ->pop();
-                            $folder = model_name_to_spanish_plural($parent);
-                            return collect([$folder, $documentable->name, $get('type')])
-                                ->join('/');
+                            $folder = model_to_spanish(
+                                model: $documentable->type,
+                                plural: true
+                            );
+
+                            $segments = collect([$folder, $documentable->name]);
+                            $category = $get('category');
+
+                            if ($category) {
+                                $segments->push($category);
+                            }
+
+                            return $segments->join('/');
                         }
                     )
                     ->getUploadedFileNameForStorageUsing(
@@ -82,24 +97,7 @@ class DocumentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('name')
-            ->recordUrl(null)
-            ->recordAction(is_not_localhost() ? 'download' : 'preview')
-            ->columns([
-                TextColumn::make('name')
-                    ->label('Nombre'),
-                TextColumn::make('type')
-                    ->label('Tipo')
-                    ->badge(),
-                TextColumn::make('current.created_at')
-                    ->label('Última versión')
-                    ->date('d/m/Y - g:i A')
-                    ->timezone('America/Caracas')
-            ])
-            ->filters([
-                //
-            ])
+        return DocumentsTable::configure($table)
             ->headerActions([
                 CreateAction::make(),
             ])
