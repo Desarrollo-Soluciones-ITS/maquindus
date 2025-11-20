@@ -7,8 +7,10 @@ use App\Models\Document;
 use App\Models\Equipment;
 use App\Models\File;
 use App\Models\Part;
+use App\Models\Permission;
 use App\Models\Person;
 use App\Models\Project;
+use App\Models\Role;
 use App\Models\State;
 use App\Models\Supplier;
 use App\Models\User;
@@ -62,8 +64,10 @@ if (! function_exists('model_to_spanish')) {
             Equipment::class => 'Equipo',
             File::class => 'Archivo',
             Part::class => 'Repuesto',
+            Permission::class => 'Permiso',
             Person::class => 'Contacto',
             Project::class => 'Proyecto',
+            Role::class => 'Rol',
             State::class => 'Estado',
             Supplier::class => 'Proveedor',
             User::class => 'Usuario',
@@ -74,7 +78,7 @@ if (! function_exists('model_to_spanish')) {
 
         $str = str($spanish);
         $last = $str->charAt($str->length() - 1);
-        $suffix = $last === 'd' || $last === 'r' ? 'es' : 's';
+        $suffix = $last === 'd' || $last === 'r' || $last === 'l' ? 'es' : 's';
         return $str->append($suffix);
     }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasActivityLog;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Permission extends Model
 {
-    use HasUuids;
+    use HasUuids, LogsActivity, HasActivityLog;
 
     public function roles()
     {
