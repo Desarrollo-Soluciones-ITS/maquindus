@@ -15,6 +15,13 @@ class Equipment extends Model
     use HasFactory, HasUuids, LogsActivity, HasActivityLog;
 
     /**
+     * Additional attributes to ignore in the activity log.
+     */
+    protected $activityIgnoredAttributes = [
+        'details',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

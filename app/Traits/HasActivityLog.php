@@ -14,10 +14,17 @@ trait HasActivityLog
         $spanishPlural = model_to_spanish($this::class, plural: true);
         $spanishSingular = model_to_spanish($this::class);
 
+        $fieldsToIgnore = ['id', 'created_at', 'updated_at'];
+
+        if (property_exists($this, 'activityIgnoredAttributes')) {
+            $fieldsToIgnore = array_merge($fieldsToIgnore, $this->activityIgnoredAttributes);
+            $fieldsToIgnore = array_unique($fieldsToIgnore);
+        }
+
         return LogOptions::defaults()
             ->useLogName($spanishPlural)
             ->logAll()
-            ->logExcept(['id', 'created_at', 'updated_at'])
+            ->logExcept($fieldsToIgnore)
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(function (string $eventName) use ($spanishSingular) {
                 $translatedEvent = translate_activity_verb($eventName);

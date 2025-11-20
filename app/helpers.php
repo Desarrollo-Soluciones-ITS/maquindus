@@ -52,7 +52,8 @@ if (! function_exists('mime_type')) {
 }
 
 if (! function_exists('model_to_spanish')) {
-    function model_to_spanish(string $model, $plural = false) {
+    function model_to_spanish(string $model, $plural = false)
+    {
         $spanish = match ($model) {
             Activity::class => 'Actividad',
             City::class => 'Ciudad',
@@ -116,9 +117,14 @@ if (! function_exists('translate_activity_verb')) {
     function translate_activity_verb(string $eventName): string
     {
         return match ($eventName) {
+            // Eventos CRUD
             'created' => 'creado',
             'updated' => 'actualizado',
             'deleted' => 'eliminado',
+            // Eventos de Autenticación
+            'authenticated' => 'inició sesión',
+            'logged_out' => 'cerró sesión',
+            'login_failed' => 'falló el inicio de sesión',
             default => $eventName,
         };
     }
@@ -128,9 +134,14 @@ if (! function_exists('translate_activity_event')) {
     function translate_activity_event(string $eventName): string
     {
         return match ($eventName) {
+            // Eventos CRUD
             'created' => 'Creación',
             'updated' => 'Actualización',
             'deleted' => 'Eliminación',
+            // Eventos de Autenticación
+            'authenticated' => 'Inicio de Sesión',
+            'logged_out' => 'Cierre de Sesión',
+            'login_failed' => 'Fallo de Inicio de Sesión',
             default => $eventName,
         };
     }
@@ -140,9 +151,14 @@ if (! function_exists('get_activity_color')) {
     function get_activity_color(string $eventName): string
     {
         return match ($eventName) {
+            // Eventos CRUD
             'created' => 'success',
             'updated' => 'warning',
             'deleted' => 'danger',
+            // Eventos de Autenticación
+            'authenticated' => 'success',
+            'logged_out' => 'info',
+            'login_failed' => 'danger',
             default => 'secondary',
         };
     }
