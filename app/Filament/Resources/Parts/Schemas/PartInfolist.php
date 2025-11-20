@@ -14,9 +14,9 @@ class PartInfolist
             ->columns(3)
             ->components([
                 TextEntry::make('name')
-                    ->label('Código'),
-                TextEntry::make('code')
                     ->label('Modelo'),
+                TextEntry::make('code')
+                    ->label('Código'),
                 TextEntry::make('about')
                     ->label('Descripción'),
                 KeyValueEntry::make('details')
