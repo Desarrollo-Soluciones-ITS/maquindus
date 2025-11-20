@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
+use App\Enums\Prefix;
 use App\Enums\Status;
+use App\Filament\Inputs\CodeInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,10 +20,7 @@ class ProjectForm
                     ->label('Nombre')
                     ->placeholder('Planta de ensayo')
                     ->required(),
-                TextInput::make('code')
-                    ->label('Código')
-                    ->placeholder('PRJ-001')
-                    ->required(),
+                CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
                     ->label('Fecha de inicio')
                     ->required(),
