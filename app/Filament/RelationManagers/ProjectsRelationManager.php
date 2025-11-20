@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -44,21 +45,31 @@ class ProjectsRelationManager extends RelationManager
         return ProjectsTable::configure($table)
             ->headerActions([
                 CreateAction::make(),
-                AttachAction::make(),
+                AttachAction::make()
+                    ->hidden($this->isCustomerPage()),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                    DetachAction::make(),
+                    DetachAction::make()
+                        ->hidden($this->isCustomerPage()),
                     DeleteAction::make(),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make(),
+                    DetachBulkAction::make()
+                        ->hidden($this->isCustomerPage()),
                     DeleteBulkAction::make(),
                 ])
             ]);
+    }
+
+    private function isCustomerPage()
+    {
+        return function (ProjectsRelationManager $livewire) {
+            return $livewire->getPageClass() === ViewCustomer::class;
+        };
     }
 }
