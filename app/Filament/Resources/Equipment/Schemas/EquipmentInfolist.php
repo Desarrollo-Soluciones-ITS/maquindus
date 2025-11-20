@@ -6,8 +6,6 @@ use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
-use function Illuminate\Log\log;
-
 class EquipmentInfolist
 {
     public static function configure(Schema $schema): Schema
@@ -16,9 +14,9 @@ class EquipmentInfolist
             ->columns(3)
             ->components([
                 TextEntry::make('name')
-                    ->label('Código'),
-                TextEntry::make('code')
                     ->label('Modelo'),
+                TextEntry::make('code')
+                    ->label('Código'),
                 TextEntry::make('about')
                     ->label('Descripción'),
                 KeyValueEntry::make('details')

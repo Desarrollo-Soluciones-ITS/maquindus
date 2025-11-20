@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Equipment\Schemas;
 
+use App\Enums\Prefix;
+use App\Filament\Inputs\CodeInput;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -17,10 +19,7 @@ class EquipmentForm
                     ->label('Modelo')
                     ->placeholder('Compresor Atlas')
                     ->required(),
-                TextInput::make('code')
-                    ->label('Código')
-                    ->placeholder('EQ-AT-001')
-                    ->required(),
+                CodeInput::make(Prefix::Equipment),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Compresor centrífugo')
