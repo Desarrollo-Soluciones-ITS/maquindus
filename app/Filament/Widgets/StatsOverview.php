@@ -6,7 +6,6 @@ use App\Models\File;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Filament\Support\Icons\Heroicon;
 
 class StatsOverview extends StatsOverviewWidget
@@ -30,24 +29,35 @@ class StatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         try {
-            $freeSpace = $this->getDiskStats();
-            $fileCount = $this->getFileCount();
+            $diskStats = $this->getDiskStats();
+            $freeSpace = $diskStats['free'];
+            $totalSpace = $diskStats['total'];
+
+            $usedBytes = $this->getDocumentableSpace();
+            $usedSpaceFormatted = File::formatBytes($usedBytes);
             $freeSpaceFormatted = File::formatBytes($freeSpace);
-            $usedSpace = File::formatBytes($this->getDocumentableSpace());
+
+            $usedSpacePercentage = $totalSpace > 0
+                ? round(($usedBytes / $totalSpace) * 100, 2)
+                : 0;
 
             return [
-                Stat::make('Espacio ocupado total', $usedSpace)
+                Stat::make('Espacio total ocupado', $usedSpaceFormatted)
                     ->description('Del total del sistema')
                     ->descriptionIcon(Heroicon::Server),
 
-                Stat::make('Cantidad archivos', $fileCount)
-                    ->description('En almacenamiento público')
+                Stat::make('Cantidad archivos', $this->getFileCount())
+                    ->description('Registrados en el sistema')
                     ->descriptionIcon(Heroicon::Folder),
 
                 Stat::make('Espacio disponible en disco', $freeSpaceFormatted)
                     ->description('Espacio libre restante')
                     ->descriptionIcon(Heroicon::ComputerDesktop)
                     ->color($freeSpace < 10 ? 'danger' : 'success'),
+
+                Stat::make('Espacio ocupado', "{$usedSpacePercentage}%")
+                    ->description('Dentro del servidor')
+                    ->descriptionIcon(Heroicon::Cloud),
             ];
 
         } catch (\Exception $e) {
@@ -59,7 +69,8 @@ class StatsOverview extends StatsOverviewWidget
             ];
         }
     }
-    private function getDiskStats(): int
+
+    private function getDiskStats(): array
     {
         return Cache::remember('disk_stats', 300, function () {
             $path = '/';
@@ -71,7 +82,10 @@ class StatsOverview extends StatsOverviewWidget
                 throw new \Exception('Unable to read disk space');
             }
 
-            return $freeSpaceBytes;
+            return [
+                'free' => $freeSpaceBytes,
+                'total' => $totalSpaceBytes,
+            ];
         });
     }
 
@@ -79,8 +93,7 @@ class StatsOverview extends StatsOverviewWidget
     {
         return Cache::remember('file_count', 300, function () {
             try {
-                $files = Storage::disk('public')->allFiles('');
-                return count($files);
+                return File::count('id');
             } catch (\Exception $e) {
                 return 0;
             }
