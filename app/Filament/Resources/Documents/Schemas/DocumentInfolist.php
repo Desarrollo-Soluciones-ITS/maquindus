@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\Documents\Schemas;
 
-use App\Enums\Type;
-use App\Models\Equipment;
-use App\Models\Part;
-use App\Models\Project;
+use App\Enums\Category;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -18,28 +15,17 @@ class DocumentInfolist
             ->components([
                 TextEntry::make('name')
                     ->label('Nombre'),
-                TextEntry::make('type')
-                    ->label('Tipo')
+                TextEntry::make('category')
+                    ->label('Categoría')
                     ->badge()
-                    ->color(fn($state): string => match ($state) {
-                        Type::Blueprint => 'primary',
-                        Type::Manual => 'warning',
-                        Type::Report => 'success',
-                        Type::Specs => 'gray',
-                    }),
+                    ->placeholder('N/A')
+                    ->color(fn($state) => Category::colors($state)),
                 TextEntry::make('documentable.name')
                     ->label('Pertenece a')
                     ->formatStateUsing(function (Model $record, $state) {
-                        $fullClass = $record->documentable_type;
-
-                        $spanishName = match ($fullClass) {
-                            Part::class      => 'Parte',
-                            Equipment::class => 'Equipo',
-                            Project::class   => 'Proyecto',
-                            default          => 'Relacionado',
-                        };
-
-                        return "($spanishName) $state";
+                        $model = $record->documentable_type;
+                        $spanish = model_to_spanish($model) ?? 'Relacionado';
+                        return "($spanish) $state";
                     }),
                 TextEntry::make('current.created_at')
                     ->label('Última versión')

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Parts\Schemas;
 
+use App\Enums\Prefix;
+use App\Filament\Inputs\CodeInput;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -14,13 +16,10 @@ class PartForm
             ->columns(3)
             ->components([
                 TextInput::make('name')
-                    ->label('Modelo')
+                    ->label('Nombre')
                     ->placeholder('Bomba hidráulica')
                     ->required(),
-                TextInput::make('code')
-                    ->label('Código')
-                    ->placeholder('PT-BMP-02')
-                    ->required(),
+                CodeInput::make(Prefix::Part),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Bomba de transferencia')

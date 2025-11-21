@@ -21,7 +21,7 @@ class PartsTable
                     ->label('Código')
                     ->searchable(),
                 TextColumn::make('name')
-                    ->label('Modelo')
+                    ->label('Nombre')
                     ->searchable(),
                 TextColumn::make('about')
                     ->label('Descripción')

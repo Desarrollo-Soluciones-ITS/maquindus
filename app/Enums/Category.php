@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Type: string
+enum Category: string
 {
     use HasOptions;
 
@@ -13,7 +13,12 @@ enum Type: string
 
     public function color(): string
     {
-        return match ($this) {
+        return static::colors($this);
+    }
+
+    public static function colors(Category $category): string
+    {
+        return match ($category) {
             self::Blueprint => 'primary',
             self::Manual => 'warning',
             self::Report => 'success',

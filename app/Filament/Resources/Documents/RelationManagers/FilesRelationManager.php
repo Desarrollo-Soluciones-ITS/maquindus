@@ -41,10 +41,20 @@ class FilesRelationManager extends RelationManager
                     ->directory(
                         function (RelationManager $livewire) {
                             $document = $livewire->getOwnerRecord();
-                            $parent = str($document->documentable::class)->explode('\\')->pop();
-                            $folder = model_name_to_spanish_plural($parent);
-                            return collect([$folder, $document->documentable->name, $document->type->value])
-                                ->join('/');
+                            $documentable = $document->documentable;
+                            $folder = model_to_spanish(
+                                model: $documentable->type,
+                                plural: true
+                            );
+
+                            $segments = collect([$folder, $documentable->name]);
+                            $category = $document->category;
+
+                            if ($category) {
+                                $segments->push($category);
+                            }
+
+                            return $segments->join('/');
                         }
                     )
                     ->getUploadedFileNameForStorageUsing(

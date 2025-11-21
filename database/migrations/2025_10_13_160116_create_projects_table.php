@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('code')->unique();
             $table->string('about')->nullable();
             $table->date('start');

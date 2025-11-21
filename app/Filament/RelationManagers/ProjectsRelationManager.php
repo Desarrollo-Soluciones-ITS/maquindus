@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -44,21 +45,30 @@ class ProjectsRelationManager extends RelationManager
         return ProjectsTable::configure($table)
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.projects.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.projects.sync')),
+                AttachAction::make()
+                    ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.projects.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.projects.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.projects.unsync')),
+                    DetachAction::make()
+                        ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
                     DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.projects.unsync')),
+                    DetachBulkAction::make()->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
                     DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ]);
+    }
+
+    private function isCustomerPage()
+    {
+        return function (ProjectsRelationManager $livewire) {
+            return $livewire->getPageClass() === ViewCustomer::class;
+        };
     }
 }

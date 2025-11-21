@@ -1,12 +1,25 @@
 <?php
 
+use App\Models\Activity;
+use App\Models\City;
+use App\Models\Customer;
+use App\Models\Document;
+use App\Models\Equipment;
+use App\Models\File;
+use App\Models\Part;
+use App\Models\Permission;
+use App\Models\Person;
+use App\Models\Project;
+use App\Models\Role;
+use App\Models\State;
+use App\Models\Supplier;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+
 /**
  * @param string $mime El tipo MIME completo del archivo (ej: 'image/png').
  * @return string Una etiqueta de texto amigable (ej: 'PNG', 'Word', 'Archivo').
  */
-
-use Illuminate\Support\Facades\Storage;
-
 if (!function_exists('mime_type')) {
     function mime_type(string $mime): string
     {
@@ -40,23 +53,35 @@ if (!function_exists('mime_type')) {
     }
 }
 
-if (!function_exists('model_to_folder')) {
-    function model_name_to_spanish_plural(string $model)
+if (!function_exists('model_to_spanish')) {
+    function model_to_spanish(string $model, $plural = false)
     {
-        return match ($model) {
-            'Activity' => 'Actividades',
-            'City' => 'Ciudades',
-            'Customer' => 'Clientes',
-            'Document' => 'Documentos',
-            'Equipment' => 'Equipos',
-            'File' => 'Archivos',
-            'Part' => 'Repuestos',
-            'Person' => 'Contactos',
-            'Project' => 'Proyectos',
-            'State' => 'Estados',
-            'Supplier' => 'Proveedor',
-            'User' => 'Usuarios',
+        $spanish = match ($model) {
+            Activity::class => 'Actividad',
+            City::class => 'Ciudad',
+            Customer::class => 'Cliente',
+            Document::class => 'Documento',
+            Equipment::class => 'Equipo',
+            File::class => 'Archivo',
+            Part::class => 'Repuesto',
+            Permission::class => 'Permiso',
+            Person::class => 'Contacto',
+            Project::class => 'Proyecto',
+            Role::class => 'Rol',
+            State::class => 'Estado',
+            Supplier::class => 'Proveedor',
+            User::class => 'Usuario',
         };
+
+        if (!$spanish)
+            return null;
+        if (!$plural)
+            return $spanish;
+
+        $str = str($spanish);
+        $last = $str->charAt($str->length() - 1);
+        $suffix = $last === 'd' || $last === 'r' || $last === 'l' ? 'es' : 's';
+        return $str->append($suffix);
     }
 }
 
@@ -94,6 +119,56 @@ if (!function_exists('path')) {
     }
 }
 
+if (!function_exists('translate_activity_verb')) {
+    function translate_activity_verb(string $eventName): string
+    {
+        return match ($eventName) {
+            // Eventos CRUD
+            'created' => 'creado',
+            'updated' => 'actualizado',
+            'deleted' => 'eliminado',
+            // Eventos de Autenticación
+            'authenticated' => 'inició sesión',
+            'logged_out' => 'cerró sesión',
+            'login_failed' => 'falló el inicio de sesión',
+            default => $eventName,
+        };
+    }
+}
+
+if (!function_exists('translate_activity_event')) {
+    function translate_activity_event(string $eventName): string
+    {
+        return match ($eventName) {
+            // Eventos CRUD
+            'created' => 'Creación',
+            'updated' => 'Actualización',
+            'deleted' => 'Eliminación',
+            // Eventos de Autenticación
+            'authenticated' => 'Inicio de Sesión',
+            'logged_out' => 'Cierre de Sesión',
+            'login_failed' => 'Fallo de Inicio de Sesión',
+            default => $eventName,
+        };
+    }
+}
+
+if (!function_exists('get_activity_color')) {
+    function get_activity_color(string $eventName): string
+    {
+        return match ($eventName) {
+            // Eventos CRUD
+            'created' => 'success',
+            'updated' => 'warning',
+            'deleted' => 'danger',
+            // Eventos de Autenticación
+            'authenticated' => 'success',
+            'logged_out' => 'info',
+            'login_failed' => 'danger',
+            default => 'secondary',
+        };
+    }
+}
 if (!function_exists('hasPermission')) {
     function currentUserHasPermission(string $permission)
     {
