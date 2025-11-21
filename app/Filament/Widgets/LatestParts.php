@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class LatestParts extends TableWidget
 {
-    protected static ?string $heading = 'Últimas partes';
+    protected static ?string $heading = 'Últimos repuestos';
 
     protected function getCachedParts()
     {

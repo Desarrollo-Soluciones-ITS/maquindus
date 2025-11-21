@@ -26,6 +26,9 @@ class EquipmentForm
                     ->required(),
                 KeyValue::make('details')
                     ->label('Características')
+                    ->keyLabel('Nombre')
+                    ->keyPlaceholder('Ej. Material')
+                    ->valuePlaceholder('Ej. Acero')
                     ->columnSpanFull(),
             ]);
     }

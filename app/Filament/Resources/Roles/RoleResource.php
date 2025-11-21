@@ -21,6 +21,8 @@ class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static bool $isGloballySearchable = false;
+
     protected static ?string $modelLabel = 'rol';
 
     protected static ?string $pluralModelLabel = 'roles';

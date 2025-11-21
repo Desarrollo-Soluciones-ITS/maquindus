@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources\ActivityLogs\Schemas;
 
-use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -39,17 +37,6 @@ class ActivityLogInfolist
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
-                // Section::make('Auditoría de Cambios')
-                //     ->schema([
-                //         Grid::make(2)
-                //             ->schema([
-                //                 KeyValueEntry::make('properties.attributes')
-                //                     ->label('Nuevos Valores'),
-                //                 KeyValueEntry::make('properties.old')
-                //                     ->label('Valores Anteriores')
-                //             ]),
-                //     ])
-                //     ->columnSpanFull()
             ]);
     }
 }
