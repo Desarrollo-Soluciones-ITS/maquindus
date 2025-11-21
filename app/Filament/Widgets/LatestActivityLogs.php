@@ -11,7 +11,7 @@ use Spatie\Activitylog\Models\Activity;
 
 class LatestActivityLogs extends TableWidget
 {
-    protected static ?string $heading = 'Últimos movimientos';
+    protected static ?string $heading = 'Acciones recientes';
 
     public function getColumnSpan(): array|int|string
     {
