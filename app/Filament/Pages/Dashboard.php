@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\DocumentsChart;
 use App\Filament\Widgets\LatestActivityLogs;
 use App\Filament\Widgets\LatestDocuments;
 use App\Filament\Widgets\LatestEquipments;
@@ -25,10 +26,16 @@ class Dashboard extends Page
         return 4;
     }
 
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 4;
+    }
+
     protected function getHeaderWidgets(): array
     {
         return [
-            StatsOverview::class
+            'stats' => StatsOverview::class,
+            'chart' => DocumentsChart::class,
         ];
     }
 
@@ -41,5 +48,10 @@ class Dashboard extends Page
             LatestProjects::class,
             LatestDocuments::class,
         ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('dashboard');
     }
 }
