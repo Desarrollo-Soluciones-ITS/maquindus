@@ -5,3 +5,16 @@ table.fi-in-key-value tbody td {
 .fi-fo-key-value .fi-fo-key-value-table > tbody > tr > td .fi-input {
   font-family: 'Inter Variable';
 }
+
+.daterangepicker:is(.dark *),
+.daterangepicker .calendar-table:is(.dark *),
+.daterangepicker td.end-date.active.off:is(.dark *),
+.daterangepicker td.off.in-range:is(.dark *),
+.daterangepicker td.off:is(.dark *),
+.daterangepicker td.start-date.active.off:is(.dark *) {
+  background: var(--gray-900);
+}
+
+.rangeItem.active {
+  background-color: var(--primary-500);
+}
