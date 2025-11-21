@@ -1,0 +1,7 @@
+table.fi-in-key-value tbody td {
+  font-family: 'Inter Variable';
+}
+
+.fi-fo-key-value .fi-fo-key-value-table > tbody > tr > td .fi-input {
+  font-family: 'Inter Variable';
+}

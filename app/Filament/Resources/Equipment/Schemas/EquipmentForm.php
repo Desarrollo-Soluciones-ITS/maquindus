@@ -26,7 +26,6 @@ class EquipmentForm
                     ->required(),
                 KeyValue::make('details')
                     ->label('Características')
-                    ->required()
                     ->columnSpanFull(),
             ]);
     }
