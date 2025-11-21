@@ -15,8 +15,8 @@ class EditPerson extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('people.delete')),
         ];
     }
 
@@ -26,7 +26,7 @@ class EditPerson extends EditRecord
             $data['state_id'] = null;
             $data['city_id'] = null;
         }
-        
+
         return $data;
     }
 }

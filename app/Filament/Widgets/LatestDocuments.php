@@ -1,14 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Documents\Tables;
+namespace App\Filament\Widgets;
 
 use App\Enums\Category;
-use App\Filament\Actions\Documents\DeleteAction;
-use App\Filament\Actions\Documents\DownloadAction;
-use App\Filament\Actions\Documents\EditAction;
-use App\Filament\Actions\Documents\OpenFolderAction;
-use App\Filament\Actions\Documents\PreviewAction;
-use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Equipment\Pages\ViewEquipment;
@@ -17,43 +11,57 @@ use App\Filament\Resources\People\Pages\ViewPerson;
 use App\Filament\Resources\Projects\Pages\ViewProject;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Customer;
+use App\Models\Document;
 use App\Models\Equipment;
 use App\Models\Part;
 use App\Models\Person;
 use App\Models\Project;
 use App\Models\Supplier;
-use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
-class DocumentsTable
+class LatestDocuments extends TableWidget
 {
-    public static function configure(Table $table): Table
+    protected static ?string $heading = 'Últimos documentos';
+
+    protected function getCachedDocuments()
     {
+        return Cache::remember('latest_documents_widget', 120, function () {
+            return Document::with('documentable')
+                ->latest()
+                ->limit(5)
+                ->get(['id', 'name', 'category']);
+        });
+    }
+
+    public function table(Table $table): Table
+    {
+        $documents = $this->getCachedDocuments();
+
         return $table
-            ->recordTitleAttribute('name')
-            ->recordUrl(null)
-            ->recordAction(is_not_localhost() ? 'download' : 'preview')
+            ->query(
+                fn(): Builder => Document::whereIn('id', $documents->pluck('id'))
+            )
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nombre')
-                    ->searchable(),
+                    ->label('Nombre'),
                 TextColumn::make('current.mime')
                     ->label('Tipo de archivo')
                     ->badge()
-                    ->searchable()
                     ->formatStateUsing(fn($state) => mime_type($state)),
                 TextColumn::make('category')
                     ->label('Categoría')
                     ->badge()
-                    ->searchable()
                     ->placeholder('N/A')
                     ->color(fn($state): string => Category::colors($state)),
                 TextColumn::make('documentable.name')
                     ->label('Pertenece a')
-                    ->hiddenOn(DocumentsRelationManager::class)
                     ->formatStateUsing(function (Model $record, $state) {
                         $model = $record->documentable_type;
                         $spanish = model_to_spanish($model) ?? 'Relacionado';
@@ -81,20 +89,23 @@ class DocumentsTable
                     ->date('d/m/Y - g:i A')
                     ->timezone('America/Caracas')
             ])
+            ->paginated(false)
+            ->recordUrl(
+                fn(Document $record): string => route('filament.dashboard.resources.documents.view', ['record' => $record]),
+            )
             ->filters([
                 //
             ])
+            ->headerActions([
+                //
+            ])
             ->recordActions([
-                ActionGroup::make([
-                    ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('documents.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('documents.open_in_folder')),
-                        DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
-                        ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
-                    ])->dropdown(false),
-                    EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete')),
-                ])
+                //
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    //
+                ]),
             ]);
     }
 }

@@ -99,23 +99,23 @@ class DocumentsRelationManager extends RelationManager
     {
         return DocumentsTable::configure($table)
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.documents.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make(),
-                        OpenFolderAction::make(),
-                        DownloadAction::make(),
-                        ViewAction::make(),
+                        PreviewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show_file')),
+                        OpenFolderAction::make()->hidden(!currentUserHasPermission('relationships.documents.open_in_folder')),
+                        DownloadAction::make()->hidden(!currentUserHasPermission('relationships.documents.download')),
+                        ViewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show')),
                     ])->dropdown(false),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.documents.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
                 ]),
             ]);
     }

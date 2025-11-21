@@ -55,4 +55,21 @@ class DocumentResource extends Resource
             'view' => ViewDocument::route('/{record}'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('documents.view');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('documents.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('documents.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('documents.test');
+    }
 }

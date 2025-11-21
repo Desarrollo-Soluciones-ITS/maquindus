@@ -70,4 +70,25 @@ class EquipmentResource extends Resource
             'gallery' => EquipmentGallery::route('/{record}/gallery'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('equipments.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('equipments.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('equipments.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('equipments.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('equipments.test');
+    }
 }

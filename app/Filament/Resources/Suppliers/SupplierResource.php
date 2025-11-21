@@ -64,4 +64,25 @@ class SupplierResource extends Resource
             'edit' => EditSupplier::route('/{record}/edit'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('suppliers.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('suppliers.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('suppliers.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('suppliers.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('suppliers.test');
+    }
 }

@@ -35,14 +35,14 @@ class SuppliersTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
                 ]),
             ]);
     }

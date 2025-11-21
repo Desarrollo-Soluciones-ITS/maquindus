@@ -16,8 +16,8 @@ class EditPart extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete')),
         ];
     }
 

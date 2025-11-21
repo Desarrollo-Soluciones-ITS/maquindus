@@ -35,14 +35,14 @@ class CustomersTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('customers.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('customers.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete')),
                 ]),
             ]);
     }

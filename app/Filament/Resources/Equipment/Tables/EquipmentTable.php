@@ -32,14 +32,14 @@ class EquipmentTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('equipments.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
                 ]),
             ]);
     }

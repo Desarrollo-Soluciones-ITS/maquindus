@@ -66,7 +66,7 @@ class FilesRelationManager extends RelationManager
                             $extension = $file->getClientOriginalExtension();
                             $baseName = str($document->name);
                             // $timestamp = now()->format('Ymd_His');
-
+                
                             return str($baseName)
                                 ->append(" - V{$nextVersion}", '.', $extension);
                         }
@@ -142,21 +142,21 @@ class FilesRelationManager extends RelationManager
                             'mime' => $mime,
                             'version' => $latestVersion + 1,
                         ]);
-                    })
+                    })->hidden(!currentUserHasPermission('relationships.files.create'))
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make(),
-                        OpenFolderAction::make(),
-                        DownloadAction::make(),
+                        PreviewAction::make()->hidden(!currentUserHasPermission('relationships.files.show_file')),
+                        OpenFolderAction::make()->hidden(!currentUserHasPermission('relationships.files.open_in_folder')),
+                        DownloadAction::make()->hidden(!currentUserHasPermission('relationships.files.download')),
                     ])->dropdown(false),
-                    DeleteAction::make(),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.files.delete')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.files.delete')),
                 ]),
             ]);
     }
