@@ -35,6 +35,7 @@ class PermissionSeeder extends Seeder
         'activities' => 'actividad',
         'files' => 'archivo',
         'images' => 'imágen',
+        'activity_logs' => 'registros',
     ];
 
     public function run(): void
@@ -99,6 +100,7 @@ class PermissionSeeder extends Seeder
             ],
             'people' => ['create', 'show', 'view', 'delete', 'edit'],
             'users' => ['create', 'show', 'view', 'delete', 'edit'],
+            'activity_logs' => ['create', 'show', 'view', 'delete', 'edit'],
             'relationships' => [
                 'parts' => ['create', 'sync', 'unsync', 'edit', 'show'],
                 'equipments' => ['create', 'sync', 'unsync', 'edit', 'show'],
