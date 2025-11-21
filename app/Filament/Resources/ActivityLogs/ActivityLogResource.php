@@ -19,7 +19,7 @@ class ActivityLogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocumentList;
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static bool $isGloballySearchable = false;
 
     protected static ?string $modelLabel = 'bitácora';
 
