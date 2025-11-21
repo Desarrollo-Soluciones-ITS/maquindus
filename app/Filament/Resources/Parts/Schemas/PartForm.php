@@ -26,9 +26,9 @@ class PartForm
                     ->required(),
                 KeyValue::make('details')
                     ->label('Características')
-                    ->keyPlaceholder('Nombre de la característica...')
-                    ->valuePlaceholder('Valor de la característica...')
-                    ->required()
+                    ->keyLabel('Nombre')
+                    ->keyPlaceholder('Ej. Material')
+                    ->valuePlaceholder('Ej. Acero')
                     ->columnSpanFull(),
             ]);
     }

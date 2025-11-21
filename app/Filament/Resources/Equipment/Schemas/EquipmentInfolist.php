@@ -21,6 +21,7 @@ class EquipmentInfolist
                     ->label('Descripción'),
                 KeyValueEntry::make('details')
                     ->label('Características')
+                    ->keyLabel('Nombre')
                     ->columnSpanFull(),
             ]);
     }

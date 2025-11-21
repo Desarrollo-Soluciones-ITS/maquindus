@@ -21,6 +21,7 @@ class PartInfolist
                     ->label('Descripción'),
                 KeyValueEntry::make('details')
                     ->label('Características')
+                    ->keyLabel('Nombre')
                     ->columnSpanFull(),
             ]);
     }
