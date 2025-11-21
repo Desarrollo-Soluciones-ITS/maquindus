@@ -63,7 +63,7 @@ class DocumentsRelationManager extends RelationManager
                         function (Get $get, RelationManager $livewire) {
                             $documentable = $livewire->getOwnerRecord();
                             $folder = model_to_spanish(
-                                model: $documentable->type,
+                                model: $documentable::class,
                                 plural: true
                             );
 

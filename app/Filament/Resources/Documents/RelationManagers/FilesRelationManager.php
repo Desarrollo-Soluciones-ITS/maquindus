@@ -43,7 +43,7 @@ class FilesRelationManager extends RelationManager
                             $document = $livewire->getOwnerRecord();
                             $documentable = $document->documentable;
                             $folder = model_to_spanish(
-                                model: $documentable->type,
+                                model: $documentable::class,
                                 plural: true
                             );
 
@@ -106,6 +106,9 @@ class FilesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('version')
+            ->recordUrl(null)
+            ->recordAction(is_not_localhost() ? 'download' : 'preview')
             ->columns([
                 TextColumn::make('version')
                     ->label('Versión')

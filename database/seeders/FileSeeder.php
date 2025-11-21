@@ -48,21 +48,23 @@ class FileSeeder extends Seeder
 
         foreach ($files as $file) {
             $document = $file->document;
+            $documentable = $document->documentable;
 
             $folder = model_to_spanish(
-                model: $document->documentable_type,
+                model: $documentable::class,
                 plural: true
             );
 
-            $segments = collect([$folder, $document->documentable->name]);
+            $segments = collect([$folder, $documentable->name]);
             $category = $document->category;
             
             if ($category) {
                 $segments->push($category->value);
             }
 
-            $name = str($file->document->name)
+            $name = str($document->name)
                 ->append(" - V1.pdf");
+
             $segments->push($name);
 
             $path = $segments->join('/');
