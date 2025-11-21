@@ -93,18 +93,18 @@ class ActivitiesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.activities.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.activities.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.activities.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.activities.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.activities.delete')),
                 ]),
             ]);
     }

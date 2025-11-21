@@ -33,14 +33,14 @@ class UsersTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('users.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('users.delete')),
                 ]),
             ]);
     }

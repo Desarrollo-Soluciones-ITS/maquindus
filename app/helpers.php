@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Storage;
  * @param string $mime El tipo MIME completo del archivo (ej: 'image/png').
  * @return string Una etiqueta de texto amigable (ej: 'PNG', 'Word', 'Archivo').
  */
-if (! function_exists('mime_type')) {
+if (!function_exists('mime_type')) {
     function mime_type(string $mime): string
     {
         return match ($mime) {
@@ -53,7 +53,7 @@ if (! function_exists('mime_type')) {
     }
 }
 
-if (! function_exists('model_to_spanish')) {
+if (!function_exists('model_to_spanish')) {
     function model_to_spanish(string $model, $plural = false)
     {
         $spanish = match ($model) {
@@ -73,8 +73,10 @@ if (! function_exists('model_to_spanish')) {
             User::class => 'Usuario',
         };
 
-        if (!$spanish) return null;
-        if (!$plural) return $spanish;
+        if (!$spanish)
+            return null;
+        if (!$plural)
+            return $spanish;
 
         $str = str($spanish);
         $last = $str->charAt($str->length() - 1);
@@ -83,7 +85,7 @@ if (! function_exists('model_to_spanish')) {
     }
 }
 
-if (! function_exists('is_local')) {
+if (!function_exists('is_local')) {
     function is_not_localhost()
     {
         return collect(['127.0.0.1', '::1'])
@@ -91,7 +93,7 @@ if (! function_exists('is_local')) {
     }
 }
 
-if (! function_exists('path')) {
+if (!function_exists('path')) {
     function path(string $path, $asFolder = false)
     {
         $segments = str($path)
@@ -117,7 +119,7 @@ if (! function_exists('path')) {
     }
 }
 
-if (! function_exists('translate_activity_verb')) {
+if (!function_exists('translate_activity_verb')) {
     function translate_activity_verb(string $eventName): string
     {
         return match ($eventName) {
@@ -134,7 +136,7 @@ if (! function_exists('translate_activity_verb')) {
     }
 }
 
-if (! function_exists('translate_activity_event')) {
+if (!function_exists('translate_activity_event')) {
     function translate_activity_event(string $eventName): string
     {
         return match ($eventName) {
@@ -151,7 +153,7 @@ if (! function_exists('translate_activity_event')) {
     }
 }
 
-if (! function_exists('get_activity_color')) {
+if (!function_exists('get_activity_color')) {
     function get_activity_color(string $eventName): string
     {
         return match ($eventName) {
@@ -165,5 +167,11 @@ if (! function_exists('get_activity_color')) {
             'login_failed' => 'danger',
             default => 'secondary',
         };
+    }
+}
+if (!function_exists('hasPermission')) {
+    function currentUserHasPermission(string $permission)
+    {
+        return auth()->user()->hasPermission($permission);
     }
 }

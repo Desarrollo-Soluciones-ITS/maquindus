@@ -46,21 +46,21 @@ class PeopleRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AttachAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.people.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.people.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DetachAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.people.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.people.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.people.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                    DeleteBulkAction::make(),
+                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.people.delete')),
                 ]),
             ]);
     }

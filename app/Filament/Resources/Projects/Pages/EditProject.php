@@ -16,8 +16,8 @@ class EditProject extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('projects.delete')),
         ];
     }
 

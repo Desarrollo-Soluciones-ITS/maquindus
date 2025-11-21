@@ -45,21 +45,21 @@ class PartsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AttachAction::make()
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.parts.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync'))
                     ->preloadRecordSelect(),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DetachAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.parts.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.parts.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    DetachBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete')),
+                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
                 ])
             ]);
     }

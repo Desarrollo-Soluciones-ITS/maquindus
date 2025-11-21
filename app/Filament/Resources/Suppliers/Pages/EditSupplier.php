@@ -15,8 +15,8 @@ class EditSupplier extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
         ];
     }
 
@@ -26,7 +26,7 @@ class EditSupplier extends EditRecord
             $data['state_id'] = null;
             $data['city_id'] = null;
         }
-        
+
         return $data;
     }
 }

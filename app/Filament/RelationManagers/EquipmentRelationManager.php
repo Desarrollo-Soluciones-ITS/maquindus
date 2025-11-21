@@ -45,20 +45,20 @@ class EquipmentRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AttachAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.equipment.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.equipment.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DetachAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.equipment.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.equipment.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.equipment.unsync')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    DetachBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.equipment.delete')),
+                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.equipment.unsync')),
                 ])
             ]);
     }

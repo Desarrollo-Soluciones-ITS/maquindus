@@ -14,8 +14,8 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('users.delete')),
         ];
     }
 }
