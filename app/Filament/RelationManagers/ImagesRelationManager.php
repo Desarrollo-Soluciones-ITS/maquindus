@@ -145,7 +145,8 @@ class ImagesRelationManager extends RelationManager
                         return $resourceClass
                             ? $resourceClass::getUrl('gallery', ['record' => $ownerRecord])
                             : '#';
-                    }),
+                    })
+                    ->hidden(!currentUserHasPermission('relationships.images.gallery')),
                 CreateAction::make()
                     ->label('Añadir imagen')
                     ->using(
@@ -161,7 +162,8 @@ class ImagesRelationManager extends RelationManager
                                     'mime' => $mime,
                                 ]);
                         }
-                    ),
+                    )
+                    ->hidden(!currentUserHasPermission('relationships.images.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -177,8 +179,10 @@ class ImagesRelationManager extends RelationManager
                                     ->danger()
                                     ->send();
                             }
-                        }),
-                    ViewAction::make(),
+                        })
+                        ->hidden(!currentUserHasPermission('relationships.images.download')),
+                    ViewAction::make()
+                        ->hidden(!currentUserHasPermission('relationships.images.show')),
                     EditAction::make()
                         ->using(function (Model $record, array $data): Model {
                             $oldPath = $record->path;
@@ -196,12 +200,14 @@ class ImagesRelationManager extends RelationManager
                             ]);
 
                             return $record;
-                        }),
+                        })
+                        ->hidden(!currentUserHasPermission('relationships.images.edit')),
                     DeleteAction::make()
                         ->using(function (Model $record) {
                             Storage::delete($record->path);
                             $record->delete();
-                        }),
+                        })
+                        ->hidden(!currentUserHasPermission('relationships.images.delete')),
                 ])
             ])
             ->toolbarActions([
@@ -213,6 +219,7 @@ class ImagesRelationManager extends RelationManager
                                 $record->delete();
                             });
                         })
+                        ->hidden(!currentUserHasPermission('relationships.images.delete'))
                 ]),
             ]);
     }

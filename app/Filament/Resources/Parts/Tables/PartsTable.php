@@ -32,14 +32,14 @@ class PartsTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('parts.delete')),
                 ]),
             ]);
     }

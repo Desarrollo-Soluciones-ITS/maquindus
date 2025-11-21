@@ -72,4 +72,25 @@ class ProjectResource extends Resource
             'gallery' => ProjectGallery::route('/{record}/gallery'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('projects.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('projects.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('projects.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('projects.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('projects.test');
+    }
 }

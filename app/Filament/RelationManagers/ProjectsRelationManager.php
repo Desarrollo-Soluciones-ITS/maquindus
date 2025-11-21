@@ -43,21 +43,21 @@ class ProjectsRelationManager extends RelationManager
     {
         return ProjectsTable::configure($table)
             ->headerActions([
-                CreateAction::make(),
-                AttachAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.projects.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DetachAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.projects.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.projects.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.projects.unsync')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                    DeleteBulkAction::make(),
+                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.projects.unsync')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ]);
     }

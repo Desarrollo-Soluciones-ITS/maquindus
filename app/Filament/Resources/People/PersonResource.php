@@ -71,4 +71,25 @@ class PersonResource extends Resource
     {
         return ['name', 'surname'];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('people.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('people.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('people.edit');
+    }
+    public static function canView(Model $record): bool
+    {
+        return currentUserHasPermission('people.show');
+    }
+    public static function canDelete(Model $record): bool
+    {
+        return currentUserHasPermission('people.test');
+    }
 }

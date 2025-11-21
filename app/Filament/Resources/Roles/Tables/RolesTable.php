@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Roles\Tables;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -9,9 +10,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Str;
 
 class RolesTable
 {
@@ -27,7 +30,7 @@ class RolesTable
                     ->sortable()
                     ->alignment('center')
                     ->weight('bold')
-                    ->color('primary')
+                    ->color('primary'),
             ])
             ->filters([
                 //
@@ -35,6 +38,7 @@ class RolesTable
             ->recordActions([
                 EditAction::make()
                     ->hidden(fn(Role $record) => $record->name === 'Administrador'),
+
                 Action::make('Asignar')
                     ->icon(Heroicon::Tag)
                     ->fillForm(fn(Role $record): array => [
@@ -67,11 +71,10 @@ class RolesTable
                                     ->where('email', '!=', 'admin@example.com')
                                     ->pluck('name', 'id')
                                     ->toArray();
-                            })
+                            }),
                     ])
                     ->action(function (Role $record, array $data) {
                         $selectedUserIds = $data['users'] ?? [];
-
                         $adminEmail = 'admin@example.com';
 
                         $currentUserIds = User::where('role_id', $record->id)
@@ -80,7 +83,6 @@ class RolesTable
                             ->toArray();
 
                         $toAdd = array_diff($selectedUserIds, $currentUserIds);
-
                         $toRemove = array_diff($currentUserIds, $selectedUserIds);
 
                         if (!empty($toRemove)) {
@@ -96,7 +98,51 @@ class RolesTable
                         }
                     })
                     ->hidden(fn(Role $r) => $r->name === 'Administrador')
-                    ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados')
+                    ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados'),
+
+                Action::make('permissions')
+                    ->label('Sincronizar permisos')
+                    ->icon(Heroicon::LockClosed)
+                    ->color('info')
+                    ->fillForm(fn(Role $record): array => [
+                        'permissions' => $record->permissions->pluck('id')->toArray(),
+                    ])
+                    ->form([
+                        Select::make('permissions')
+                            ->label('Permisos')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Seleccionar permisos...')
+                            ->options(function () {
+                                return Permission::orderBy('name')
+                                    ->pluck('name', 'id');
+                            })
+                            ->required(false),
+                    ])
+                    ->action(function (Role $record, array $data) {
+                        $permissionIds = $data['permissions'] ?? [];
+                        if (empty($permissionIds)) {
+
+                            Notification::make()
+                                ->title('Datos no encontrados')
+                                ->body('No se seleccionaron permisos a sincronizar')
+                                ->info()
+                                ->send();
+                        } else {
+                            $record->permissions()->sync($permissionIds);
+
+                            $totalPermissions = count($permissionIds);
+
+                            Notification::make()
+                                ->title('Rol actualizado')
+                                ->body(Str::markdown("Se sincronizaron **$totalPermissions** permisos correctamente"))
+                                ->success()
+                                ->send();
+                        }
+
+                    })
+                    ->hidden(fn(Role $r) => $r->name === 'Administrador'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -27,7 +27,7 @@ class ProjectsTable
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn ($state): string => match ($state) {
+                    ->color(fn($state): string => match ($state) {
                         Status::Planning => 'primary',
                         Status::Ongoing => 'warning',
                         Status::Finished => 'success',
@@ -41,14 +41,14 @@ class ProjectsTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('projects.delete')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete')),
                 ]),
             ]);
     }

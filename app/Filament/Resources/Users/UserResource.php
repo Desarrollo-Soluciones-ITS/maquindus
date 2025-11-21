@@ -59,4 +59,25 @@ class UserResource extends Resource
             'edit' => EditUser::route('/{record}/edit'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('users.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('users.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('users.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('users.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('users.test');
+    }
 }

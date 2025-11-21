@@ -70,4 +70,25 @@ class PartResource extends Resource
             'gallery' => PartGallery::route('/{record}/gallery'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('parts.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('parts.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('parts.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('parts.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('parts.test');
+    }
 }

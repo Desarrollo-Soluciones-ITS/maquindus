@@ -43,10 +43,10 @@ class DocumentsTable
                         $fullClass = $record->documentable_type;
                         // TODO -> centralizar junto con función helper model_name_to_spanish_name()
                         $spanishName = match ($fullClass) {
-                            Part::class      => 'Repuesto',
+                            Part::class => 'Repuesto',
                             Equipment::class => 'Equipo',
-                            Project::class   => 'Proyecto',
-                            default          => 'Relacionado',
+                            Project::class => 'Proyecto',
+                            default => 'Relacionado',
                         };
 
                         return "($spanishName) $state";
@@ -62,13 +62,13 @@ class DocumentsTable
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make(),
-                        OpenFolderAction::make(),
-                        DownloadAction::make(),
-                        ViewAction::make(),
+                        PreviewAction::make()->hidden(!currentUserHasPermission('documents.show_file')),
+                        OpenFolderAction::make()->hidden(!currentUserHasPermission('documents.open_in_folder')),
+                        DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
+                        ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete')),
                 ])
             ]);
     }

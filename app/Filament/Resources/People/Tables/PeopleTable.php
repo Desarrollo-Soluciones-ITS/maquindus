@@ -40,14 +40,14 @@ class PeopleTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('people.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete')),
                 ]),
             ]);
     }

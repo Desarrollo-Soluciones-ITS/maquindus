@@ -37,12 +37,12 @@ class ProjectsRelationManager extends RelationManager
     {
         return ProjectsTable::configure($table)
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()->hidden(!currentUserHasPermission('relationships.projects.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
+                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.projects.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('relationships.projects.edit')),
                 ])
             ])
             ->toolbarActions([

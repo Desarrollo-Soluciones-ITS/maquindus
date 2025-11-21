@@ -60,4 +60,25 @@ class CustomerResource extends Resource
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('customers.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('customers.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('customers.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('customers.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('customers.test');
+    }
 }
