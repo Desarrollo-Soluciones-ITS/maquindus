@@ -70,6 +70,6 @@ class DocumentResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('documents.test');
+        return currentUserHasPermission('documents.delete');
     }
 }

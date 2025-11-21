@@ -90,6 +90,6 @@ class PersonResource extends Resource
     }
     public static function canDelete(Model $record): bool
     {
-        return currentUserHasPermission('people.test');
+        return currentUserHasPermission('people.delete');
     }
 }
