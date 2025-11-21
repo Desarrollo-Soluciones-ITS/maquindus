@@ -80,6 +80,6 @@ class UserResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('users.test');
+        return currentUserHasPermission('users.delete');
     }
 }

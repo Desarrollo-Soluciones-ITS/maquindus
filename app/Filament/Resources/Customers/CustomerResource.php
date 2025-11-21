@@ -79,6 +79,6 @@ class CustomerResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('customers.test');
+        return currentUserHasPermission('customers.delete');
     }
 }

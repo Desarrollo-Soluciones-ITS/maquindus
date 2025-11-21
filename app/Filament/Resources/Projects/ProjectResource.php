@@ -91,6 +91,6 @@ class ProjectResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('projects.test');
+        return currentUserHasPermission('projects.delete');
     }
 }

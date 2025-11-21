@@ -6,7 +6,6 @@ use App\Filament\Resources\Roles\Pages\ListRoles;
 use App\Filament\Resources\Roles\Schemas\RoleForm;
 use App\Filament\Resources\Roles\Tables\RolesTable;
 use App\Models\Role;
-use Auth;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -55,6 +54,6 @@ class RoleResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()->email === 'admin@example.com';
+        return currentUserHasPermission('roles');
     }
 }

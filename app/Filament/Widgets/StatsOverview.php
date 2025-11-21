@@ -6,41 +6,58 @@ use App\Models\File;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Filament\Support\Icons\Heroicon;
 
 class StatsOverview extends StatsOverviewWidget
 {
     public function getColumnSpan(): array|int|string
     {
-        return 'full';
+        return [
+            'sm' => 1,
+            'md' => 2,
+        ];
+    }
+
+    protected function getColumns(): int|array
+    {
+        return [
+            'sm' => 1,
+            'md' => 2,
+        ];
     }
 
     protected function getStats(): array
     {
         try {
             $diskStats = $this->getDiskStats();
-            $fileCount = $this->getFileCount();
-            $usedSpace = File::formatBytes($this->getDocumentableSpace());
-            $usedDiskByDocuments = $this->getSpacePercentage($fileCount);
+            $freeSpace = $diskStats['free'];
+            $totalSpace = $diskStats['total'];
+
+            $usedBytes = $this->getDocumentableSpace();
+            $usedSpaceFormatted = File::formatBytes($usedBytes);
+            $freeSpaceFormatted = File::formatBytes($freeSpace);
+
+            $usedSpacePercentage = $totalSpace > 0
+                ? round(($usedBytes / $totalSpace) * 100, 2)
+                : 0;
 
             return [
-                Stat::make('Espacio ocupado total (GB)', $usedSpace)
+                Stat::make('Espacio total ocupado', $usedSpaceFormatted)
                     ->description('Del total del sistema')
                     ->descriptionIcon(Heroicon::Server),
 
-                Stat::make('Espacio ocupado por documentos', $usedDiskByDocuments)
-                    ->description('Basado en archivos almacenados')
-                    ->descriptionIcon(Heroicon::Document),
-
-                Stat::make('Cantidad archivos', $fileCount)
-                    ->description('En almacenamiento público')
+                Stat::make('Cantidad archivos', $this->getFileCount())
+                    ->description('Registrados en el sistema')
                     ->descriptionIcon(Heroicon::Folder),
 
-                Stat::make('Espacio disponible en disco (GB)', $diskStats['free_gb'])
+                Stat::make('Espacio disponible en disco', $freeSpaceFormatted)
                     ->description('Espacio libre restante')
                     ->descriptionIcon(Heroicon::ComputerDesktop)
-                    ->color($diskStats['free_gb'] < 10 ? 'danger' : 'success'),
+                    ->color($freeSpace < 10 ? 'danger' : 'success'),
+
+                Stat::make('Espacio ocupado', "{$usedSpacePercentage}%")
+                    ->description('Dentro del servidor')
+                    ->descriptionIcon(Heroicon::Cloud),
             ];
 
         } catch (\Exception $e) {
@@ -52,6 +69,7 @@ class StatsOverview extends StatsOverviewWidget
             ];
         }
     }
+
     private function getDiskStats(): array
     {
         return Cache::remember('disk_stats', 300, function () {
@@ -64,42 +82,29 @@ class StatsOverview extends StatsOverviewWidget
                 throw new \Exception('Unable to read disk space');
             }
 
-            $usedSpaceBytes = $totalSpaceBytes - $freeSpaceBytes;
-
             return [
-                'free_gb' => round($freeSpaceBytes / (1024 * 1024 * 1024), 2),
-                'used_gb' => round($usedSpaceBytes / (1024 * 1024 * 1024), 2),
-                'total_gb' => round($totalSpaceBytes / (1024 * 1024 * 1024), 2),
+                'free' => $freeSpaceBytes,
+                'total' => $totalSpaceBytes,
             ];
         });
     }
 
     private function getFileCount(): int
     {
-        return Cache::remember('file_count', 600, function () {
+        return Cache::remember('file_count', 300, function () {
             try {
-                $files = Storage::disk('public')->allFiles('');
-                return count($files);
+                return File::count('id');
             } catch (\Exception $e) {
                 return 0;
             }
         });
     }
 
-    /**
-     * ! TODO - convertir a grafico de tortas agrupado por tipo de modelo
-     * Espacio ocupado por documentos de Equipos (25 GB - 50%)
-     * Espacio ocupado por documentos de Proyectos (10 GB - 20%)
-     * Espacio ocupado por documentos de Repuestos (5 GB - 10%)
-     * Espacio ocupado por documentos de Clientes (5 GB - 10%)
-     * Espacio ocupado por documentos de Proveedores (2.5 GB - 5%)
-     * Espacio ocupado por documentos de Contactos (2.5 GB - 5%)
-     */
     private function getDocumentableSpace(): int
     {
-        return Cache::remember('documents_space', 600, function () {
+        return Cache::remember('documents_space', 300, function () {
             try {
-                return (int) File::sum('file_size') >> 20;
+                return File::sum('file_size');
             } catch (\Exception $e) {
                 return 0;
             }

@@ -62,6 +62,8 @@ class PermissionSeeder extends Seeder
     protected function getPermissionsTree(): array
     {
         return [
+            'dashboard',
+            'roles',
             'equipments' => [
                 'create',
                 'edit',

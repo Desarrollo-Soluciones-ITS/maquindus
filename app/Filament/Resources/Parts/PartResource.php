@@ -89,6 +89,6 @@ class PartResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('parts.test');
+        return currentUserHasPermission('parts.delete');
     }
 }

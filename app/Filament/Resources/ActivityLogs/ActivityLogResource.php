@@ -72,6 +72,6 @@ class ActivityLogResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('activity_logs.test');
+        return currentUserHasPermission('activity_logs.delete');
     }
 }
