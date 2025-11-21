@@ -59,6 +59,14 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        
+        // --- DISCO PERSONALIZADO PARA BACKUP (Añadido) ---
+        // Este disco usa la ruta definida en la variable CUSTOM_BACKUP_PATH del .env
+        'backup_custom_disk' => [
+            'driver' => 'local',
+            'root' => env('CUSTOM_BACKUP_PATH', 'D:/david/Documentos'),
+            'throw' => false,
+        ],
 
     ],
 
