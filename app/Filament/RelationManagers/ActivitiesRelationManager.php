@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -37,11 +38,13 @@ class ActivitiesRelationManager extends RelationManager
             ->components([
                 TextInput::make('title')
                     ->label('Título')
-                    ->placeholder('Instalación de equipo principal')
+                    ->placeholder('Ej. Instalación de equipo principal')
+                    ->maxLength(80)
                     ->required(),
                 Textarea::make('comment')
                     ->label('Comentario')
-                    ->placeholder('Se inició la instalación del equipo principal en el proyecto')
+                    ->placeholder('Ej. Se inició la instalación del equipo principal en el proyecto')
+                    ->maxLength(255)
                     ->required(),
                 Select::make('people')
                     ->label('Participantes')
@@ -55,11 +58,16 @@ class ActivitiesRelationManager extends RelationManager
     public function infolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
                 TextEntry::make('title')
                     ->label('Título'),
                 TextEntry::make('comment')
                     ->label('Comentario'),
+                TextEntry::make('created_at')
+                    ->label('Fecha')
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
                 RepeatableEntry::make('people')
                     ->label('Participantes')
                     ->grid(3)
@@ -88,9 +96,13 @@ class ActivitiesRelationManager extends RelationManager
                         fn(string $state) => str($state)
                             ->limit(limit: 70, preserveWords: true)
                     ),
+                TextColumn::make('created_at')
+                    ->label('Fecha')
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas')
             ])
             ->filters([
-                //
+                DateFilter::make(),
             ])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.activities.create')),
