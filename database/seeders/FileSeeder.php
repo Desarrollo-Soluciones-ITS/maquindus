@@ -68,6 +68,10 @@ class FileSeeder extends Seeder
             $path = $segments->join('/');
 
             Storage::copy('sample.pdf', $path);
+
+            $file->update([
+                'path' => $path,
+            ]);
         }
     }
 }
