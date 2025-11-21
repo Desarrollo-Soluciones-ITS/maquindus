@@ -7,25 +7,13 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class File extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>
-     */
-    protected $fillable = [
-        'path',
-        'mime',
-        'version',
-        'document_id',
-        'file_size'
-    ];
 
     protected static function booted(): void
     {
@@ -80,7 +68,7 @@ class File extends Model
                 return Storage::size($path);
             }
         } catch (\Exception $e) {
-            \Log::warning("Could not get file size for path: {$path}", [
+            Log::warning("Could not get file size for path: {$path}", [
                 'error' => $e->getMessage()
             ]);
         }
