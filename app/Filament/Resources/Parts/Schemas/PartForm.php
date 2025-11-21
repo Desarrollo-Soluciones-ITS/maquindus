@@ -16,7 +16,7 @@ class PartForm
             ->columns(3)
             ->components([
                 TextInput::make('name')
-                    ->label('Modelo')
+                    ->label('Nombre')
                     ->placeholder('Bomba hidráulica')
                     ->required(),
                 CodeInput::make(Prefix::Part),

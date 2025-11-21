@@ -15,7 +15,7 @@ class PartSeeder extends Seeder
     {
         $parts = [
             ['name' => 'Filtro principal', 'code' => Code::full('FTP', Prefix::Part), 'about' => 'Filtro de aceite', 'details' => ['Material' => 'Acero', 'Diámetro' => '50mm'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Bomba hidráulica', 'code' => Code::full('BHD', Prefix::Part), 'about' => 'Bomba de transferencia', 'details' => ['Capacidad' => '120L/min', 'Modelo' => 'BMP-120'], 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Bomba hidráulica', 'code' => Code::full('BHD', Prefix::Part), 'about' => 'Bomba de transferencia', 'details' => ['Capacidad' => '120L/min', 'Potencia' => '200kw'], 'created_at' => now(), 'updated_at' => now()],
         ];
 
         foreach ($parts as $p) {

@@ -16,7 +16,7 @@ class EquipmentForm
             ->columns(3)
             ->components([
                 TextInput::make('name')
-                    ->label('Modelo')
+                    ->label('Nombre')
                     ->placeholder('Compresor Atlas')
                     ->required(),
                 CodeInput::make(Prefix::Equipment),
