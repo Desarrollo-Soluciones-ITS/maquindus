@@ -2,19 +2,18 @@
 
 namespace App\Filament\Resources\Documents\RelationManagers;
 
-use App\Filament\Actions\Documents\DeleteAction;
-use App\Filament\Actions\Documents\DeleteBulkAction;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\PreviewAction;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -25,7 +24,7 @@ class FilesRelationManager extends RelationManager
 {
     protected static string $relationship = 'files';
 
-    protected static ?string $recordTitleAttribute = 'versión';
+    protected static ?string $recordTitleAttribute = 'version';
 
     protected static ?string $title = 'Versiones';
 
@@ -36,7 +35,7 @@ class FilesRelationManager extends RelationManager
         return $schema
             ->components([
                 FileUpload::make('path')
-                    ->label('Nueva versión')
+                    ->label('Archivo de nueva versión')
                     ->disk('local')
                     ->directory(
                         function (RelationManager $livewire) {
@@ -48,7 +47,7 @@ class FilesRelationManager extends RelationManager
                             );
 
                             $segments = collect([$folder, $documentable->name]);
-                            $category = $document->category;
+                            $category = $document->category->value;
 
                             if ($category) {
                                 $segments->push($category);
@@ -65,7 +64,6 @@ class FilesRelationManager extends RelationManager
 
                             $extension = $file->getClientOriginalExtension();
                             $baseName = str($document->name);
-                            // $timestamp = now()->format('Ymd_His');
                 
                             return str($baseName)
                                 ->append(" - V{$nextVersion}", '.', $extension);
@@ -91,13 +89,9 @@ class FilesRelationManager extends RelationManager
                             ->badge()
                             ->formatStateUsing(fn(string $state): string => mime_type($state)),
                         TextEntry::make('created_at')
-                            ->label('Subido el')
+                            ->label('Fecha de subida')
                             ->date('d/m/Y - g:i A')
                             ->timezone('America/Caracas'),
-                        TextEntry::make('updated_at')
-                            ->label('Última actualización')
-                            ->date('d/m/Y - g:i A')
-                            ->timezone('America/Caracas')
                     ])
                     ->columnSpanFull(),
             ]);
@@ -106,21 +100,21 @@ class FilesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('version')
             ->recordUrl(null)
             ->recordAction(is_not_localhost() ? 'download' : 'preview')
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('version')
                     ->label('Versión')
-                    ->sortable()
                     ->searchable()
+                    ->sortable()
                     ->numeric(),
                 TextColumn::make('mime')
                     ->label('Tipo de archivo')
                     ->badge()
                     ->formatStateUsing(fn(string $state): string => mime_type($state)),
                 TextColumn::make('created_at')
-                    ->label('Fecha de creación')
+                    ->label('Fecha de subida')
                     ->date('d/m/Y - g:i A')
                     ->timezone('America/Caracas')
                     ->sortable(),
@@ -154,12 +148,10 @@ class FilesRelationManager extends RelationManager
                         OpenFolderAction::make()->hidden(!currentUserHasPermission('relationships.files.open_in_folder')),
                         DownloadAction::make()->hidden(!currentUserHasPermission('relationships.files.download')),
                     ])->dropdown(false),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.files.delete')),
-                ]),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.files.delete')),
+                    ViewAction::make()
+                        ->color(Color::Blue)
+                        ->modalHeading('Datos de la versión')
+                        ->hidden(!currentUserHasPermission('relationships.files.show')),
                 ]),
             ]);
     }
