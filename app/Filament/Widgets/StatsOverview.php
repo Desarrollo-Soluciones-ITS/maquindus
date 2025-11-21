@@ -2,11 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\File;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use BackedEnum;
 use Filament\Support\Icons\Heroicon;
 
 class StatsOverview extends StatsOverviewWidget
@@ -21,13 +21,15 @@ class StatsOverview extends StatsOverviewWidget
         try {
             $diskStats = $this->getDiskStats();
             $fileCount = $this->getFileCount();
+            $usedSpace = File::formatBytes($this->getDocumentableSpace());
+            $usedDiskByDocuments = $this->getSpacePercentage($fileCount);
 
             return [
-                Stat::make('Espacio ocupado total (GB)', $diskStats['used_gb'])
+                Stat::make('Espacio ocupado total (GB)', $usedSpace)
                     ->description('Del total del sistema')
                     ->descriptionIcon(Heroicon::Server),
 
-                Stat::make('Espacio ocupado por documentable', $this->getDocumentableSpace($fileCount))
+                Stat::make('Espacio ocupado por documentos', $usedDiskByDocuments)
                     ->description('Basado en archivos almacenados')
                     ->descriptionIcon(Heroicon::Document),
 
@@ -50,7 +52,6 @@ class StatsOverview extends StatsOverviewWidget
             ];
         }
     }
-
     private function getDiskStats(): array
     {
         return Cache::remember('disk_stats', 300, function () {
@@ -85,9 +86,28 @@ class StatsOverview extends StatsOverviewWidget
         });
     }
 
-    private function getDocumentableSpace(int $fileCount): string
+    /**
+     * ! TODO - convertir a grafico de tortas agrupado por tipo de modelo
+     * Espacio ocupado por documentos de Equipos (25 GB - 50%)
+     * Espacio ocupado por documentos de Proyectos (10 GB - 20%)
+     * Espacio ocupado por documentos de Repuestos (5 GB - 10%)
+     * Espacio ocupado por documentos de Clientes (5 GB - 10%)
+     * Espacio ocupado por documentos de Proveedores (2.5 GB - 5%)
+     * Espacio ocupado por documentos de Contactos (2.5 GB - 5%)
+     */
+    private function getDocumentableSpace(): int
     {
-        // Replace with your actual business logic
+        return Cache::remember('documents_space', 600, function () {
+            try {
+                return (int) File::sum('file_size') >> 20;
+            } catch (\Exception $e) {
+                return 0;
+            }
+        });
+    }
+
+    private function getSpacePercentage(int $fileCount): string
+    {
         return $fileCount > 0 ? round(($fileCount / 1000) * 100, 2) . '%' : '0%';
     }
 }

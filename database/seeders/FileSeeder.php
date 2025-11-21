@@ -41,7 +41,8 @@ class FileSeeder extends Seeder
             File::create($file);
         }
 
-        if (Storage::missing('sample.pdf')) return;
+        if (Storage::missing('sample.pdf'))
+            return;
 
         $files = File::with(['document', 'document.documentable'])
             ->get();
@@ -57,7 +58,7 @@ class FileSeeder extends Seeder
 
             $segments = collect([$folder, $documentable->name]);
             $category = $document->category;
-            
+
             if ($category) {
                 $segments->push($category->value);
             }
