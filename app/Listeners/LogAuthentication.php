@@ -47,7 +47,7 @@ class LogAuthentication
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ])
-            ->log("{$userEmail} - Inició sesión exitosamente desde la IP " . request()->ip());
+            ->log("{$userEmail} - Inició sesión desde la IP " . request()->ip());
     }
 
     protected function handleLogout(Logout $event): void

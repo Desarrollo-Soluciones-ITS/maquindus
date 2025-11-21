@@ -4,7 +4,6 @@ namespace App\Filament\Actions\Documents;
 
 use Filament\Actions\Action;
 use Filament\Actions\EditAction as FilamentEditAction;
-use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,13 +16,21 @@ class EditAction
                 $data = collect($data);
                 $oldName = $record->name;
                 $newName = $data['name'];
-                $oldType = $record->type;
-                $newType = $data['type'];
+                $oldCategory = $record->category;
+                $newCategory = $data['category'];
 
-                if ($oldName !== $newName || $oldType !== $newType) {
+                if ($oldName !== $newName || $oldCategory !== $newCategory) {
                     $documentable = $record->documentable;
-                    $parent = str($documentable::class)->explode('\\')->pop();
-                    $newFolder = collect([$parent, $documentable->name, $newType])->join('/');
+
+                    $parent = model_to_spanish($documentable::class, plural: true);
+
+                    $segments = collect([$parent, $documentable->name]);
+
+                    if ($newCategory) {
+                        $segments->push($newCategory);
+                    }
+
+                    $newFolder = $segments->join('/');
 
                     $record->files()->each(function ($file) use ($oldName, $newName, $newFolder) {
                         $oldPath = $file->path;
