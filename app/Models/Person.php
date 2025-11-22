@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Person extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes;
 
     public function personable(): MorphTo
     {

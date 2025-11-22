@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -37,7 +38,8 @@ class ProjectsTable
                 TextColumn::make('customer.name')
                     ->label('Cliente')
                     ->color(Color::Blue)
-                    ->url(fn($record) =>
+                    ->url(
+                        fn($record) =>
                         ViewCustomer::getUrl(['record' => $record->customer_id])
                     )
                     ->searchable(),
@@ -49,12 +51,16 @@ class ProjectsTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('projects.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('projects.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

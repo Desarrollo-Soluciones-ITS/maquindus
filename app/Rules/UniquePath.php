@@ -65,9 +65,8 @@ class UniquePath
 
                         if ($count > 0) {
                             $fail('Ya existe un archivo con ese nombre y carpeta.');
+                            return;
                         }
-
-                        return;
                     }
 
                     $likeWithValue = $path . '%';
@@ -80,9 +79,18 @@ class UniquePath
 
                     if ($count > 0) {
                         $fail('Ya existe un archivo con este nombre y carpeta.');
+                        return;
                     }
 
-                    return;
+                    $deletedFullPath = 'Superado/' . $computedPath . '/' . $value . '%';
+                    $count = DB::table('files')
+                        ->where('path', 'like', $deletedFullPath)
+                        ->count();
+
+                    if ($count > 0) {
+                        $fail('Ya existe un archivo con este nombre en la carpeta "Superado".');
+                        return;
+                    }
                 }
 
                 $fullPath = $computedPath . '/' . $value . '%';
@@ -93,6 +101,17 @@ class UniquePath
 
                 if ($count > 0) {
                     $fail('Ya existe un archivo con este nombre y carpeta.');
+                    return;
+                }
+
+                $deletedFullPath = 'Superado/' . $computedPath . '/' . $value . '%';
+                $count = DB::table('files')
+                    ->where('path', 'like', $deletedFullPath)
+                    ->count();
+
+                if ($count > 0) {
+                    $fail('Ya existe un archivo con este nombre en la carpeta "Superado".');
+                    return;
                 }
             };
         };

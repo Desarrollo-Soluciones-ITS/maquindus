@@ -16,6 +16,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class EquipmentRelationManager extends RelationManager
@@ -57,7 +58,9 @@ class EquipmentRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.equipment.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.equipment.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                     DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.equipment.unsync')),
                 ])
             ]);

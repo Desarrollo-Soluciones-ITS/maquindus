@@ -5,9 +5,9 @@ namespace App\Filament\RelationManagers;
 use App\Filament\Actions\Documents\CreateAction;
 use App\Filament\Actions\Documents\DeleteAction;
 use App\Filament\Actions\Documents\DeleteBulkAction;
-use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\EditAction;
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\PreviewAction;
 use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Resources\Documents\Schemas\DocumentForm;
@@ -17,6 +17,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class DocumentsRelationManager extends RelationManager
@@ -54,12 +55,16 @@ class DocumentsRelationManager extends RelationManager
                         ViewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

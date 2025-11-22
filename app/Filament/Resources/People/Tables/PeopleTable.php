@@ -13,6 +13,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -61,12 +62,16 @@ class PeopleTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('people.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('people.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class File extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes;
 
     protected static function booted(): void
     {

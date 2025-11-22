@@ -109,7 +109,7 @@ class PermissionSeeder extends Seeder
                 'projects' => ['create', 'edit', 'show'],
                 'documents' => ['create', 'delete', 'edit', 'show', 'download', 'open_in_folder', 'show_file'],
                 'people' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
-                'activities' => ['create', 'edit', 'show', 'delete'],
+                'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
                 'suppliers' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
                 'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
                 'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],

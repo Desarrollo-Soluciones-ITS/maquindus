@@ -7,6 +7,7 @@ use App\Models\Country;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Icons\Heroicon;
 
 class EditSupplier extends EditRecord
 {
@@ -16,7 +17,9 @@ class EditSupplier extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-            DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete'))
+                ->label('Archivar')
+                ->icon(Heroicon::ArchiveBoxArrowDown),
         ];
     }
 

@@ -146,7 +146,9 @@ class RolesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

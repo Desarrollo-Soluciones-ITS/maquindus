@@ -26,6 +26,7 @@ use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Actions\ActionGroup;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
@@ -84,7 +85,9 @@ class DocumentsTable
                     }),
                 TextColumn::make('current_created_at')
                     ->label('Última versión')
-                    ->sortable(true, fn(Builder $query, string $direction) =>
+                    ->sortable(
+                        true,
+                        fn(Builder $query, string $direction) =>
                         $query->withAggregate('current', 'created_at')
                             ->orderBy('current_created_at', $direction)
                     )
@@ -93,25 +96,29 @@ class DocumentsTable
             ])
             ->filters([
                 DateFilter::make('current.created_at')
-                    ->query(function (
-                        Builder $query,
-                        ?Carbon $startDate,
-                        ?Carbon $endDate
-                    ) {
+                    ->query(function (Builder $query, ?Carbon $startDate, ?Carbon $endDate) {
                         $when = $startDate && $endDate;
-                        return $query->when($when, fn (Builder $middle) =>
-                            $middle->whereHas('current', fn (Builder $inner) =>
+                        return $query->when(
+                            $when,
+                            fn(Builder $middle) =>
+                            $middle->whereHas(
+                                'current',
+                                fn(Builder $inner) =>
                                 $inner->whereBetween(
-                                    'files.created_at', [$startDate, $endDate]
+                                    'files.created_at',
+                                    [$startDate, $endDate]
                                 )
                             )
                         );
                     }),
                 SelectFilter::make('current.mime')
                     ->label('Tipo de archivo')
-                    ->query(fn (Builder $query, array $data) =>
+                    ->query(
+                        fn(Builder $query, array $data) =>
                         !$data['value'] ? $query
-                            : $query->whereHas('current', fn (Builder $inner) =>
+                        : $query->whereHas(
+                            'current',
+                            fn(Builder $inner) =>
                             $inner->where('mime', '=', $data['value'])
                         )
                     )
@@ -149,7 +156,9 @@ class DocumentsTable
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ]);
     }

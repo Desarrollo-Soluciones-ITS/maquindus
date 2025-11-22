@@ -16,6 +16,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class PartsRelationManager extends RelationManager
@@ -53,12 +54,14 @@ class PartsRelationManager extends RelationManager
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.parts.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.parts.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                     DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
                 ])
             ]);

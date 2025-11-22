@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -37,12 +38,16 @@ class CustomersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('customers.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('customers.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('customers.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

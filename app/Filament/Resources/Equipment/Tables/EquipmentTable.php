@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,12 +35,16 @@ class EquipmentTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('equipments.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

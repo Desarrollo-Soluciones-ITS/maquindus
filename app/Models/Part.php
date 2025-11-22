@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Part extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.

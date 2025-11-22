@@ -5,6 +5,7 @@ namespace App\Filament\Actions\Documents;
 use App\Models\File;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteBulkAction as FilamentDeleteBulkAction;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,6 +29,7 @@ class DeleteBulkAction
 
                     $record->delete();
                 });
-            });
+            })->label('Archivar')
+            ->icon(Heroicon::ArchiveBoxArrowDown);
     }
 }

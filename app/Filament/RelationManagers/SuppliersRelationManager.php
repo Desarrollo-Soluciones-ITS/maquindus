@@ -17,6 +17,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class SuppliersRelationManager extends RelationManager
@@ -54,13 +55,17 @@ class SuppliersRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete')),
+                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

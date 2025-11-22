@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -37,7 +38,9 @@ class SuppliersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+                    DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete'))
+                        ->label('Archivar')
+                        ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([

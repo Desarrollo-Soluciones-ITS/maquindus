@@ -8,6 +8,7 @@ use App\Services\Code;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Icons\Heroicon;
 
 class EditPart extends EditRecord
 {
@@ -17,7 +18,9 @@ class EditPart extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
-            DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete')),
+            DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete'))
+                ->label('Archivar')
+                ->icon(Heroicon::ArchiveBoxArrowDown),
         ];
     }
 
