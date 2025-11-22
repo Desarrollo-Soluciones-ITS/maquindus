@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Enums\Prefix;
 use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
 use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
@@ -43,13 +44,17 @@ class EquipmentRelationManager extends RelationManager
         return EquipmentTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.equipment.create')),
+                CreateAction::make()
+                    ->mutateDataUsing(code_to_full(Prefix::Equipment))
+                    ->hidden(!currentUserHasPermission('relationships.equipment.create')),
                 AttachAction::make()->hidden(!currentUserHasPermission('relationships.equipment.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.equipment.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.equipment.edit')),
+                    EditAction::make()
+                        ->mutateDataUsing(code_to_full(Prefix::Equipment))
+                        ->hidden(!currentUserHasPermission('relationships.equipment.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.equipment.unsync')),
                 ])
             ])

@@ -19,6 +19,7 @@ class EquipmentForm
                     ->label('Nombre')
                     ->placeholder('Ej. Compresor Atlas')
                     ->maxLength(80)
+                    ->unique()
                     ->required(),
                 CodeInput::make(Prefix::Equipment),
                 TextInput::make('about')

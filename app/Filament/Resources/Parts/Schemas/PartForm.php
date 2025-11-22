@@ -18,11 +18,14 @@ class PartForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Bomba hidráulica')
+                    ->maxLength(80)
+                    ->unique()
                     ->required(),
                 CodeInput::make(Prefix::Part),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Bomba de transferencia')
+                    ->maxLength(255)
                     ->required(),
                 KeyValue::make('details')
                     ->label('Características')

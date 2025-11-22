@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Parts\Tables;
 
+use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -19,16 +20,22 @@ class PartsTable
             ->columns([
                 TextColumn::make('code')
                     ->label('Código')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('about')
-                    ->label('Descripción')
-                    ->searchable(),
+                    ->label('Descripción'),
+                TextColumn::make('created_at')
+                    ->label('Fecha')
+                    ->sortable(is_not_relation_manager())
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
             ])
             ->filters([
-                //
+                DateFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

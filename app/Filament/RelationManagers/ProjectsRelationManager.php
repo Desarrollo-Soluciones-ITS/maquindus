@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Enums\Prefix;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
@@ -44,14 +45,18 @@ class ProjectsRelationManager extends RelationManager
     {
         return ProjectsTable::configure($table)
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.projects.create')),
+                CreateAction::make()
+                    ->mutateDataUsing(code_to_full(Prefix::Project))
+                    ->hidden(!currentUserHasPermission('relationships.projects.create')),
                 AttachAction::make()
                     ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.projects.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.projects.edit')),
+                    EditAction::make()
+                        ->mutateDataUsing(code_to_full(Prefix::Project))
+                        ->hidden(!currentUserHasPermission('relationships.projects.edit')),
                     DetachAction::make()
                         ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
                     DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),

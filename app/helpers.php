@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Prefix;
 use App\Models\Activity;
 use App\Models\City;
 use App\Models\Customer;
@@ -14,6 +15,7 @@ use App\Models\Role;
 use App\Models\State;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Services\Code;
 use Filament\Resources\RelationManagers\RelationManager;
 use Illuminate\Support\Facades\Storage;
 
@@ -200,5 +202,14 @@ if (!function_exists('is_relation_manager')) {
     function is_not_relation_manager()
     {
         return fn($livewire) => !($livewire instanceof RelationManager);
+    }
+}
+
+if (!function_exists('code_to_full')) {
+    function code_to_full(Prefix $prefix) {
+        return function ($data) use ($prefix) {
+            $data['code'] = Code::full($data['code'], $prefix);
+            return $data;
+        };
     }
 }
