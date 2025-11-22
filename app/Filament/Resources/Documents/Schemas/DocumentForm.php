@@ -6,6 +6,7 @@ use App\Enums\Category;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Models\Equipment;
 use App\Models\Part;
+use Closure;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -14,6 +15,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class DocumentForm
@@ -26,13 +28,58 @@ class DocumentForm
                     ->label('Nombre')
                     ->maxLength(80)
                     ->placeholder('Manual de Operación de la Bomba P-5')
-                    // aqui tienes que meter la regla custom de validacion, para que si el nombre introducido (ya sea al crear o editar) hace que exista un path duplicado, no permita ese nombre
+                    ->rule(
+                        function (Get $get, ?Model $record, object $livewire) {
+                            return function (string $attribute, mixed $value, Closure $fail) use ($get, $record, $livewire) {
+                                $documentable = null;
+
+                                if ($livewire instanceof RelationManager) {
+                                    $documentable = $livewire->getOwnerRecord();
+                                } elseif ($record?->documentable) {
+                                    $documentable = $record->documentable;
+                                }
+
+                                if (!$documentable) {
+                                    return;
+                                }
+
+                                $category = $get('category');
+
+                                $folder = model_to_spanish(model: $documentable::class, plural: true);
+                                $segments = collect([$folder, $documentable->name]);
+
+                                if ($category) {
+                                    $segments->push($category);
+                                }
+
+                                $computedPath = $segments->join('/');
+
+                                $file = $get('path');
+
+                                if (!$file || !$file instanceof TemporaryUploadedFile) {
+                                    $file = $record->files()->latest()->value('path');
+                                }
+
+                                $extension = is_string($file)
+                                    ? pathinfo($file, PATHINFO_EXTENSION)
+                                    : $file->getClientOriginalExtension();
+
+                                $initialVersion = 1;
+                                $fileName = str($value)->append(" - V{$initialVersion}", '.', $extension)->toString();
+                                $fullPath = $computedPath . '/' . $fileName;
+
+                                if (Storage::disk('local')->exists($fullPath)) {
+                                    $fail('Este archivo ya se encuentra registrado.');
+                                }
+                            };
+                        }
+                    )
                     ->required(),
                 Select::make('category')
                     ->label('Categoría')
                     ->options(Category::options())
                     ->placeholder('Ninguna')
-                    ->visible(function (RelationManager | ListDocuments $livewire, Model | null $record) {
+                    ->visible(function (RelationManager|ListDocuments $livewire, Model|null $record) {
                         $documentable = null;
                         if ($livewire instanceof RelationManager) {
                             $documentable = $livewire->getOwnerRecord();
