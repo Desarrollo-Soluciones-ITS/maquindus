@@ -17,7 +17,11 @@ class CreateAction
                 function (array $data, RelationManager $livewire): Model {
                     $data = collect($data);
                     $path = $data->get('path');
-                    $mime = Storage::mimeType($path);
+
+                    $mime = check_solidworks(
+                        mime: Storage::mimeType($path),
+                        path: $path
+                    );
 
                     $document = $livewire->getOwnerRecord()
                         ->documents()
@@ -25,7 +29,7 @@ class CreateAction
 
                     return $document->files()->create([
                         'path' => $path,
-                        'mime' => $mime,
+                        'mime' => mime_type($mime),
                         'version' => 1,
                     ]);
                 }

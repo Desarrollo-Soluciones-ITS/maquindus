@@ -17,10 +17,8 @@ class PreviewAction
             ->action(function ($record) {
                 $file = $record->current ?? $record;
                 try {
-                    $mime = mime_type($file->mime);
                     $path = path($file->path);
-                    
-                    $app = match ($mime) {
+                    $app = match ($file->mime) {
                         'Excel' => 'excel',
                         'Word' => 'winword',
                         'PowerPoint' => 'powerpnt',

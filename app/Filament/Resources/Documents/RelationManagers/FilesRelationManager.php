@@ -47,10 +47,10 @@ class FilesRelationManager extends RelationManager
                             );
 
                             $segments = collect([$folder, $documentable->name]);
-                            $category = $document->category->value;
+                            $category = $document->category;
 
                             if ($category) {
-                                $segments->push($category);
+                                $segments->push($category->value);
                             }
 
                             return $segments->join('/');
@@ -86,8 +86,7 @@ class FilesRelationManager extends RelationManager
                             ->numeric(),
                         TextEntry::make('mime')
                             ->label('Tipo de archivo')
-                            ->badge()
-                            ->formatStateUsing(fn(string $state): string => mime_type($state)),
+                            ->badge(),
                         TextEntry::make('created_at')
                             ->label('Fecha de subida')
                             ->date('d/m/Y - g:i A')
@@ -111,8 +110,7 @@ class FilesRelationManager extends RelationManager
                     ->numeric(),
                 TextColumn::make('mime')
                     ->label('Tipo de archivo')
-                    ->badge()
-                    ->formatStateUsing(fn(string $state): string => mime_type($state)),
+                    ->badge(),
                 TextColumn::make('created_at')
                     ->label('Fecha de subida')
                     ->date('d/m/Y - g:i A')
@@ -132,11 +130,15 @@ class FilesRelationManager extends RelationManager
                         $document = $livewire->getOwnerRecord();
                         $latestVersion = $document->files()->max('version') ?? 0;
                         $path = $data['path'];
-                        $mime = Storage::mimeType($path);
+
+                        $mime = check_solidworks(
+                            mime: Storage::mimeType($path),
+                            path: $path
+                        );
 
                         return $document->files()->create([
                             'path' => $path,
-                            'mime' => $mime,
+                            'mime' => mime_type($mime),
                             'version' => $latestVersion + 1,
                         ]);
                     })->hidden(!currentUserHasPermission('relationships.files.create'))

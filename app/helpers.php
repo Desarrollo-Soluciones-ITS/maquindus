@@ -29,6 +29,7 @@ if (!function_exists('mime_type')) {
             'image/jpg' => 'Imagen',
             'image/png' => 'Imagen',
             'image/webp' => 'Imagen',
+            'image/svg+xml' => 'Imagen',
             'image/gif' => 'GIF',
             'application/msword' => 'Word',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'Word',
@@ -44,12 +45,29 @@ if (!function_exists('mime_type')) {
             'audio/mpeg' => 'MP3',
             'application/acad' => 'AutoCAD',
             'image/vnd.dwg' => 'AutoCAD',
+            'image/vnd.dxf' => 'AutoCAD',
             'image/x-dwg' => 'AutoCAD',
             'application/dwg' => 'AutoCAD',
             'application/x-autocad' => 'AutoCAD',
             'application/x-dwg' => 'AutoCAD',
+            'application/x-solidworks' => 'SolidWorks',
             default => 'Archivo',
         };
+    }
+}
+
+if (!function_exists('check_solidworks')) {
+    function check_solidworks(string $mime, string $path) {
+        if ($mime !== 'application/vnd.ms-office') return $mime;
+    
+        $extension = str($path)
+            ->lower()->explode('.')->last();
+    
+        $contains = collect(['sldprt', 'sldasm', 'slddrw', 'slddrt'])
+            ->contains($extension);
+    
+        if (!$contains) return $mime;
+        return 'application/x-solidworks';
     }
 }
 

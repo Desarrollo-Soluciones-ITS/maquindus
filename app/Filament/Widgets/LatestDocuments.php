@@ -53,8 +53,7 @@ class LatestDocuments extends TableWidget
                     ->label('Nombre'),
                 TextColumn::make('current.mime')
                     ->label('Tipo de archivo')
-                    ->badge()
-                    ->formatStateUsing(fn($state) => mime_type($state)),
+                    ->badge(),
                 TextColumn::make('category')
                     ->label('Categoría')
                     ->badge()
