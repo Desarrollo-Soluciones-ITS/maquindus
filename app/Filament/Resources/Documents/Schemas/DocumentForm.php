@@ -7,6 +7,7 @@ use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Models\Equipment;
 use App\Models\Part;
 use Closure;
+use DB;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -54,15 +55,54 @@ class DocumentForm
 
                                 $computedPath = $segments->join('/');
 
+                                if ($record !== null) {
+                                    $recordName = $record->name ?? null;
+                                    $recordCategory = $record->category?->value ?? null;
+
+                                    if (
+                                        (string) $value === (string) $recordName
+                                        && (string) $category === (string) $recordCategory
+                                    ) {
+                                        return;
+                                    }
+                                }
+
                                 $file = $get('path');
 
                                 if (!$file || !$file instanceof TemporaryUploadedFile) {
-                                    $file = $record->files()->latest()->value('path');
+                                    $path = "$computedPath/$value";
+
+
+                                    if ($category) {
+                                        $like = $path . '%';
+
+                                        $count = DB::table('files')
+                                            ->where('path', 'like', $like)
+                                            ->count();
+
+                                        if ($count > 0) {
+                                            $fail('Este archivo ya se encuentra registrado.');
+                                        }
+
+                                        return;
+                                    }
+
+                                    $likeWithValue = $path . '%';
+                                    $expectedSlashCount = substr_count($computedPath, '/') + 1;
+
+                                    $count = DB::table('files')
+                                        ->where('path', 'like', $likeWithValue)
+                                        ->whereRaw("(LENGTH(path) - LENGTH(REPLACE(path, '/', ''))) = ?", [$expectedSlashCount])
+                                        ->count();
+
+                                    if ($count > 0) {
+                                        $fail('Este archivo ya se encuentra registrado.');
+                                    }
+
+                                    return;
                                 }
 
-                                $extension = is_string($file)
-                                    ? pathinfo($file, PATHINFO_EXTENSION)
-                                    : $file->getClientOriginalExtension();
+                                $extension = $file->getClientOriginalExtension();
 
                                 $initialVersion = 1;
                                 $fileName = str($value)->append(" - V{$initialVersion}", '.', $extension)->toString();
