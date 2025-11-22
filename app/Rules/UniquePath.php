@@ -65,7 +65,7 @@ class UniquePath
                             ->count();
 
                         if ($count > 0) {
-                            $fail('Ya existe un archivo con este nombre.');
+                            $fail('Ya existe un archivo con ese nombre y carpeta.');
                         }
 
                         return;
@@ -80,7 +80,7 @@ class UniquePath
                         ->count();
 
                     if ($count > 0) {
-                        $fail('Ya existe un archivo con este nombre.');
+                        $fail('Ya existe un archivo con este nombre y carpeta.');
                     }
 
                     return;
@@ -93,7 +93,7 @@ class UniquePath
                 $fullPath = $computedPath . '/' . $fileName;
 
                 if (Storage::disk('local')->exists($fullPath)) {
-                    $fail('Este archivo ya se encuentra registrado.');
+                    $fail('Ya existe un archivo con este nombre y carpeta.');
                 }
             };
         };
