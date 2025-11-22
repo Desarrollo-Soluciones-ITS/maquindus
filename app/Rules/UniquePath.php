@@ -7,7 +7,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class UniquePath
@@ -86,13 +85,13 @@ class UniquePath
                     return;
                 }
 
-                $extension = $file->getClientOriginalExtension();
+                $fullPath = $computedPath . '/' . $value . '%';
 
-                $initialVersion = 1;
-                $fileName = str($value)->append(" - V{$initialVersion}", '.', $extension)->toString();
-                $fullPath = $computedPath . '/' . $fileName;
+                $count = DB::table('files')
+                    ->where('path', 'like', $fullPath)
+                    ->count();
 
-                if (Storage::disk('local')->exists($fullPath)) {
+                if ($count > 0) {
                     $fail('Ya existe un archivo con este nombre y carpeta.');
                 }
             };
