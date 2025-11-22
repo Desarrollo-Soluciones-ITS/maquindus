@@ -7,7 +7,7 @@ use Filament\Widgets\ChartWidget;
 
 class DocumentsChart extends ChartWidget
 {
-    protected ?string $heading = 'Espacio ocupado por documentos';
+    protected ?string $heading = 'Documentos por tipo de registro';
     protected ?string $maxHeight = '200px';
 
     public function getColumnSpan(): array|int|string
