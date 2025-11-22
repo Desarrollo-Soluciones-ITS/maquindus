@@ -14,6 +14,8 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog;
 
+    protected $with = ['role', 'role.permissions'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -44,8 +46,9 @@ class User extends Authenticatable
 
     public function hasPermission(string $name): bool
     {
-        return $this->role()
-            ->whereHas('permissions', fn($query) => $query->where('slug', $name))
-            ->exists();
+        $permission = $this->role->permissions
+            ->first(fn($perm) => $perm->slug === $name);
+
+        return !!$permission;
     }
 }
