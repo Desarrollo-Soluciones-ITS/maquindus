@@ -53,7 +53,7 @@ class PartsRelationManager extends RelationManager
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.parts.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.parts.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
                 ])
             ])
             ->toolbarActions([
