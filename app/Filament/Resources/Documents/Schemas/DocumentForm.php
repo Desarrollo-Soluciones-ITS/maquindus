@@ -26,7 +26,7 @@ class DocumentForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->maxLength(80)
-                    ->placeholder('Manual de Operación de la Bomba P-5')
+                    ->placeholder('Ej. Manual de operación')
                     ->rule(UniquePath::apply())
                     ->required(),
                 Select::make('category')

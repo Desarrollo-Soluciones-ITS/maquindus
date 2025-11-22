@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Enums\Prefix;
 use App\Filament\Resources\Parts\Schemas\PartForm;
 use App\Filament\Resources\Parts\Schemas\PartInfolist;
 use App\Filament\Resources\Parts\Tables\PartsTable;
@@ -42,18 +43,20 @@ class PartsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return PartsTable::configure($table)
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.parts.create')),
+                CreateAction::make()
+                    ->mutateDataUsing(code_to_full(Prefix::Part))
+                    ->hidden(!currentUserHasPermission('relationships.parts.create')),
                 AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync'))
                     ->preloadRecordSelect(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.parts.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.parts.edit')),
+                    EditAction::make()
+                        ->mutateDataUsing(code_to_full(Prefix::Part))
+                        ->hidden(!currentUserHasPermission('relationships.parts.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
                 ])
             ])

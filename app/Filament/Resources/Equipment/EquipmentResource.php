@@ -46,7 +46,8 @@ class EquipmentResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return EquipmentTable::configure($table);
+        return EquipmentTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

@@ -46,7 +46,8 @@ class PartResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return PartsTable::configure($table);
+        return PartsTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

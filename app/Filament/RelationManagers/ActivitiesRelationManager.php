@@ -94,7 +94,6 @@ class ActivitiesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('comment')
                     ->label('Comentario')
-                    ->searchable()
                     ->formatStateUsing(
                         fn(string $state) => str($state)
                             ->limit(limit: 70, preserveWords: true)
