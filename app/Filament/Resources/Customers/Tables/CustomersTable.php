@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
+use App\Filament\Actions\Documents\DeleteAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
@@ -45,9 +44,9 @@ class CustomersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

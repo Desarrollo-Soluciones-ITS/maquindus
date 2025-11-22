@@ -60,16 +60,19 @@ if (!function_exists('mime_type')) {
 }
 
 if (!function_exists('check_solidworks')) {
-    function check_solidworks(string $mime, string $path) {
-        if ($mime !== 'application/vnd.ms-office') return $mime;
-    
+    function check_solidworks(string $mime, string $path)
+    {
+        if ($mime !== 'application/vnd.ms-office')
+            return $mime;
+
         $extension = str($path)
             ->lower()->explode('.')->last();
-    
+
         $contains = collect(['sldprt', 'sldasm', 'slddrw', 'slddrt'])
             ->contains($extension);
-    
-        if (!$contains) return $mime;
+
+        if (!$contains)
+            return $mime;
         return 'application/x-solidworks';
     }
 }
@@ -147,7 +150,7 @@ if (!function_exists('translate_activity_verb')) {
             // Eventos CRUD
             'created' => 'creado',
             'updated' => 'actualizado',
-            'deleted' => 'eliminado',
+            'deleted' => 'archivado',
             // Eventos de Autenticación
             'authenticated' => 'inició sesión',
             'logged_out' => 'cerró sesión',
@@ -164,7 +167,7 @@ if (!function_exists('translate_activity_event')) {
             // Eventos CRUD
             'created' => 'Creación',
             'updated' => 'Actualización',
-            'deleted' => 'Eliminación',
+            'deleted' => 'Archivación',
             // Eventos de Autenticación
             'authenticated' => 'Inicio de Sesión',
             'logged_out' => 'Cierre de Sesión',
@@ -206,7 +209,8 @@ if (!function_exists('is_relation_manager')) {
 }
 
 if (!function_exists('code_to_full')) {
-    function code_to_full(Prefix $prefix) {
+    function code_to_full(Prefix $prefix)
+    {
         return function ($data) use ($prefix) {
             $data['code'] = Code::full($data['code'], $prefix);
             return $data;

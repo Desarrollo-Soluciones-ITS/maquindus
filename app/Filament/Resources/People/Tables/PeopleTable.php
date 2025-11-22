@@ -2,14 +2,13 @@
 
 namespace App\Filament\Resources\People\Tables;
 
+use App\Filament\Actions\Documents\DeleteAction;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Customer;
 use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
@@ -69,9 +68,9 @@ class PeopleTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

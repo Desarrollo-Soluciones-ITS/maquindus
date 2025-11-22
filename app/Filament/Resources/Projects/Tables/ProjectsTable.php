@@ -3,11 +3,10 @@
 namespace App\Filament\Resources\Projects\Tables;
 
 use App\Enums\Status;
+use App\Filament\Actions\Documents\DeleteAction;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
@@ -58,9 +57,9 @@ class ProjectsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

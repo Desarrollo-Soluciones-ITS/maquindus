@@ -36,16 +36,16 @@ class UsersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('users.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteAction::make()->hidden(!currentUserHasPermission('users.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('users.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('users.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

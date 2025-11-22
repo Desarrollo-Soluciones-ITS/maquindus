@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\Equipment\Tables;
 
 use App\Filament\Filters\DateFilter;
+use App\Filament\Actions\Documents\DeleteAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
@@ -51,9 +50,9 @@ class EquipmentTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }

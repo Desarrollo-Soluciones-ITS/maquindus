@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Documents;
 
+use App\Models\Document;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction as FilamentDeleteAction;
 use Filament\Notifications\Notification;
@@ -17,37 +18,81 @@ class DeleteAction
             ->using(function (Model $record) {
                 \DB::beginTransaction();
                 try {
-                    foreach ($record->files as $file) {
-                        $newPath = "Superado/" . $file->path;
-                        $oldPath = $file->path;
+                    if ($record instanceof Document) {
+                        $files = $record->files()->get();
 
-                        if (Storage::exists($newPath)) {
-                            Notification::make()
-                                ->title('No se pudo archivar el documento')
-                                ->body('El archivo "' . $file->path . '" ya existe en la carpeta "Superado".')
-                                ->danger()
-                                ->send();
+                        foreach ($files as $file) {
+                            $newPath = "Superado/{$file->path}";
+                            $oldPath = $file->path;
 
-                            \DB::rollBack();
-                            return;
+                            if (Storage::exists($newPath)) {
+                                Notification::make()
+                                    ->title('No se pudo archivar el documento')
+                                    ->body("El archivo \"{$file->path}\" ya existe en la carpeta \"Superado\".")
+                                    ->danger()
+                                    ->send();
+
+                                \DB::rollBack();
+                                return;
+                            }
+
+                            $file->update(['path' => $newPath]);
+                            Storage::move($oldPath, $newPath);
+                            $file->delete();
                         }
 
-                        $file->update(['path' => $newPath]);
-                        Storage::move($oldPath, $newPath);
-                        $file->delete();
+                        $record->delete();
+                    } else {
+                        $documents = $record->documents()->get();
+
+                        foreach ($documents as $document) {
+                            $files = $document->files()->get();
+
+                            foreach ($files as $file) {
+                                $newPath = "Superado/{$file->path}";
+                                $oldPath = $file->path;
+
+                                if (Storage::exists($newPath)) {
+                                    Notification::make()
+                                        ->title('No se pudo archivar el documento')
+                                        ->body("El archivo \"{$file->path}\" ya existe en la carpeta \"Superado\".")
+                                        ->danger()
+                                        ->send();
+
+                                    \DB::rollBack();
+                                    return;
+                                }
+
+                                $file->update(['path' => $newPath]);
+                                Storage::move($oldPath, $newPath);
+                                $file->delete();
+                            }
+
+                            $document->delete();
+                        }
+
+                        $record->delete();
                     }
 
-                    $record->delete();
+                    $name = model_to_spanish($record::class);
+                    $description = strtolower($name);
+                    Notification::make()
+                        ->title("$name archivado")
+                        ->body("El $description y sus documentos asociados han sido archivados correctamente.")
+                        ->success()
+                        ->send();
+
                     \DB::commit();
                 } catch (\Throwable $e) {
                     \DB::rollBack();
                     throw $e;
                 }
-
-                $record->delete();
             })
-            ->modalHeading('Archivar Documento')
-            ->modalDescription('¿Estás seguro de que deseas archivar este documento? Esta acción moverá todas sus versiones a la carpeta "Superado" y ocultará el documento en la tabla.')
+            ->modalHeading(fn(Model $record): string => "Archivar '{$record->getAttribute('name')}'")
+            ->modalDescription(function (Model $record) {
+                $name = model_to_spanish($record::class);
+                return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y ocultará en la tabla.";
+            })
             ->modalIcon(Heroicon::ArchiveBoxArrowDown)
             ->modalSubmitActionLabel('Archivar')
             ->modalCancelActionLabel('Cancelar')

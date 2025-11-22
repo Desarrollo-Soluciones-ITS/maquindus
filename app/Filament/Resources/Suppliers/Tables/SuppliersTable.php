@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\Suppliers\Tables;
 
 use Filament\Actions\ActionGroup;
+use App\Filament\Actions\Documents\DeleteAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
@@ -45,7 +44,7 @@ class SuppliersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
                 ]),
             ]);
     }

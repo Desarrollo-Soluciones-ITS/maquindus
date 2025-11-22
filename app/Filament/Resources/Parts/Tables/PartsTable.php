@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\Parts\Tables;
 
 use App\Filament\Filters\DateFilter;
+use App\Filament\Actions\Documents\DeleteAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
@@ -44,15 +43,14 @@ class PartsTable
                     EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
                     DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete'))
                         ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown)
                         ->icon(Heroicon::ArchiveBoxArrowDown),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('parts.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('parts.delete'))
+                    //     ->label('Archivar')
+                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ]);
     }
