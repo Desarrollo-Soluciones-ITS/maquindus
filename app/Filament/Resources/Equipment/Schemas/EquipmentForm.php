@@ -17,12 +17,14 @@ class EquipmentForm
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Compresor Atlas')
+                    ->placeholder('Ej. Compresor Atlas')
+                    ->maxLength(80)
                     ->required(),
                 CodeInput::make(Prefix::Equipment),
                 TextInput::make('about')
                     ->label('Descripción')
-                    ->placeholder('Compresor centrífugo')
+                    ->placeholder('Ej. Compresor centrífugo')
+                    ->maxLength(255)
                     ->required(),
                 KeyValue::make('details')
                     ->label('Características')

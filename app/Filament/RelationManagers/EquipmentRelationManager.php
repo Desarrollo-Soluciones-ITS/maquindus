@@ -41,9 +41,7 @@ class EquipmentRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return EquipmentTable::configure($table)
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.equipment.create')),
                 AttachAction::make()->hidden(!currentUserHasPermission('relationships.equipment.sync')),

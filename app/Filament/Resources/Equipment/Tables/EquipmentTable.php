@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Equipment\Tables;
 
+use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -9,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 class EquipmentTable
@@ -16,19 +18,26 @@ class EquipmentTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->filtersLayout(FiltersLayout::Modal)
             ->columns([
                 TextColumn::make('code')
                     ->label('Código')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('about')
-                    ->label('Descripción')
-                    ->searchable(),
+                    ->label('Descripción'),
+                TextColumn::make('created_at')
+                    ->label('Fecha')
+                    ->sortable(is_not_relation_manager())
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
             ])
             ->filters([
-                //
+                DateFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
