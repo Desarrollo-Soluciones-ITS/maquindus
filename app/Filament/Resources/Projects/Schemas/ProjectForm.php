@@ -19,11 +19,12 @@ class ProjectForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Planta de ensayo')
+                    ->maxLength(80)
+                    ->unique()
                     ->required(),
                 CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
-                    ->label('Fecha de inicio')
-                    ->required(),
+                    ->label('Fecha de inicio'),
                 DatePicker::make('end')
                     ->label('Fecha de finalización'),
                 Select::make('status')

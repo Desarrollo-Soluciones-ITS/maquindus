@@ -3,7 +3,6 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -43,12 +42,13 @@ class ProjectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return ProjectsTable::configure($table)
+            ->filters([])
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Project))
                     ->hidden(!currentUserHasPermission('relationships.projects.create')),
                 AttachAction::make()
-                    ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.sync')),
+                    ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -57,7 +57,7 @@ class ProjectsRelationManager extends RelationManager
                         ->mutateDataUsing(code_to_full(Prefix::Project))
                         ->hidden(!currentUserHasPermission('relationships.projects.edit')),
                     DetachAction::make()
-                        ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
+                        ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.unsync')),
                     DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete'))
                         ->label('Archivar')
                         ->icon(Heroicon::ArchiveBoxArrowDown),
@@ -68,12 +68,5 @@ class ProjectsRelationManager extends RelationManager
 
                 ])
             ]);
-    }
-
-    private function isCustomerPage()
-    {
-        return function (ProjectsRelationManager $livewire) {
-            return $livewire->getPageClass() === ViewCustomer::class;
-        };
     }
 }

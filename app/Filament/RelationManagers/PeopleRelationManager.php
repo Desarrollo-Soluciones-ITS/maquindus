@@ -41,9 +41,7 @@ class PeopleRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return PeopleTable::configure($table)
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.people.create')),
                 AttachAction::make()->hidden(!currentUserHasPermission('relationships.people.sync')),

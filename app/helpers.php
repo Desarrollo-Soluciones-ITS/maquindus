@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\Prefix;
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
+use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Models\Activity;
 use App\Models\City;
 use App\Models\Customer;
@@ -214,6 +216,16 @@ if (!function_exists('code_to_full')) {
         return function ($data) use ($prefix) {
             $data['code'] = Code::full($data['code'], $prefix);
             return $data;
+        };
+    }
+}
+
+if (!function_exists('is_view_customer')) {
+    function is_view_customer()
+    {
+        return function (RelationManager | ListProjects $livewire) {
+            if ($livewire instanceof ListProjects) return false;
+            return $livewire->getPageClass() === ViewCustomer::class;
         };
     }
 }

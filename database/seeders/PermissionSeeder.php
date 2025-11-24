@@ -34,7 +34,7 @@ class PermissionSeeder extends Seeder
         'users' => 'usuario',
         'activities' => 'actividad',
         'files' => 'archivo',
-        'images' => 'imágen',
+        'images' => 'imagen',
         'activity_logs' => 'registros',
     ];
 

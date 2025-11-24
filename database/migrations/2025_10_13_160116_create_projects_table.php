@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->string('code')->unique();
             $table->string('about')->nullable();
-            $table->date('start');
+            $table->date('start')->nullable();
             $table->date('end')->nullable();
             $table->enum('status', Status::cases());
             $table->foreignUuid('customer_id')->constrained();
