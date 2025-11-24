@@ -8,6 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Illuminate\Database\Eloquent\Builder;
 
 class SupplierForm
@@ -20,16 +21,25 @@ class SupplierForm
             ->components([
                 TextInput::make('rif')
                     ->label('RIF')
-                    ->placeholder('J-07621321-0')
+                    ->placeholder('Ej. J-07621321-0')
+                    ->mask(RawJs::make(<<<'JS'
+                        'J-99999999-9'
+                    JS))
+                    ->maxLength(12)
+                    ->unique()
                     ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Suministros Industriales C.A.')
+                    ->placeholder('Ej. Suministros Industriales C.A.')
+                    ->maxLength(80)
+                    ->unique()
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
-                    ->placeholder('info@sumindus.com')
+                    ->placeholder('Ej. info@sumindus.com')
                     ->email()
+                    ->unique()
+                    ->maxLength(255)
                     ->required(),
                 PhoneInput::make(),
                 Select::make('country_id')
@@ -61,11 +71,13 @@ class SupplierForm
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')
-                    ->placeholder('Calle 10, Avenida MC')
+                    ->placeholder('Ej. Calle 10, Avenida MC')
+                    ->maxLength(255)
                     ->required(),
                 TextInput::make('about')
                     ->label('Descripción')
-                    ->placeholder('Empresa de suministro de equipamiento.')
+                    ->placeholder('Ej. Empresa de suministro de equipamiento.')
+                    ->maxLength(255)
                     ->default(null),
             ]);
     }
