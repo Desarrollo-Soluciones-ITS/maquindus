@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Country;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class CountrySeeder extends Seeder
 {
@@ -14,11 +13,13 @@ class CountrySeeder extends Seeder
     public function run(): void
     {
         $countries = [
-            ['id' => Str::uuid(), 'name' => 'China'],
-            ['id' => Str::uuid(), 'name' => 'Estados Unidos'],
-            ['id' => Str::uuid(), 'name' => 'Venezuela'],
+            ['name' => 'Venezuela'],
+            ['name' => 'China'],
+            ['name' => 'Estados Unidos'],
         ];
 
-        Country::insert($countries);
+        foreach ($countries as $country) {
+            Country::create($country);
+        }
     }
 }

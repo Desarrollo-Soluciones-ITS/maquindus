@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers\Schemas;
 
+use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -30,18 +31,14 @@ class CustomerForm
                     ->placeholder('info@clopez.com')
                     ->email()
                     ->required(),
-                TextInput::make('phone')
-                    ->label('Teléfono')
-                    ->placeholder('02129876543')
-                    ->tel()
-                    ->required(),
+                PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
                     ->selectablePlaceholder(false)
                     ->relationship(
                         name: 'country',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                        modifyQueryUsing: fn(Builder $query) => $query->oldest()
                     )
                     ->live()
                     ->required()
