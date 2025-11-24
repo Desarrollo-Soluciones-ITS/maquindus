@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Projects\Tables;
 
 use App\Enums\Status;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
@@ -66,9 +66,7 @@ class ProjectsTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('projects.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('projects.delete')),
                 ]),
             ])
                 ->toolbarActions([

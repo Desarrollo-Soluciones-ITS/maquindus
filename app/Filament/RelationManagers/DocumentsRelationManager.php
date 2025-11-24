@@ -3,7 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\Documents\CreateAction;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
@@ -54,9 +54,7 @@ class DocumentsRelationManager extends RelationManager
                         ViewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
                 ]),
             ])
             ->toolbarActions([

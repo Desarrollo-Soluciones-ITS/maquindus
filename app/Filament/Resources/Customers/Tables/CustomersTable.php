@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
@@ -37,9 +37,7 @@ class CustomersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('customers.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('customers.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('customers.delete')),
                 ])
             ])
             ->toolbarActions([

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Documents\Tables;
 
 use App\Enums\Category;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
@@ -154,9 +154,7 @@ class DocumentsTable
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('documents.delete')),
                 ])
             ]);
     }

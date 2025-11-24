@@ -19,6 +19,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use App\Services\Code;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -227,5 +228,21 @@ if (!function_exists('is_view_customer')) {
             if ($livewire instanceof ListProjects) return false;
             return $livewire->getPageClass() === ViewCustomer::class;
         };
+    }
+}
+
+if (!function_exists('is_files_model')) {
+    function is_files_model(Model $model)
+    {
+        $models = collect([
+            Project::class,
+            Equipment::class,
+            Person::class,
+            Customer::class,
+            Part::class,
+            Supplier::class,
+        ]);
+
+        return $models->contains($model::class);
     }
 }

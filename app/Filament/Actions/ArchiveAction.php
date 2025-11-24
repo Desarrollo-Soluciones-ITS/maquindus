@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Actions\Documents;
+namespace App\Filament\Actions;
 
 use App\Models\Document;
 use Filament\Actions\Action;
@@ -11,12 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class DeleteAction
+class ArchiveAction
 {
     public static function make(): Action
     {
         return FilamentDeleteAction::make()
+            ->successNotificationTitle('Se archivó correctamente.')
             ->using(function (Model $record) {
+                if (!is_files_model($record)) {
+                    $record->delete();
+                    return true;
+                }
+
                 DB::beginTransaction();
                 try {
                     if ($record instanceof Document) {
@@ -89,7 +95,10 @@ class DeleteAction
                     throw $e;
                 }
             })
-            ->modalHeading(fn(Model $record): string => "Archivar '{$record->getAttribute('name')}'")
+            ->modalHeading(function (Model $record) {
+                $name = model_to_spanish($record::class);
+                return "Archivar $name";
+            })
             ->modalDescription(function (Model $record) {
                 $name = model_to_spanish($record::class);
                 return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";

@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\People\Schemas\PersonForm;
 use App\Filament\Resources\People\Schemas\PersonInfolist;
 use App\Filament\Resources\People\Tables\PeopleTable;
@@ -9,7 +10,6 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -51,9 +51,7 @@ class PeopleRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.people.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.people.delete')),
                 ])
             ])
             ->toolbarActions([

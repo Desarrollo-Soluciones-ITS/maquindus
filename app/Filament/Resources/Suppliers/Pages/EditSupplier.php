@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\Suppliers\Pages;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Suppliers\SupplierResource;
 use App\Models\Country;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Icons\Heroicon;
 
 class EditSupplier extends EditRecord
 {
@@ -17,9 +16,7 @@ class EditSupplier extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-            DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete'))
-                ->label('Archivar')
-                ->icon(Heroicon::ArchiveBoxArrowDown),
+            ArchiveAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
         ];
     }
 

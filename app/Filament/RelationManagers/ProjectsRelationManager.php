@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -11,12 +12,10 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class ProjectsRelationManager extends RelationManager
@@ -58,9 +57,7 @@ class ProjectsRelationManager extends RelationManager
                         ->hidden(!currentUserHasPermission('relationships.projects.edit')),
                     DetachAction::make()
                         ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ])
             ->toolbarActions([

@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\Roles\Pages;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Roles\RoleResource;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Icons\Heroicon;
 
 class EditRole extends EditRecord
 {
@@ -14,9 +13,7 @@ class EditRole extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make()
-                ->label('Archivar')
-                ->icon(Heroicon::ArchiveBoxArrowDown),
+            ArchiveAction::make(),
         ];
     }
 }

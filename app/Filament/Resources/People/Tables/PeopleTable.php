@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\People\Tables;
 
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Customer;
@@ -12,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -81,9 +80,7 @@ class PeopleTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('people.delete')),
                 ])
             ])
             ->toolbarActions([
