@@ -4,9 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\AttachAction;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -107,14 +105,11 @@ class ActivitiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.activities.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.activities.sync'))
-                    ->preloadRecordSelect(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.activities.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.activities.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.activities.unsync')),
                 ])
             ]);
     }
