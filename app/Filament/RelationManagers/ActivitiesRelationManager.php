@@ -17,7 +17,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 class ActivitiesRelationManager extends RelationManager
@@ -85,7 +84,6 @@ class ActivitiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->filtersLayout(FiltersLayout::Modal)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('title')

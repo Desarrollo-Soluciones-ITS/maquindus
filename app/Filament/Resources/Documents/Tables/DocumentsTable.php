@@ -28,7 +28,6 @@ use Filament\Actions\ActionGroup;
 use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -43,7 +42,6 @@ class DocumentsTable
             ->recordUrl(null)
             ->recordAction(is_not_localhost() ? 'download' : 'preview')
             ->defaultSort('current_created_at', 'desc')
-            ->filtersLayout(FiltersLayout::Modal)
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')

@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +29,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+
+        Table::configureUsing(function (Table $table) {
+            $table->filtersLayout(FiltersLayout::Modal);
+        });
+
+        TextColumn::configureUsing(function (TextColumn $column) {
+            $column->placeholder('N/A');
+        });
+
+        TextEntry::configureUsing(function (TextEntry $entry) {
+            $entry->placeholder('N/A');
+        });
+
+        RepeatableEntry::configureUsing(function (RepeatableEntry $entry) {
+            $entry->placeholder('N/A');
+        });
 
         FilamentAsset::register([
             Css::make('glightbox-style', asset('vendor/glightbox/css/glightbox.min.css')),
