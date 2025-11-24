@@ -44,7 +44,7 @@ class SuppliersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+
                 ]),
             ]);
     }

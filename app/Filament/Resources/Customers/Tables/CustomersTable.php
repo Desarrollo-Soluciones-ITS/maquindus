@@ -44,9 +44,7 @@ class CustomersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('customers.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

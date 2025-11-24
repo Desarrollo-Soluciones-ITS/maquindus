@@ -55,12 +55,10 @@ class ProjectsTable
                         ->icon(Heroicon::ArchiveBoxArrowDown),
                 ]),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('projects.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
-                ]),
-            ]);
+                ->toolbarActions([
+                    BulkActionGroup::make([
+
+                    ]),
+                ]);
     }
 }

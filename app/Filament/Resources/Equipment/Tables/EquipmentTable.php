@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 class EquipmentTable
@@ -18,7 +17,6 @@ class EquipmentTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->filtersLayout(FiltersLayout::Modal)
             ->columns([
                 TextColumn::make('code')
                     ->label('Código')
@@ -50,9 +48,7 @@ class EquipmentTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }
