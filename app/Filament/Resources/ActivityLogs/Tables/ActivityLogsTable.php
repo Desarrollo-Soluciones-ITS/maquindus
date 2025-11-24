@@ -40,7 +40,6 @@ class ActivityLogsTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission(permission: 'activity_logs.show')),
                 ])
-            ])
-            ->defaultSort('created_at', 'desc');
+            ]);
     }
 }

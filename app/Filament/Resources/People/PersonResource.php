@@ -43,7 +43,8 @@ class PersonResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return PeopleTable::configure($table);
+        return PeopleTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
