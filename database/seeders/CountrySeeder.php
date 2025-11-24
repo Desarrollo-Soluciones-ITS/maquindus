@@ -12,8 +12,9 @@ class CountrySeeder extends Seeder
      */
     public function run(): void
     {
+        $date = now()->subDay();
         $countries = [
-            ['name' => 'Venezuela'],
+            ['name' => 'Venezuela', 'created_at' => $date, 'updated_at' => $date],
             ['name' => 'China'],
             ['name' => 'Estados Unidos'],
         ];
