@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\People;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\People\Pages\CreatePerson;
 use App\Filament\Resources\People\Pages\EditPerson;
 use App\Filament\Resources\People\Pages\ListPeople;
@@ -48,7 +49,7 @@ class PersonResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'documents' => DocumentsRelationManager::class,
         ];
     }
 

@@ -14,6 +14,7 @@ use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,23 +26,26 @@ class PeopleTable
             ->columns([
                 TextColumn::make('fullname')
                     ->label('Nombre')
-                    ->searchable(['name', 'surname']),
+                    ->searchable(['name', 'surname'])
+                    ->sortable(['surname', 'name']),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('phone')
                     ->label('Teléfono')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('position')
                     ->label('Cargo')
-                    ->placeholder('N/A')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('personable.name')
                     ->label('Empresa')
-                    ->placeholder('N/A')
                     ->searchable()
                     ->color(Color::Blue)
                     ->url(function (Model $record) {
+                        if (!$record->personable) return null;
                         $class = $record->personable::class;
 
                         $page = match ($class) {
@@ -55,7 +59,23 @@ class PeopleTable
                     }),
             ])
             ->filters([
-                //
+                SelectFilter::make('personable_id')
+                    ->label('Empresa')
+                    ->searchable()
+                    ->getSearchResultsUsing(
+                        fn(string $search): array =>
+                        Customer::query()
+                            ->where('name', 'like', "%{$search}%")
+                            ->limit(20)
+                            ->unionAll(
+                                Supplier::query()
+                                    ->select('name', 'id')
+                                    ->where('name', 'like', "%{$search}%")
+                                    ->limit(20)
+                            )
+                            ->pluck('name', 'id')
+                            ->all()
+                    ),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -68,9 +88,7 @@ class PeopleTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

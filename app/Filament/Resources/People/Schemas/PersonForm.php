@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\People\Schemas;
 
+use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Supplier;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,29 +23,29 @@ class PersonForm
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Mario')
+                    ->placeholder('Ej. Mario')
+                    ->maxLength(50)
                     ->required(),
                 TextInput::make('surname')
                     ->label('Apellido')
-                    ->placeholder('Gómez')
+                    ->placeholder('Ej. Gómez')
+                    ->maxLength(50)
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
-                    ->placeholder('contacto@correo.com')
+                    ->placeholder('Ej. contacto@correo.com')
                     ->email()
+                    ->unique()
+                    ->maxLength(255)
                     ->required(),
-                TextInput::make('phone')
-                    ->label('Teléfono')
-                    ->placeholder('04128029102')
-                    ->tel()
-                    ->required(),
+                PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
                     ->selectablePlaceholder(false)
                     ->relationship(
                         name: 'country',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                        modifyQueryUsing: fn(Builder $query) => $query->oldest()
                     )
                     ->live()
                     ->required()
@@ -68,7 +68,8 @@ class PersonForm
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')
-                    ->placeholder('Calle 15, Avenida FG')
+                    ->placeholder('Ej. Calle 15, Avenida FG')
+                    ->maxLength(255)
                     ->required(),
                 MorphToSelect::make('personable')
                     ->label('Empresa relacionada')
@@ -85,7 +86,8 @@ class PersonForm
                     ),
                 TextInput::make('position')
                     ->label('Cargo')
-                    ->placeholder('Responsable de ventas'),
+                    ->placeholder('Ej. Responsable de ventas')
+                    ->maxLength(255),
             ]);
     }
 }
