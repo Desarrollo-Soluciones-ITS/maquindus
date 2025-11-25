@@ -4,11 +4,11 @@ namespace App\Filament\Resources\Equipment\Tables;
 
 use App\Filament\Filters\DateFilter;
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -36,6 +36,7 @@ class EquipmentTable
             ])
             ->filters([
                 DateFilter::make(),
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\People\Tables;
 
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Customer;
@@ -75,6 +76,7 @@ class PeopleTable
                             ->pluck('name', 'id')
                             ->all()
                     ),
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Projects\Tables;
 
 use App\Enums\Status;
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -60,7 +60,8 @@ class ProjectsTable
                     ->options(Status::options()),
                 SelectFilter::make('customer')
                     ->label('Cliente')
-                    ->relationship('customer', 'name')
+                    ->relationship('customer', 'name'),
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

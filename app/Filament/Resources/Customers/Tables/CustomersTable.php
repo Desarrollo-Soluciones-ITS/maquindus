@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Customers\Tables;
 
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,7 +33,7 @@ class CustomersTable
                     ->searchable(),
             ])
             ->filters([
-                //
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

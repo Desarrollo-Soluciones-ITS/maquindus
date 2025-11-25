@@ -9,6 +9,7 @@ use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\PreviewAction;
 use App\Filament\Actions\Documents\ViewAction;
+use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
@@ -26,7 +27,6 @@ use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Actions\ActionGroup;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -142,7 +142,8 @@ class DocumentsTable
                             return $query->where('category', $value);
                         }
                         return $query;
-                    })
+                    }),
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

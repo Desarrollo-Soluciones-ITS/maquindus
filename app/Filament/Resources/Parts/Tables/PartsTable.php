@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Parts\Tables;
 
 use App\Filament\Filters\DateFilter;
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
@@ -36,6 +37,7 @@ class PartsTable
             ])
             ->filters([
                 DateFilter::make(),
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

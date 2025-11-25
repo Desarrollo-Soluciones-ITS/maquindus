@@ -4,10 +4,10 @@ namespace App\Filament\Resources\Suppliers\Tables;
 
 use Filament\Actions\ActionGroup;
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,7 +33,7 @@ class SuppliersTable
                     ->searchable(),
             ])
             ->filters([
-                //
+                ArchivedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
