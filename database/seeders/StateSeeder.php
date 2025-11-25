@@ -4,18 +4,40 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\State;
-use Str;
 
 class StateSeeder extends Seeder
 {
     public function run(): void
     {
         $states = [
-            ['id' => Str::uuid(), 'name' => 'Caracas'],
-            ['id' => Str::uuid(), 'name' => 'Miranda'],
-            ['id' => Str::uuid(), 'name' => 'Aragua'],
+            ['name' => 'Distrito Capital'],
+            ['name' => 'Amazonas'],
+            ['name' => 'Anzoátegui'],
+            ['name' => 'Apure'],
+            ['name' => 'Aragua'],
+            ['name' => 'Barinas'],
+            ['name' => 'Bolívar'],
+            ['name' => 'Carabobo'],
+            ['name' => 'Cojedes'],
+            ['name' => 'Delta Amacuro'],
+            ['name' => 'Falcón'],
+            ['name' => 'Guárico'],
+            ['name' => 'La Guaira (Vargas)'],
+            ['name' => 'Lara'],
+            ['name' => 'Mérida'],
+            ['name' => 'Miranda'],
+            ['name' => 'Monagas'],
+            ['name' => 'Nueva Esparta'],
+            ['name' => 'Portuguesa'],
+            ['name' => 'Sucre'],
+            ['name' => 'Táchira'],
+            ['name' => 'Trujillo'],
+            ['name' => 'Yaracuy'],
+            ['name' => 'Zulia'],
         ];
 
-        State::insert($states);
+        foreach ($states as $state) {
+            State::create($state);
+        }
     }
 }

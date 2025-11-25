@@ -14,11 +14,11 @@ class CustomerSeeder extends Seeder
     {
         $venezuela = Country::venezuela();
 
-        $caracas = State::where('name', 'Caracas')->first();
+        $caracas = State::where('name', 'Distrito Capital')->first();
         $miranda = State::where('name', 'Miranda')->first();
 
-        $libertador = City::where('name', 'Libertador')->first();
-        $petare = City::where('name', 'Petare')->first();
+        $libertador = City::where('name', 'Caracas (Centro)')->first();
+        $petare = City::where('name', 'Sucre (Petare)')->first();
 
         $customers = [
             [

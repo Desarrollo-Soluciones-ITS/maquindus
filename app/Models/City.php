@@ -12,6 +12,8 @@ class City extends Model
 {
     use HasFactory, HasUuids;
 
+    public $timestamps = false;
+
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);

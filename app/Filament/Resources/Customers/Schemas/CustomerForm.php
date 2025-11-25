@@ -45,6 +45,8 @@ class CustomerForm
                 Select::make('country_id')
                     ->label('País')
                     ->selectablePlaceholder(false)
+                    ->searchable()
+                    ->optionsLimit(15)
                     ->relationship(
                         name: 'country',
                         titleAttribute: 'name',
