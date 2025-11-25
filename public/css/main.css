@@ -18,3 +18,7 @@ table.fi-in-key-value tbody td {
 .rangeItem.active {
   background-color: var(--primary-500);
 }
+
+.search-hidden {
+    display: none !important;
+}
