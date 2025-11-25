@@ -17,7 +17,7 @@ class EditPart extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
-            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('parts.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.delete')),
         ];
     }
 

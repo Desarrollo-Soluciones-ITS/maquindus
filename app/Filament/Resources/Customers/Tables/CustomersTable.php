@@ -39,7 +39,7 @@ class CustomersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('customers.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('customers.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('customers.delete')),
                 ])
             ])
             ->toolbarActions([

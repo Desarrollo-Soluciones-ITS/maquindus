@@ -154,7 +154,7 @@ class DocumentsTable
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('documents.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
                 ])
             ]);
     }

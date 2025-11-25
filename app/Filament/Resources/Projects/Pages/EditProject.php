@@ -17,7 +17,7 @@ class EditProject extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('projects.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
         ];
     }
 
