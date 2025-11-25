@@ -35,7 +35,7 @@ class PermissionSeeder extends Seeder
         'activities' => 'actividad',
         'files' => 'archivo',
         'images' => 'imagen',
-        'activity_logs' => 'registros',
+        'activity_logs' => 'bitácora',
     ];
 
     public function run(): void

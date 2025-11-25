@@ -410,7 +410,7 @@ class RolesTable
         'activities' => 'actividad',
         'files' => 'archivo',
         'images' => 'imagen',
-        'activity_logs' => 'registros',
+        'activity_logs' => 'bitácora',
     ];
 
     protected static function getPermissionsTreeForFilament(): array
