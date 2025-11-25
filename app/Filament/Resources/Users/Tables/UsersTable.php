@@ -2,12 +2,17 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class UsersTable
 {
@@ -17,10 +22,12 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('role.name')
                     ->label('Rol')
                     ->searchable(),
@@ -31,12 +38,21 @@ class UsersTable
                     ->timezone('America/Caracas')
             ])
             ->filters([
-                //
+                DateFilter::make(),
+                SelectFilter::make('role.name')
+                    ->label('Rol')
+                    ->relationship('role', 'name'),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('users.edit'))
+                    EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
+                    ArchiveAction::make()->hidden(function (Model $record) {
+                        $user = $record;
+                        $nodelete = $user->id === Auth::user()->id
+                            || $user->role->name === 'Administrador';
+                        return $nodelete || !currentUserHasPermission('users.delete');
+                    }),
                 ])
             ])
             ->toolbarActions([
