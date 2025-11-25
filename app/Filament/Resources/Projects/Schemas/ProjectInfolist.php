@@ -23,7 +23,6 @@ class ProjectInfolist
                     ->date(),
                 TextEntry::make('end')
                     ->label('Fecha de finalización')
-                    ->placeholder('N/A')
                     ->date(),
                 TextEntry::make('status')
                     ->label('Estado')
@@ -34,8 +33,7 @@ class ProjectInfolist
                         Status::Finished => 'success',
                     }),
                 TextEntry::make('about')
-                    ->label('Descripción')
-                    ->placeholder('N/A'),
+                    ->label('Descripción'),
             ]);
     }
 }

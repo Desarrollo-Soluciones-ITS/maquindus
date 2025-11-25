@@ -18,7 +18,6 @@ class DocumentInfolist
                 TextEntry::make('category')
                     ->label('Categoría')
                     ->badge()
-                    ->placeholder('N/A')
                     ->color(fn($state) => Category::colors($state)),
                 TextEntry::make('documentable.name')
                     ->label('Pertenece a')

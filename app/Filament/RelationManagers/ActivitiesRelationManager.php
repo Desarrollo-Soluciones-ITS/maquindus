@@ -69,7 +69,6 @@ class ActivitiesRelationManager extends RelationManager
                     ->label('Participantes')
                     ->grid(3)
                     ->columnSpanFull()
-                    ->placeholder('N/A')
                     ->schema([
                         TextEntry::make('fullname')
                             ->label('Nombre'),

@@ -18,19 +18,15 @@ class PersonInfolist
                 TextEntry::make('phone')
                     ->label('Teléfono'),
                 TextEntry::make('personable.name')
-                    ->label('Empresa relacionada')
-                    ->placeholder('N/A'),
+                    ->label('Empresa relacionada'),
                 TextEntry::make('position')
-                    ->label('Cargo')
-                    ->placeholder('N/A'),
+                    ->label('Cargo'),
                 TextEntry::make('country.name')
                     ->label('País'),
                 TextEntry::make('state.name')
-                    ->label('Estado')
-                    ->placeholder('N/A'),
+                    ->label('Estado'),
                 TextEntry::make('city.name')
-                    ->label('Ciudad')
-                    ->placeholder('N/A'),
+                    ->label('Ciudad'),
                 TextEntry::make('address')
                     ->label('Dirección'),
             ]);
