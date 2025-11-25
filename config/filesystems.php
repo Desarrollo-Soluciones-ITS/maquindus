@@ -64,7 +64,7 @@ return [
         // Este disco usa la ruta definida en la variable CUSTOM_BACKUP_PATH del .env
         'backup_custom_disk' => [
             'driver' => 'local',
-            'root' => env('CUSTOM_BACKUP_PATH', 'D:/david/Documentos'),
+            'root' => env('CUSTOM_BACKUP_PATH', storage_path('app/backup')),
             'throw' => false,
         ],
 
