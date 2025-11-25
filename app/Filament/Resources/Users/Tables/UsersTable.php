@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
-use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -47,10 +47,9 @@ class UsersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
-                    ArchiveAction::make()->hidden(function (Model $record) {
-                        $user = $record;
-                        $nodelete = $user->id === Auth::user()->id
-                            || $user->role->name === 'Administrador';
+                    DeleteAction::make()->hidden(function (Model $record) {
+                        $nodelete = $record->id === Auth::user()->id
+                            || $record->role->name === 'Administrador';
                         return $nodelete || !currentUserHasPermission('users.delete');
                     }),
                 ])

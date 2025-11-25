@@ -17,12 +17,20 @@ class ArchiveAction
     {
         return FilamentDeleteAction::make()
             ->successNotificationTitle('Se archivó correctamente.')
+            ->modalIcon(Heroicon::ArchiveBoxArrowDown)
+            ->icon(Heroicon::ArchiveBoxArrowDown)
+            ->modalSubmitActionLabel('Archivar')
+            ->modalCancelActionLabel('Cancelar')
+            ->label('Archivar')
+            ->modalHeading(function (Model $record) {
+                $name = model_to_spanish($record::class);
+                return "Archivar $name";
+            })
+            ->modalDescription(function (Model $record) {
+                $name = model_to_spanish($record::class);
+                return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
+            })
             ->using(function (Model $record) {
-                if (!is_files_model($record)) {
-                    $record->delete();
-                    return true;
-                }
-
                 DB::beginTransaction();
                 try {
                     if ($record instanceof Document) {
@@ -94,19 +102,6 @@ class ArchiveAction
                     DB::rollBack();
                     throw $e;
                 }
-            })
-            ->modalHeading(function (Model $record) {
-                $name = model_to_spanish($record::class);
-                return "Archivar $name";
-            })
-            ->modalDescription(function (Model $record) {
-                $name = model_to_spanish($record::class);
-                return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
-            })
-            ->modalIcon(Heroicon::ArchiveBoxArrowDown)
-            ->modalSubmitActionLabel('Archivar')
-            ->modalCancelActionLabel('Cancelar')
-            ->label('Archivar')
-            ->icon(Heroicon::ArchiveBoxArrowDown);
+            });
     }
 }
