@@ -41,7 +41,8 @@ class CustomerResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return CustomersTable::configure($table);
+        return CustomersTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

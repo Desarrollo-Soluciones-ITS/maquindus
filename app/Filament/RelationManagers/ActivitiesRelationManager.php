@@ -4,9 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\AttachAction;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -17,7 +15,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 class ActivitiesRelationManager extends RelationManager
@@ -72,7 +69,6 @@ class ActivitiesRelationManager extends RelationManager
                     ->label('Participantes')
                     ->grid(3)
                     ->columnSpanFull()
-                    ->placeholder('N/A')
                     ->schema([
                         TextEntry::make('fullname')
                             ->label('Nombre'),
@@ -85,7 +81,6 @@ class ActivitiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->filtersLayout(FiltersLayout::Modal)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('title')
@@ -109,14 +104,11 @@ class ActivitiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.activities.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.activities.sync'))
-                    ->preloadRecordSelect(),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.activities.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.activities.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.activities.unsync')),
                 ])
             ]);
     }

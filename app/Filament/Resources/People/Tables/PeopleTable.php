@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\People\Tables;
 
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Customer;
@@ -12,8 +12,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,23 +25,26 @@ class PeopleTable
             ->columns([
                 TextColumn::make('fullname')
                     ->label('Nombre')
-                    ->searchable(['name', 'surname']),
+                    ->searchable(['name', 'surname'])
+                    ->sortable(['surname', 'name']),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('phone')
                     ->label('Teléfono')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('position')
                     ->label('Cargo')
-                    ->placeholder('N/A')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('personable.name')
                     ->label('Empresa')
-                    ->placeholder('N/A')
                     ->searchable()
                     ->color(Color::Blue)
                     ->url(function (Model $record) {
+                        if (!$record->personable) return null;
                         $class = $record->personable::class;
 
                         $page = match ($class) {
@@ -55,22 +58,34 @@ class PeopleTable
                     }),
             ])
             ->filters([
-                //
+                SelectFilter::make('personable_id')
+                    ->label('Empresa')
+                    ->searchable()
+                    ->getSearchResultsUsing(
+                        fn(string $search): array =>
+                        Customer::query()
+                            ->where('name', 'like', "%{$search}%")
+                            ->limit(20)
+                            ->unionAll(
+                                Supplier::query()
+                                    ->select('name', 'id')
+                                    ->where('name', 'like', "%{$search}%")
+                                    ->limit(20)
+                            )
+                            ->pluck('name', 'id')
+                            ->all()
+                    ),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('people.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('people.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

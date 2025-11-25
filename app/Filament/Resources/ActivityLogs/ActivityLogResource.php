@@ -36,7 +36,8 @@ class ActivityLogResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return ActivityLogsTable::configure($table);
+        return ActivityLogsTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

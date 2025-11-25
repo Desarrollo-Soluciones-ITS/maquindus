@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Projects;
 use App\Filament\RelationManagers\ActivitiesRelationManager;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
-// use App\Filament\RelationManagers\ImagesRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\RelationManagers\PeopleRelationManager;
 use App\Filament\Resources\Projects\Pages\CreateProject;
@@ -47,7 +46,8 @@ class ProjectResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return ProjectsTable::configure($table);
+        return ProjectsTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
@@ -58,7 +58,6 @@ class ProjectResource extends Resource
             'parts' => PartsRelationManager::class,
             'people' => PeopleRelationManager::class,
             'activities' => ActivitiesRelationManager::class,
-            // 'images' => ImagesRelationManager::class
         ];
     }
 

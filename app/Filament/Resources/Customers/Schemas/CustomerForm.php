@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Customers\Schemas;
 
+use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Illuminate\Database\Eloquent\Builder;
 
 class CustomerForm
@@ -19,29 +21,34 @@ class CustomerForm
             ->components([
                 TextInput::make('rif')
                     ->label('RIF')
-                    ->placeholder('J-87654321-0')
+                    ->placeholder('Ej. J-87654321-0')
+                    ->mask(RawJs::make(<<<'JS'
+                        'J-99999999-9'
+                    JS))
+                    ->maxLength(12)
+                    ->unique()
                     ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Construcciones López C.A.')
+                    ->placeholder('Ej. Construcciones López C.A.')
+                    ->maxLength(80)
+                    ->unique()
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
-                    ->placeholder('info@clopez.com')
+                    ->placeholder('Ej. info@clopez.com')
                     ->email()
+                    ->unique()
+                    ->maxLength(255)
                     ->required(),
-                TextInput::make('phone')
-                    ->label('Teléfono')
-                    ->placeholder('02129876543')
-                    ->tel()
-                    ->required(),
+                PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
                     ->selectablePlaceholder(false)
                     ->relationship(
                         name: 'country',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                        modifyQueryUsing: fn(Builder $query) => $query->oldest()
                     )
                     ->live()
                     ->required()
@@ -64,11 +71,13 @@ class CustomerForm
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')
-                    ->placeholder('Calle 15, Avenida FG')
+                    ->placeholder('Ej. Calle 15, Avenida FG')
+                    ->maxLength(255)
                     ->required(),
                 TextInput::make('about')
                     ->label('Descripción')
-                    ->placeholder('Empresa de construcción de urbanizaciones.')
+                    ->placeholder('Ej. Empresa de construcción de urbanizaciones.')
+                    ->maxLength(255)
                     ->default(null),
             ]);
     }

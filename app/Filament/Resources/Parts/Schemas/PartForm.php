@@ -17,14 +17,14 @@ class PartForm
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Bomba hidráulica')
+                    ->placeholder('Ej. Bomba hidráulica')
                     ->maxLength(80)
                     ->unique()
                     ->required(),
                 CodeInput::make(Prefix::Part),
                 TextInput::make('about')
                     ->label('Descripción')
-                    ->placeholder('Bomba de transferencia')
+                    ->placeholder('Ej. Bomba de transferencia')
                     ->maxLength(255)
                     ->required(),
                 KeyValue::make('details')

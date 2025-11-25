@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\People;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\People\Pages\CreatePerson;
 use App\Filament\Resources\People\Pages\EditPerson;
 use App\Filament\Resources\People\Pages\ListPeople;
@@ -42,13 +43,14 @@ class PersonResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return PeopleTable::configure($table);
+        return PeopleTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            'documents' => DocumentsRelationManager::class,
         ];
     }
 

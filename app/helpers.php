@@ -1,8 +1,11 @@
 <?php
 
 use App\Enums\Prefix;
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
+use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Models\Activity;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Document;
 use App\Models\Equipment;
@@ -17,6 +20,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use App\Services\Code;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -83,6 +87,7 @@ if (!function_exists('model_to_spanish')) {
         $spanish = match ($model) {
             Activity::class => 'Actividad',
             City::class => 'Ciudad',
+            Country::class => 'País',
             Customer::class => 'Cliente',
             Document::class => 'Documento',
             Equipment::class => 'Equipo',
@@ -167,7 +172,7 @@ if (!function_exists('translate_activity_event')) {
             // Eventos CRUD
             'created' => 'Creación',
             'updated' => 'Actualización',
-            'deleted' => 'Archivación',
+            'deleted' => 'Archivado',
             // Eventos de Autenticación
             'authenticated' => 'Inicio de Sesión',
             'logged_out' => 'Cierre de Sesión',
@@ -215,5 +220,31 @@ if (!function_exists('code_to_full')) {
             $data['code'] = Code::full($data['code'], $prefix);
             return $data;
         };
+    }
+}
+
+if (!function_exists('is_view_customer')) {
+    function is_view_customer()
+    {
+        return function (RelationManager | ListProjects $livewire) {
+            if ($livewire instanceof ListProjects) return false;
+            return $livewire->getPageClass() === ViewCustomer::class;
+        };
+    }
+}
+
+if (!function_exists('is_files_model')) {
+    function is_files_model(Model $model)
+    {
+        $models = collect([
+            Project::class,
+            Equipment::class,
+            Person::class,
+            Customer::class,
+            Part::class,
+            Supplier::class,
+        ]);
+
+        return $models->contains($model::class);
     }
 }

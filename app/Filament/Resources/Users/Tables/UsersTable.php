@@ -2,15 +2,17 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class UsersTable
 {
@@ -20,32 +22,42 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('role.name')
+                    ->label('Rol')
                     ->searchable(),
-                // TextColumn::make('role')
-                //     ->label('Rol')
-                //     ->state('TODO')
-                //     ->searchable(),
+                TextColumn::make('created_at')
+                    ->label('Fecha')
+                    ->sortable()
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas')
             ])
             ->filters([
-                //
+                DateFilter::make(),
+                SelectFilter::make('role.name')
+                    ->label('Rol')
+                    ->relationship('role', 'name'),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
-                    // DeleteAction::make()->hidden(!currentUserHasPermission('users.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(function (Model $record) {
+                        $user = $record;
+                        $nodelete = $user->id === Auth::user()->id
+                            || $user->role->name === 'Administrador';
+                        return $nodelete || !currentUserHasPermission('users.delete');
+                    }),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('users.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

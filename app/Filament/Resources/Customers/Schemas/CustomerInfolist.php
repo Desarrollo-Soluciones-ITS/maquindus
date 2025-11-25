@@ -22,15 +22,12 @@ class CustomerInfolist
                 TextEntry::make('country.name')
                     ->label('País'),
                 TextEntry::make('state.name')
-                    ->label('Estado')
-                    ->placeholder('N/A'),
+                    ->label('Estado'),
                 TextEntry::make('city.name')
-                    ->label('Ciudad')
-                    ->placeholder('N/A'),
+                    ->label('Ciudad'),
                 TextEntry::make('address')
                     ->label('Dirección'),
                 TextEntry::make('about')
-                    ->placeholder('N/A')
                     ->label('Descripción'),
             ]);
     }

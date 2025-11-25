@@ -10,9 +10,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -48,8 +46,7 @@ class PartsRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Part))
                     ->hidden(!currentUserHasPermission('relationships.parts.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync'))
-                    ->preloadRecordSelect(),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -62,10 +59,7 @@ class PartsRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
-                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
+
                 ])
             ]);
     }

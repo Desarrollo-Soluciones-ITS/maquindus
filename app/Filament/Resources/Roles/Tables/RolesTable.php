@@ -7,14 +7,13 @@ use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Str;
+use Illuminate\Support\Str;
 
 class RolesTable
 {
@@ -27,10 +26,17 @@ class RolesTable
                 TextColumn::make('users_count')
                     ->label('Usuarios')
                     ->counts(relationships: 'users')
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
                     ->sortable()
-                    ->alignment('center')
-                    ->weight('bold')
-                    ->color('primary'),
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
+                TextColumn::make('updated_at')
+                    ->label('Última actualización')
+                    ->sortable()
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas')
             ])
             ->filters([
                 //
@@ -47,7 +53,7 @@ class RolesTable
                             ->pluck('id')
                             ->toArray(),
                     ])
-                    ->form([
+                    ->schema([
                         Select::make('users')
                             ->label('Usuarios')
                             ->multiple()
@@ -107,12 +113,11 @@ class RolesTable
                     ->fillForm(fn(Role $record): array => [
                         'permissions' => $record->permissions->pluck('id')->toArray(),
                     ])
-                    ->form([
+                    ->schema([
                         Select::make('permissions')
                             ->label('Permisos')
                             ->multiple()
                             ->searchable()
-                            ->preload()
                             ->placeholder('Seleccionar permisos...')
                             ->options(function () {
                                 return Permission::orderBy('name')
@@ -146,9 +151,7 @@ class RolesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

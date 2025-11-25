@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Suppliers\Tables;
 
 use Filament\Actions\ActionGroup;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -22,10 +22,12 @@ class SuppliersTable
                     ->searchable(),
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Correo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('phone')
                     ->label('Teléfono')
                     ->searchable(),
@@ -37,14 +39,12 @@ class SuppliersTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('suppliers.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+
                 ]),
             ]);
     }

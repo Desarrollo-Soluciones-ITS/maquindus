@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\People\Schemas\PersonForm;
 use App\Filament\Resources\People\Schemas\PersonInfolist;
 use App\Filament\Resources\People\Tables\PeopleTable;
@@ -9,10 +10,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -43,9 +41,7 @@ class PeopleRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return PeopleTable::configure($table)
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->headerActions([
                 CreateAction::make()->hidden(!currentUserHasPermission('relationships.people.create')),
                 AttachAction::make()->hidden(!currentUserHasPermission('relationships.people.sync')),
@@ -55,17 +51,12 @@ class PeopleRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.people.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.people.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.people.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

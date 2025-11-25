@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Documents\Tables;
 
 use App\Enums\Category;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
@@ -28,7 +28,6 @@ use Filament\Actions\ActionGroup;
 use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -43,7 +42,6 @@ class DocumentsTable
             ->recordUrl(null)
             ->recordAction(is_not_localhost() ? 'download' : 'preview')
             ->defaultSort('current_created_at', 'desc')
-            ->filtersLayout(FiltersLayout::Modal)
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
@@ -55,7 +53,6 @@ class DocumentsTable
                 TextColumn::make('category')
                     ->label('Categoría')
                     ->badge()
-                    ->placeholder('N/A')
                     ->color(fn($state): string => Category::colors($state)),
                 TextColumn::make('documentable.name')
                     ->label('Pertenece a')
@@ -156,9 +153,7 @@ class DocumentsTable
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('documents.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('documents.delete')),
                 ])
             ]);
     }

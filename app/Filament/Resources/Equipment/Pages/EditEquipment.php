@@ -3,12 +3,11 @@
 namespace App\Filament\Resources\Equipment\Pages;
 
 use App\Enums\Prefix;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Equipment\EquipmentResource;
 use App\Services\Code;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Icons\Heroicon;
 
 class EditEquipment extends EditRecord
 {
@@ -18,9 +17,7 @@ class EditEquipment extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
-            DeleteAction::make()->hidden(!currentUserHasPermission('equipments.delete'))
-                ->label('Archivar')
-                ->icon(Heroicon::ArchiveBoxArrowDown),
+            ArchiveAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
         ];
     }
 

@@ -44,7 +44,8 @@ class SupplierResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return SuppliersTable::configure($table);
+        return SuppliersTable::configure($table)
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

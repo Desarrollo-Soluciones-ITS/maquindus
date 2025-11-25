@@ -13,7 +13,9 @@ class RoleForm
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Operador')
+                    ->placeholder('Ej. Operador')
+                    ->maxLength(80)
+                    ->unique()
                     ->required(),
             ]);
     }

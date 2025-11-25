@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\Customers\Pages;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Models\Country;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Icons\Heroicon;
 
 class EditCustomer extends EditRecord
 {
@@ -17,9 +16,7 @@ class EditCustomer extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
-            DeleteAction::make()->hidden(!currentUserHasPermission('customers.delete'))
-                ->label('Archivar')
-                ->icon(Heroicon::ArchiveBoxArrowDown),
+            ArchiveAction::make()->hidden(!currentUserHasPermission('customers.delete')),
         ];
     }
 

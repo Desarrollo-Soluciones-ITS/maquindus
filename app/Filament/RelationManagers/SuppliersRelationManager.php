@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
@@ -9,10 +10,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -55,17 +53,12 @@ class SuppliersRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

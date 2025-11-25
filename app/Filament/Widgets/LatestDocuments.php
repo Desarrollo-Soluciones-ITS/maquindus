@@ -57,7 +57,6 @@ class LatestDocuments extends TableWidget
                 TextColumn::make('category')
                     ->label('Categoría')
                     ->badge()
-                    ->placeholder('N/A')
                     ->color(fn($state): string => Category::colors($state)),
                 TextColumn::make('documentable.name')
                     ->label('Pertenece a')

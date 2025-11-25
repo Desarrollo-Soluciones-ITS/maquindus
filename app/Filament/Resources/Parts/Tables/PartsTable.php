@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Parts\Tables;
 
 use App\Filament\Filters\DateFilter;
-use App\Filament\Actions\Documents\DeleteAction;
+use App\Filament\Actions\ArchiveAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
@@ -41,16 +41,12 @@ class PartsTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('parts.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('parts.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // DeleteBulkAction::make()->hidden(!currentUserHasPermission('parts.delete'))
-                    //     ->label('Archivar')
-                    //     ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ]),
             ]);
     }

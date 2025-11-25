@@ -3,7 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
+use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -11,15 +11,11 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class ProjectsRelationManager extends RelationManager
@@ -45,12 +41,12 @@ class ProjectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return ProjectsTable::configure($table)
+            ->filters([])
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Project))
                     ->hidden(!currentUserHasPermission('relationships.projects.create')),
-                AttachAction::make()
-                    ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.sync')),
+                AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -59,26 +55,14 @@ class ProjectsRelationManager extends RelationManager
                         ->mutateDataUsing(code_to_full(Prefix::Project))
                         ->hidden(!currentUserHasPermission('relationships.projects.edit')),
                     DetachAction::make()
-                        ->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
-                    DeleteAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+                        ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.unsync')),
+                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
                 ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make()->hidden($this->isCustomerPage() || !currentUserHasPermission('relationships.projects.unsync')),
-                    DeleteBulkAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete'))
-                        ->label('Archivar')
-                        ->icon(Heroicon::ArchiveBoxArrowDown),
+
                 ])
             ]);
-    }
-
-    private function isCustomerPage()
-    {
-        return function (ProjectsRelationManager $livewire) {
-            return $livewire->getPageClass() === ViewCustomer::class;
-        };
     }
 }

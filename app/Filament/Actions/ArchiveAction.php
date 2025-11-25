@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Actions\Documents;
+namespace App\Filament\Actions;
 
 use App\Models\Document;
 use Filament\Actions\Action;
@@ -8,15 +8,22 @@ use Filament\Actions\DeleteAction as FilamentDeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class DeleteAction
+class ArchiveAction
 {
     public static function make(): Action
     {
         return FilamentDeleteAction::make()
+            ->successNotificationTitle('Se archivó correctamente.')
             ->using(function (Model $record) {
-                \DB::beginTransaction();
+                if (!is_files_model($record)) {
+                    $record->delete();
+                    return true;
+                }
+
+                DB::beginTransaction();
                 try {
                     if ($record instanceof Document) {
                         $files = $record->files()->get();
@@ -32,7 +39,7 @@ class DeleteAction
                                     ->danger()
                                     ->send();
 
-                                \DB::rollBack();
+                                DB::rollBack();
                                 return;
                             }
 
@@ -54,12 +61,12 @@ class DeleteAction
 
                                 if (Storage::exists($newPath)) {
                                     Notification::make()
-                                        ->title('No se pudo archivar el documento')
-                                        ->body("El archivo \"{$file->path}\" ya existe en la carpeta \"Superado\".")
+                                        ->title('No se pudo archivar el registro')
+                                        ->body("Ya existe un registro con esta ruta en la carpeta \"Superado\".")
                                         ->danger()
                                         ->send();
 
-                                    \DB::rollBack();
+                                    DB::rollBack();
                                     return;
                                 }
 
@@ -82,16 +89,19 @@ class DeleteAction
                         ->success()
                         ->send();
 
-                    \DB::commit();
+                    DB::commit();
                 } catch (\Throwable $e) {
-                    \DB::rollBack();
+                    DB::rollBack();
                     throw $e;
                 }
             })
-            ->modalHeading(fn(Model $record): string => "Archivar '{$record->getAttribute('name')}'")
+            ->modalHeading(function (Model $record) {
+                $name = model_to_spanish($record::class);
+                return "Archivar $name";
+            })
             ->modalDescription(function (Model $record) {
                 $name = model_to_spanish($record::class);
-                return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y ocultará en la tabla.";
+                return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
             })
             ->modalIcon(Heroicon::ArchiveBoxArrowDown)
             ->modalSubmitActionLabel('Archivar')
