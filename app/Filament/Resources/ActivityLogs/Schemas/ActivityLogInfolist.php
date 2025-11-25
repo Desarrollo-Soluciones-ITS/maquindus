@@ -25,8 +25,7 @@ class ActivityLogInfolist
                         TextEntry::make('description')
                             ->label('Descripción'),
                         TextEntry::make('subject.name')
-                            ->label('Elemento Afectado')
-                            ->default('N/A'),
+                            ->label('Registro afectado'),
                         TextEntry::make('causer.name')
                             ->label('Causado por')
                             ->default('Sistema'),

@@ -5,6 +5,7 @@ use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Models\Activity;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Document;
 use App\Models\Equipment;
@@ -86,6 +87,7 @@ if (!function_exists('model_to_spanish')) {
         $spanish = match ($model) {
             Activity::class => 'Actividad',
             City::class => 'Ciudad',
+            Country::class => 'País',
             Customer::class => 'Cliente',
             Document::class => 'Documento',
             Equipment::class => 'Equipo',
@@ -170,7 +172,7 @@ if (!function_exists('translate_activity_event')) {
             // Eventos CRUD
             'created' => 'Creación',
             'updated' => 'Actualización',
-            'deleted' => 'Archivación',
+            'deleted' => 'Archivado',
             // Eventos de Autenticación
             'authenticated' => 'Inicio de Sesión',
             'logged_out' => 'Cierre de Sesión',
