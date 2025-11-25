@@ -405,12 +405,12 @@ class RolesTable
         'documents' => 'documento',
         'suppliers' => 'proveedor',
         'customers' => 'cliente',
-        'people' => 'persona',
+        'people' => 'contacto',
         'users' => 'usuario',
         'activities' => 'actividad',
         'files' => 'archivo',
         'images' => 'imagen',
-        'activity_logs' => 'registros',
+        'activity_logs' => 'bitácora',
     ];
 
     protected static function getPermissionsTreeForFilament(): array

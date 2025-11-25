@@ -30,12 +30,12 @@ class PermissionSeeder extends Seeder
         'documents' => 'documento',
         'suppliers' => 'proveedor',
         'customers' => 'cliente',
-        'people' => 'persona',
+        'people' => 'contacto',
         'users' => 'usuario',
         'activities' => 'actividad',
         'files' => 'archivo',
         'images' => 'imagen',
-        'activity_logs' => 'registros',
+        'activity_logs' => 'bitácora',
     ];
 
     public function run(): void
@@ -85,7 +85,16 @@ class PermissionSeeder extends Seeder
                 'delete',
                 'edit',
             ],
-            'documents' => ['view', 'delete', 'edit', 'show', 'open_in_folder', 'show_file', 'download', 'upload'],
+            'documents' => [
+                'view',
+                'delete',
+                'edit',
+                'show',
+                'open_in_folder',
+                'show_file',
+                'download',
+                'upload'
+            ],
             'suppliers' => [
                 'create',
                 'show',
@@ -100,9 +109,27 @@ class PermissionSeeder extends Seeder
                 'delete',
                 'edit',
             ],
-            'people' => ['create', 'show', 'view', 'delete', 'edit'],
-            'users' => ['create', 'show', 'view', 'delete', 'edit'],
-            'activity_logs' => ['create', 'show', 'view', 'delete', 'edit'],
+            'people' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'users' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'activity_logs' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
             'relationships' => [
                 'parts' => ['create', 'sync', 'unsync', 'edit', 'show'],
                 'equipments' => ['create', 'sync', 'unsync', 'edit', 'show'],
