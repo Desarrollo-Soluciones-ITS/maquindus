@@ -36,7 +36,8 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
 
         Table::configureUsing(function (Table $table) {
-            $table->filtersLayout(FiltersLayout::Modal);
+            $table->filtersLayout(FiltersLayout::Modal)
+                ->defaultPaginationPageOption(5);
         });
 
         TextColumn::configureUsing(function (TextColumn $column) {
