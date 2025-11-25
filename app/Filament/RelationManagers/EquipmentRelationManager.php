@@ -44,16 +44,16 @@ class EquipmentRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Equipment))
-                    ->hidden(!currentUserHasPermission('relationships.equipments.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.equipments.sync')),
+                    ->hidden(!currentUserHasPermission('equipments.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('equipments.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.equipments.show')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
                     EditAction::make()
                         ->mutateDataUsing(code_to_full(Prefix::Equipment))
-                        ->hidden(!currentUserHasPermission('relationships.equipments.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.equipments.unsync')),
+                        ->hidden(!currentUserHasPermission('equipments.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('equipments.unsync')),
                 ])
             ])
             ->toolbarActions([

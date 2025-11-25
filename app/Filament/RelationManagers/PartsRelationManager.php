@@ -44,16 +44,16 @@ class PartsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Part))
-                    ->hidden(!currentUserHasPermission('relationships.parts.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync')),
+                    ->hidden(!currentUserHasPermission('parts.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('parts.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.parts.show')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
                     EditAction::make()
                         ->mutateDataUsing(code_to_full(Prefix::Part))
-                        ->hidden(!currentUserHasPermission('relationships.parts.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.parts.unsync')),
+                        ->hidden(!currentUserHasPermission('parts.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('parts.unsync')),
                 ])
             ])
             ->toolbarActions([

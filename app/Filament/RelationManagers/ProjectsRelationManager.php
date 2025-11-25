@@ -45,18 +45,18 @@ class ProjectsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Project))
-                    ->hidden(!currentUserHasPermission('relationships.projects.create')),
-                AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.sync')),
+                    ->hidden(!currentUserHasPermission('projects.create')),
+                AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.projects.show')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
                     EditAction::make()
                         ->mutateDataUsing(code_to_full(Prefix::Project))
-                        ->hidden(!currentUserHasPermission('relationships.projects.edit')),
+                        ->hidden(!currentUserHasPermission('projects.edit')),
                     DetachAction::make()
-                        ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.projects.delete')),
+                        ->hidden(is_view_customer() || !currentUserHasPermission('projects.unsync')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('projects.delete')),
                 ])
             ])
             ->toolbarActions([

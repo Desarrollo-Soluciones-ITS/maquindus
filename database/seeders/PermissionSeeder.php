@@ -70,6 +70,8 @@ class PermissionSeeder extends Seeder
                 'show',
                 'delete',
                 'view',
+                'sync',
+                'unsync'
             ],
             'parts' => [
                 'create',
@@ -77,6 +79,8 @@ class PermissionSeeder extends Seeder
                 'view',
                 'delete',
                 'edit',
+                'sync',
+                'unsync'
             ],
             'projects' => [
                 'create',
@@ -93,7 +97,8 @@ class PermissionSeeder extends Seeder
                 'open_in_folder',
                 'show_file',
                 'download',
-                'upload'
+                'upload',
+                'create',
             ],
             'suppliers' => [
                 'create',
@@ -101,6 +106,8 @@ class PermissionSeeder extends Seeder
                 'view',
                 'delete',
                 'edit',
+                'sync',
+                'unsync'
             ],
             'customers' => [
                 'create',
@@ -115,6 +122,8 @@ class PermissionSeeder extends Seeder
                 'view',
                 'delete',
                 'edit',
+                'sync',
+                'unsync'
             ],
             'users' => [
                 'create',
@@ -130,17 +139,9 @@ class PermissionSeeder extends Seeder
                 'delete',
                 'edit',
             ],
-            'relationships' => [
-                'parts' => ['create', 'sync', 'unsync', 'edit', 'show'],
-                'equipments' => ['create', 'sync', 'unsync', 'edit', 'show'],
-                'projects' => ['create', 'edit', 'show'],
-                'documents' => ['create', 'delete', 'edit', 'show', 'download', 'open_in_folder', 'show_file'],
-                'people' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
-                'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
-                'suppliers' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
-                'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
-                'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],
-            ]
+            'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
+            'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
+            'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],
         ];
     }
 
@@ -149,21 +150,7 @@ class PermissionSeeder extends Seeder
         $definitions = [];
 
         foreach ($tree as $key => $value) {
-            if ($key === 'relationships') {
-                foreach ($value as $relatedModel => $actions) {
-                    $newSlugPrefix = $slugPrefix ? "{$slugPrefix}.relationships.{$relatedModel}" : "relationships.{$relatedModel}";
-                    $relatedLabel = $this->resourceLabels[$relatedModel] ?? $relatedModel;
-                    $newNamePrefix = $namePrefix ? "{$namePrefix} de {$relatedLabel}" : $relatedLabel;
-
-                    foreach ($actions as $action) {
-                        $slug = "{$newSlugPrefix}.{$action}";
-                        $actionLabel = $this->actionLabels[$action] ?? ucfirst($action);
-                        $name = "{$actionLabel} {$newNamePrefix}";
-
-                        $definitions[] = compact('slug', 'name');
-                    }
-                }
-            } elseif (is_numeric($key) && is_string($value)) {
+            if (is_numeric($key) && is_string($value)) {
                 $action = $value;
                 $slug = $slugPrefix ? "{$slugPrefix}.{$action}" : $action;
                 $actionLabel = $this->actionLabels[$action] ?? ucfirst($action);

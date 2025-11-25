@@ -42,18 +42,18 @@ class DocumentsRelationManager extends RelationManager
     {
         return DocumentsTable::configure($table)
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.documents.create')),
+                CreateAction::make()->hidden(!currentUserHasPermission('documents.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('relationships.documents.open_in_folder')),
-                        DownloadAction::make()->hidden(!currentUserHasPermission('relationships.documents.download')),
-                        ViewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show')),
+                        PreviewAction::make()->hidden(!currentUserHasPermission('documents.show_file')),
+                        OpenFolderAction::make()->hidden(!currentUserHasPermission('documents.open_in_folder')),
+                        DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
+                        ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.documents.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('relationships.documents.delete')),
+                    EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
                 ]),
             ])
             ->toolbarActions([

@@ -44,15 +44,15 @@ class SuppliersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.sync')),
+                CreateAction::make()->hidden(!currentUserHasPermission('suppliers.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('suppliers.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.suppliers.delete')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('suppliers.unsync')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('suppliers.delete')),
                 ])
             ])
             ->toolbarActions([

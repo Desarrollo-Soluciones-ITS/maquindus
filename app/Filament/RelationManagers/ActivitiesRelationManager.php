@@ -103,12 +103,12 @@ class ActivitiesRelationManager extends RelationManager
                 DateFilter::make(),
             ])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.activities.create')),
+                CreateAction::make()->hidden(!currentUserHasPermission('activities.create')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.activities.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.activities.edit')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('activities.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('activities.edit')),
                 ])
             ]);
     }

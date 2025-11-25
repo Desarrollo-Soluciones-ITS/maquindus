@@ -42,15 +42,15 @@ class PeopleRelationManager extends RelationManager
         return PeopleTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('relationships.people.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.people.sync')),
+                CreateAction::make()->hidden(!currentUserHasPermission('people.create')),
+                AttachAction::make()->hidden(!currentUserHasPermission('people.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->hidden(!currentUserHasPermission('relationships.people.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('relationships.people.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.people.delete')),
+                    ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
+                    EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
+                    DetachAction::make()->hidden(!currentUserHasPermission('people.unsync')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('people.delete')),
                 ])
             ])
             ->toolbarActions([

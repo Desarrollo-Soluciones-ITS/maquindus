@@ -12,11 +12,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -51,14 +51,14 @@ class RolesTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('Asignar rol')
-                        ->icon(Heroicon::Tag)
+                        ->icon('heroicon-o-tag')
                         ->fillForm(fn(Role $record): array => [
                             'users' => $record->users()
                                 ->where('email', '!=', 'admin@example.com')
                                 ->pluck('id')
                                 ->toArray(),
                         ])
-                        ->schema([
+                        ->form([
                             Select::make('users')
                                 ->label('Usuarios')
                                 ->multiple()
@@ -113,15 +113,63 @@ class RolesTable
                                 ->success()
                                 ->send();
                         })
-                        ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados'),
+                        ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados')
+                        ->hidden(fn($record) => $record->name === 'Administrador'),
 
                     Action::make('permissions')
                         ->label('Editar permisos')
-                        ->icon(Heroicon::LockClosed)
-                        ->fillForm(fn(Role $record): array => [
-                            'permissions' => $record->permissions->pluck('id')->toArray(),
-                        ])
-                        ->schema(function () {
+                        ->icon('heroicon-o-lock-closed')
+                        ->modalWidth('7xl')
+                        ->fillForm(function (Role $record): array {
+                            $permissionIds = $record->permissions->pluck('id')->toArray();
+
+                            $formData = [];
+                            $tree = static::getPermissionsTreeForFilament();
+                            $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
+                            $slugToId = array_flip($permissionSlugs);
+
+                            foreach ($tree as $key => $value) {
+                                if (is_string($key) && is_array($value)) {
+                                    $fieldName = "permissions_group_$key";
+                                    $formData[$fieldName] = [];
+
+                                    foreach ($value as $action) {
+                                        if (!is_string($key) || !is_string($action))
+                                            continue;
+                                        $slug = "$key.$action";
+                                        if (isset($slugToId[$slug]) && in_array($slugToId[$slug], $permissionIds)) {
+                                            $formData[$fieldName][] = $slugToId[$slug];
+                                        }
+                                    }
+                                } elseif ($key === 'relationships') {
+                                    foreach ($value as $relatedModel => $actions) {
+                                        $fieldName = "permissions_group_relationships_$relatedModel";
+                                        $formData[$fieldName] = [];
+
+                                        foreach ($actions as $action) {
+                                            if (!is_string($relatedModel) || !is_string($action))
+                                                continue;
+                                            $slug = "relationships.$relatedModel.$action";
+                                            if (isset($slugToId[$slug]) && in_array($slugToId[$slug], $permissionIds)) {
+                                                $formData[$fieldName][] = $slugToId[$slug];
+                                            }
+                                        }
+                                    }
+                                } elseif (is_string($value)) {
+                                    $fieldName = "permissions_group_general";
+                                    if (!isset($formData[$fieldName])) {
+                                        $formData[$fieldName] = [];
+                                    }
+                                    $slug = $value;
+                                    if (isset($slugToId[$slug]) && in_array($slugToId[$slug], $permissionIds)) {
+                                        $formData[$fieldName][] = $slugToId[$slug];
+                                    }
+                                }
+                            }
+
+                            return $formData;
+                        })
+                        ->form(function () {
                             $tree = static::getPermissionsTreeForFilament();
                             $permissionOptions = Permission::orderBy('name')->pluck('name', 'id')->toArray();
                             $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
@@ -138,12 +186,18 @@ class RolesTable
                                             continue;
                                         $slug = "$key.$action";
                                         if (isset($slugToId[$slug])) {
-                                            $options[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]];
+                                            $options[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]] ?? $slug;
                                         }
                                     }
                                     if (!empty($options)) {
                                         $groups[$groupLabel] = CheckboxList::make("permissions_group_$key")
                                             ->label($groupLabel)
+                                            ->selectAllAction(
+                                                fn(Action $action) => $action->label('Seleccionar todos')
+                                            )
+                                            ->deselectAllAction(
+                                                fn(Action $action) => $action->label('Limpiar selección')
+                                            )
                                             ->options($options)
                                             ->columns(1)
                                             ->bulkToggleable()
@@ -159,37 +213,64 @@ class RolesTable
                                                 continue;
                                             $slug = "relationships.$relatedModel.$action";
                                             if (isset($slugToId[$slug])) {
-                                                $options[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]];
+                                                $options[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]] ?? $slug;
                                             }
                                         }
                                         if (!empty($options)) {
                                             $groups[$groupLabel] = CheckboxList::make("permissions_group_relationships_$relatedModel")
                                                 ->label($groupLabel)
+                                                ->selectAllAction(
+                                                    fn(Action $action) => $action->label('Seleccionar todos')
+                                                )
+                                                ->deselectAllAction(
+                                                    fn(Action $action) => $action->label('Limpiar selección')
+                                                )
                                                 ->options($options)
                                                 ->columns(1)
                                                 ->bulkToggleable()
                                                 ->extraAttributes(['class' => 'permission-group', 'data-group-label' => strtolower($groupLabel)]);
                                         }
                                     }
+                                } elseif (is_string($value)) {
+                                    if (!isset($groups['General'])) {
+                                        $groups['General'] = CheckboxList::make('permissions_group_general')
+                                            ->label('General')
+                                            ->selectAllAction(
+                                                fn(Action $action) => $action->label('Seleccionar todos')
+                                            )
+                                            ->deselectAllAction(
+                                                fn(Action $action) => $action->label('Limpiar selección')
+                                            )
+                                            ->columns(1)
+                                            ->bulkToggleable()
+                                            ->extraAttributes(['class' => 'permission-group', 'data-group-label' => 'general']);
+                                    }
                                 }
                             }
 
-                            $topLevelPermissions = array_filter($tree, 'is_string');
-                            if (!empty($topLevelPermissions)) {
-                                $options = [];
-                                foreach ($topLevelPermissions as $slug) {
+                            $generalOptions = [];
+                            foreach ($tree as $key => $value) {
+                                if (is_string($value)) {
+                                    $slug = $value;
                                     if (isset($slugToId[$slug])) {
-                                        $options[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]];
+                                        $generalOptions[$slugToId[$slug]] = $permissionOptions[$slugToId[$slug]] ?? $slug;
                                     }
                                 }
-                                if (!empty($options)) {
-                                    $groups['General'] = CheckboxList::make('permissions_group_general')
-                                        ->label('General')
-                                        ->options($options)
-                                        ->columns(1)
-                                        ->bulkToggleable()
-                                        ->extraAttributes(['class' => 'permission-group', 'data-group-label' => 'general']);
-                                }
+                            }
+
+                            if (!empty($generalOptions) && isset($groups['General'])) {
+                                $groups['General'] = CheckboxList::make('permissions_group_general')
+                                    ->label('General')
+                                    ->selectAllAction(
+                                        fn(Action $action) => $action->label('Seleccionar todos')
+                                    )
+                                    ->deselectAllAction(
+                                        fn(Action $action) => $action->label('Limpiar selección')
+                                    )
+                                    ->options($generalOptions)
+                                    ->columns(1)
+                                    ->bulkToggleable()
+                                    ->extraAttributes(['class' => 'permission-group', 'data-group-label' => 'general']);
                             }
 
                             $sectionComponents = [];
@@ -205,148 +286,160 @@ class RolesTable
                             }
 
                             return [
-                                \Filament\Forms\Components\TextInput::make('permission_search')
+                                TextInput::make('permission_search')
                                     ->label('Buscar permisos')
                                     ->placeholder('Escriba para filtrar permisos...')
-                                    ->extraAttributes([
-                                        'x-data' => '',
-                                        'x-on:input.debounce.300ms' => "
-                                        const searchTerm = \$event.target.value.toLowerCase();
-                                        const sections = document.querySelectorAll('.permission-section');
-                                        
-                                        sections.forEach(section => {
-                                            const sectionHeader = section.querySelector('.fi-section-header-heading');
-                                            const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
-                                            const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
-                                            let hasVisibleItems = false;
+                                    ->live()
+                                    ->debounce(300)
+                                    ->afterStateUpdated(function ($state, $set) {
+                                        $searchTerm = strtolower($state);
+                                        $script = "
+                                            const searchTerm = '{$searchTerm}';
+                                            const sections = document.querySelectorAll('.permission-section');
                                             
-                                            // Reset all options first
-                                            permissionOptions.forEach(optionLabel => {
-                                                const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
-                                                const gridParent = optionContainer.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-                                                if (gridParent) {
-                                                    gridParent.style.display = 'block';
-                                                }
-                                            });
-                                            
-                                            // Show section by default
-                                            section.style.display = 'block';
-                                            
-                                            // Check if section header matches
-                                            if (sectionLabel.includes(searchTerm)) {
-                                                hasVisibleItems = true;
-                                            } else {
-                                                // Check individual options
+                                            sections.forEach(section => {
+                                                const sectionHeader = section.querySelector('.fi-section-header-heading');
+                                                const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
+                                                const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
+                                                let hasVisibleItems = false;
+                                                
+                                                // Reset all options first
                                                 permissionOptions.forEach(optionLabel => {
-                                                    const labelText = optionLabel.textContent.toLowerCase();
                                                     const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
-                                                    const gridParent = optionContainer.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-                                                    
-                                                    if (labelText.includes(searchTerm)) {
-                                                        hasVisibleItems = true;
-                                                        if (optionContainer) {
-                                                            optionContainer.style.display = 'flex';
-                                                        }
-                                                    } else if (optionContainer && searchTerm.length > 0) {
-                                                        
-                                                        gridParent.style.display = 'none';
+                                                    if (optionContainer) {
+                                                        optionContainer.style.display = 'flex';
                                                     }
                                                 });
-                                            }
-                                            
-                                            // Hide section if no matches found
-                                            if (!hasVisibleItems && searchTerm.length > 0) {
-                                                section.style.display = 'none';
-                                            }
-                                        });
-                                    ",
-                                    ])
+                                                
+                                                // Show section by default
+                                                section.style.display = 'block';
+                                                
+                                                // Check if section header matches
+                                                if (sectionLabel.includes(searchTerm)) {
+                                                    hasVisibleItems = true;
+                                                } else {
+                                                    // Check individual options
+                                                    permissionOptions.forEach(optionLabel => {
+                                                        const labelText = optionLabel.textContent.toLowerCase();
+                                                        const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
+                                                        
+                                                        if (labelText.includes(searchTerm)) {
+                                                            hasVisibleItems = true;
+                                                            if (optionContainer) {
+                                                                optionContainer.style.display = 'flex';
+                                                            }
+                                                        } else if (optionContainer && searchTerm.length > 0) {
+                                                            optionContainer.style.display = 'none';
+                                                        }
+                                                    });
+                                                }
+                                                
+                                                // Hide section if no matches found
+                                                if (!hasVisibleItems && searchTerm.length > 0) {
+                                                    section.style.display = 'none';
+                                                }
+                                            });
+                                        ";
+                                        $set('search_script', $script);
+                                    })
                                     ->dehydrated(false),
+
                                 Fieldset::make('Acciones rápidas')
                                     ->schema([
-                                        Action::make('select_all_permissions')
-                                            ->label('Seleccionar todos los permisos')
-                                            ->button()
-                                            ->color('primary')
-                                            ->action(function ($livewire, $set) {
-                                                $tree = static::getPermissionsTreeForFilament();
-                                                $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
-                                                $slugToId = array_flip($permissionSlugs);
+                                        Grid::make()
+                                            ->columns(2)
+                                            ->schema([
+                                                Action::make('select_all_permissions')
+                                                    ->label('Seleccionar todos los permisos')
+                                                    ->button()
+                                                    ->color('primary')
+                                                    ->action(function ($livewire, $set) {
+                                                        $tree = static::getPermissionsTreeForFilament();
+                                                        $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
+                                                        $slugToId = array_flip($permissionSlugs);
 
-                                                $fieldPermissions = [];
+                                                        foreach ($tree as $key => $value) {
+                                                            if (is_string($key) && is_array($value)) {
+                                                                $fieldName = "permissions_group_$key";
+                                                                $fieldPermissions = [];
 
-                                                foreach ($tree as $key => $value) {
-                                                    if (is_string($key) && is_array($value)) {
-                                                        $fieldName = "permissions_group_$key";
-                                                        $fieldPermissions[$fieldName] = [];
+                                                                foreach ($value as $action) {
+                                                                    if (!is_string($key) || !is_string($action))
+                                                                        continue;
+                                                                    $slug = "$key.$action";
+                                                                    if (isset($slugToId[$slug])) {
+                                                                        $fieldPermissions[] = $slugToId[$slug];
+                                                                        $allPermissionIds[] = $slugToId[$slug];
+                                                                    }
+                                                                }
+                                                                $set($fieldName, $fieldPermissions);
+                                                            } elseif ($key === 'relationships') {
+                                                                foreach ($value as $relatedModel => $actions) {
+                                                                    $fieldName = "permissions_group_relationships_$relatedModel";
+                                                                    $fieldPermissions = [];
 
-                                                        foreach ($value as $action) {
-                                                            if (!is_string($key) || !is_string($action))
-                                                                continue;
-                                                            $slug = "$key.$action";
-                                                            if (isset($slugToId[$slug])) {
-                                                                $fieldPermissions[$fieldName][] = $slugToId[$slug];
-                                                            }
-                                                        }
-                                                    } elseif ($key === 'relationships') {
-                                                        foreach ($value as $relatedModel => $actions) {
-                                                            $fieldName = "permissions_group_relationships_$relatedModel";
-                                                            $fieldPermissions[$fieldName] = [];
-
-                                                            foreach ($actions as $action) {
-                                                                if (!is_string($relatedModel) || !is_string($action))
-                                                                    continue;
-                                                                $slug = "relationships.$relatedModel.$action";
+                                                                    foreach ($actions as $action) {
+                                                                        if (!is_string($relatedModel) || !is_string($action))
+                                                                            continue;
+                                                                        $slug = "relationships.$relatedModel.$action";
+                                                                        if (isset($slugToId[$slug])) {
+                                                                            $fieldPermissions[] = $slugToId[$slug];
+                                                                            $allPermissionIds[] = $slugToId[$slug];
+                                                                        }
+                                                                    }
+                                                                    $set($fieldName, $fieldPermissions);
+                                                                }
+                                                            } elseif (is_string($value)) {
+                                                                $fieldName = "permissions_group_general";
+                                                                $slug = $value;
                                                                 if (isset($slugToId[$slug])) {
-                                                                    $fieldPermissions[$fieldName][] = $slugToId[$slug];
+                                                                    $allPermissionIds[] = $slugToId[$slug];
                                                                 }
                                                             }
                                                         }
-                                                    } elseif (is_string($value)) {
-                                                        $fieldName = "permissions_group_general";
-                                                        if (!isset($fieldPermissions[$fieldName])) {
-                                                            $fieldPermissions[$fieldName] = [];
+
+                                                        $generalPermissions = [];
+                                                        foreach ($tree as $key => $value) {
+                                                            if (is_string($value)) {
+                                                                $slug = $value;
+                                                                if (isset($slugToId[$slug])) {
+                                                                    $generalPermissions[] = $slugToId[$slug];
+                                                                }
+                                                            }
                                                         }
-                                                        $slug = $value;
-                                                        if (isset($slugToId[$slug])) {
-                                                            $fieldPermissions[$fieldName][] = $slugToId[$slug];
+                                                        if (!empty($generalPermissions)) {
+                                                            $set('permissions_group_general', $generalPermissions);
                                                         }
-                                                    }
-                                                }
+                                                    }),
 
-                                                foreach ($fieldPermissions as $fieldName => $permissionIds) {
-                                                    if (!empty($permissionIds)) {
-                                                        $set($fieldName, $permissionIds);
-                                                    }
-                                                }
+                                                Action::make('deselect_all_permissions')
+                                                    ->label('Deseleccionar todos los permisos')
+                                                    ->button()
+                                                    ->color('danger')
+                                                    ->action(function ($set) {
+                                                        $tree = static::getPermissionsTreeForFilament();
 
-                                                if (method_exists($livewire, 'dispatchFormEvent')) {
-                                                    $livewire->dispatchFormEvent('selectAllPermissionsUpdated');
-                                                }
-                                            }),
-
-                                        Action::make('deselect_all_permissions')
-                                            ->label('Deseleccionar todos los permisos')
-                                            ->button()
-                                            ->color('danger')
-                                            ->action(function ($set, $get) {
-                                                foreach ($get() as $field => $value) {
-                                                    if (str_starts_with($field, 'permissions_group_')) {
-                                                        $set($field, []);
-                                                    }
-                                                }
-                                            }),
+                                                        foreach ($tree as $key => $value) {
+                                                            if (is_string($key) && is_array($value)) {
+                                                                $set("permissions_group_$key", []);
+                                                            } elseif ($key === 'relationships') {
+                                                                foreach (array_keys($value) as $relatedModel) {
+                                                                    $set("permissions_group_relationships_$relatedModel", []);
+                                                                }
+                                                            }
+                                                        }
+                                                        $set('permissions_group_general', []);
+                                                    }),
+                                            ])
                                     ]),
 
-                                Grid::make(3)
-                                    ->schema($sectionComponents)
-                                    ->extraAttributes([
-                                        'x-data' => '',
-                                    ]),
+                                Grid::make(4)
+                                    ->schema($sectionComponents),
                             ];
                         })
                         ->action(function (Role $record, array $data) {
                             $permissionIds = [];
+
                             foreach ($data as $key => $value) {
                                 if (str_starts_with($key, 'permissions_group_') && is_array($value)) {
                                     $permissionIds = array_merge($permissionIds, $value);
@@ -355,28 +448,20 @@ class RolesTable
 
                             $permissionIds = array_unique($permissionIds);
 
-                            if (empty($permissionIds)) {
-                                $record->permissions()->sync([]);
-                                Notification::make()
-                                    ->title('Rol actualizado')
-                                    ->body(Str::markdown("Se removieron todos los permisos del rol **$record->name**"))
-                                    ->warning()
-                                    ->send();
-                            } else {
-                                $record->permissions()->sync($permissionIds);
-                                $total = count($permissionIds);
-                                Notification::make()
-                                    ->title('Rol actualizado')
-                                    ->body(Str::markdown("Se sincronizaron **$total** permisos al rol **$record->name** correctamente"))
-                                    ->success()
-                                    ->send();
-                            }
+                            $record->permissions()->sync($permissionIds);
+
+                            $total = count($permissionIds);
+                            Notification::make()
+                                ->title('Permisos actualizados')
+                                ->body(Str::markdown("Se sincronizaron **$total** permisos al rol **{$record->name}** correctamente"))
+                                ->success()
+                                ->send();
                         })
-                        ->hidden(fn(Role $r) => $r->name === 'Administrador'),
+                        ->hidden(fn(Role $role) => $role->name === 'Administrador'),
+
                     EditAction::make()
                         ->hidden(fn(Role $record) => $record->name === 'Administrador'),
                 ]),
-
             ])
             ->toolbarActions([
                 BulkActionGroup::make([]),
@@ -417,26 +502,85 @@ class RolesTable
     {
         return [
             'dashboard',
-            'equipments' => ['create', 'edit', 'show', 'delete', 'view'],
-            'parts' => ['create', 'show', 'view', 'delete', 'edit'],
-            'projects' => ['create', 'show', 'view', 'delete', 'edit'],
-            'documents' => ['view', 'delete', 'edit', 'show', 'open_in_folder', 'show_file', 'download', 'upload'],
-            'suppliers' => ['create', 'show', 'view', 'delete', 'edit'],
-            'customers' => ['create', 'show', 'view', 'delete', 'edit'],
-            'people' => ['create', 'show', 'view', 'delete', 'edit'],
-            'users' => ['create', 'show', 'view', 'delete', 'edit'],
-            'activity_logs' => ['create', 'show', 'view', 'delete', 'edit'],
-            'relationships' => [
-                'parts' => ['create', 'sync', 'unsync', 'edit', 'show'],
-                'equipments' => ['create', 'sync', 'unsync', 'edit', 'show'],
-                'projects' => ['create', 'edit', 'show'],
-                'documents' => ['create', 'delete', 'edit', 'show', 'download', 'open_in_folder', 'show_file'],
-                'people' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
-                'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
-                'suppliers' => ['create', 'sync', 'unsync', 'edit', 'show', 'delete'],
-                'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
-                'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],
-            ]
+            'roles',
+            'equipments' => [
+                'create',
+                'edit',
+                'show',
+                'delete',
+                'view',
+                'sync',
+                'unsync'
+            ],
+            'parts' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+                'sync',
+                'unsync'
+            ],
+            'projects' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'documents' => [
+                'view',
+                'delete',
+                'edit',
+                'show',
+                'open_in_folder',
+                'show_file',
+                'download',
+                'upload',
+                'create',
+            ],
+            'suppliers' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+                'sync',
+                'unsync'
+            ],
+            'customers' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'people' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+                'sync',
+                'unsync'
+            ],
+            'users' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'activity_logs' => [
+                'create',
+                'show',
+                'view',
+                'delete',
+                'edit',
+            ],
+            'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
+            'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
+            'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],
         ];
     }
 }
