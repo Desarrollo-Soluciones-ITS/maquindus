@@ -26,10 +26,17 @@ class RolesTable
                 TextColumn::make('users_count')
                     ->label('Usuarios')
                     ->counts(relationships: 'users')
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
                     ->sortable()
-                    ->alignment('center')
-                    ->weight('bold')
-                    ->color('primary'),
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
+                TextColumn::make('updated_at')
+                    ->label('Última actualización')
+                    ->sortable()
+                    ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas')
             ])
             ->filters([
                 //
