@@ -12,7 +12,7 @@ class PermissionSeeder extends Seeder
         'create' => 'Crear',
         'edit' => 'Editar',
         'show' => 'Ver',
-        'delete' => 'Eliminar',
+        'delete' => 'Archivar',
         'view' => 'Listar',
         'download' => 'Descargar',
         'upload' => 'Subir',
