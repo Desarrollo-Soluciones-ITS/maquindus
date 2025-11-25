@@ -18,6 +18,8 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PersonResource extends Resource
 {
@@ -93,5 +95,13 @@ class PersonResource extends Resource
     public static function canDelete(Model $record): bool
     {
         return currentUserHasPermission('people.delete');
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }
