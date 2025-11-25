@@ -141,7 +141,7 @@ class FilesRelationManager extends RelationManager
                             'mime' => mime_type($mime),
                             'version' => $latestVersion + 1,
                         ]);
-                    })->hidden(!currentUserHasPermission('files.create'))
+                    })->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('files.create'))
             ])
             ->recordActions([
                 ActionGroup::make([

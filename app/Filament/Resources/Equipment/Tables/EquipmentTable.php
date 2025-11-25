@@ -8,6 +8,7 @@ use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -43,6 +44,7 @@ class EquipmentTable
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('equipments.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('equipments.restore')),
                 ])
             ])
             ->toolbarActions([

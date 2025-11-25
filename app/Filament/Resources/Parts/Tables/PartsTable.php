@@ -8,6 +8,7 @@ use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -44,6 +45,7 @@ class PartsTable
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('parts.restore')),
                 ])
             ])
             ->toolbarActions([

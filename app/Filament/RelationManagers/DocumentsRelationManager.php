@@ -3,20 +3,14 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\Documents\CreateAction;
-use App\Filament\Actions\ArchiveAction;
-use App\Filament\Actions\Documents\DownloadAction;
-use App\Filament\Actions\Documents\EditAction;
-use App\Filament\Actions\Documents\OpenFolderAction;
-use App\Filament\Actions\Documents\PreviewAction;
-use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Resources\Documents\Schemas\DocumentForm;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
 use App\Filament\Resources\Documents\Tables\DocumentsTable;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -27,6 +21,8 @@ class DocumentsRelationManager extends RelationManager
     protected static ?string $title = 'Documentos';
 
     protected static ?string $modelLabel = 'documento';
+
+    protected static bool $isLazy = false;
 
     public function form(Schema $schema): Schema
     {
@@ -41,20 +37,18 @@ class DocumentsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return DocumentsTable::configure($table)
+            ->modifyQueryUsing(function (Builder $query) {
+                $parent = $this->getOwnerRecord();
+
+                if (!$parent->trashed()) {
+                    return $query;
+                }
+
+                return $query->withTrashed()
+                    ->with(['documentable' => fn($query) => $query->withTrashed()]);
+            })
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('documents.create')),
-            ])
-            ->recordActions([
-                ActionGroup::make([
-                    ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('documents.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('documents.open_in_folder')),
-                        DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
-                        ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
-                    ])->dropdown(false),
-                    EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
-                ]),
+                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('documents.create')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

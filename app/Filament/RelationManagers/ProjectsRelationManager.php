@@ -13,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -57,6 +58,7 @@ class ProjectsRelationManager extends RelationManager
                     DetachAction::make()
                         ->hidden(is_view_customer() || !currentUserHasPermission('projects.unsync')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
                 ])
             ])
             ->toolbarActions([

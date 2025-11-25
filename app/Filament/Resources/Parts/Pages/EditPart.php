@@ -6,6 +6,7 @@ use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Parts\PartResource;
 use App\Services\Code;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -18,6 +19,7 @@ class EditPart extends EditRecord
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.delete')),
+            RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('parts.restore')),
         ];
     }
 

@@ -10,6 +10,7 @@ use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
@@ -68,6 +69,7 @@ class ProjectsTable
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
                 ]),
             ])
             ->toolbarActions([

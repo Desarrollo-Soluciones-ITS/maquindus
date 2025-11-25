@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Suppliers\Pages;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Suppliers\SupplierResource;
 use App\Models\Country;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -17,6 +18,7 @@ class EditSupplier extends EditRecord
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.delete')),
+            RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('suppliers.restore')),
         ];
     }
 

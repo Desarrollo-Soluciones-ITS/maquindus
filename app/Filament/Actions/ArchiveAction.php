@@ -53,7 +53,6 @@ class ArchiveAction
 
                             $file->update(['path' => $newPath]);
                             Storage::move($oldPath, $newPath);
-                            $file->delete();
                         }
 
                         $record->delete();
@@ -80,7 +79,6 @@ class ArchiveAction
 
                                 $file->update(['path' => $newPath]);
                                 Storage::move($oldPath, $newPath);
-                                $file->delete();
                             }
 
                             $document->delete();

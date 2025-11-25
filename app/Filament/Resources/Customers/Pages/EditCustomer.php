@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Customers\Pages;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Models\Country;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -17,6 +18,7 @@ class EditCustomer extends EditRecord
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('customers.delete')),
+            RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('customers.restore')),
         ];
     }
 

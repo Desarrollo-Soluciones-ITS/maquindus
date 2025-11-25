@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
@@ -84,6 +85,7 @@ class PeopleTable
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('people.restore')),
                 ])
             ])
             ->toolbarActions([
