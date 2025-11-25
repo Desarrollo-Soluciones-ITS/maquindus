@@ -16,8 +16,7 @@ class EditPerson extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
-            ArchiveAction::make()
-                ->hidden(!currentUserHasPermission('people.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.delete')),
         ];
     }
 

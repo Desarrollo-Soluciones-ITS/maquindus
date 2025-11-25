@@ -17,7 +17,7 @@ class EditEquipment extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
-            ArchiveAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('equipments.delete')),
         ];
     }
 

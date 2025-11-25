@@ -16,7 +16,7 @@ class EditSupplier extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-            ArchiveAction::make()->hidden(!currentUserHasPermission('suppliers.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('suppliers.delete')),
         ];
     }
 

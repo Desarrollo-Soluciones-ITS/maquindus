@@ -53,7 +53,7 @@ class DocumentsRelationManager extends RelationManager
                         ViewAction::make()->hidden(!currentUserHasPermission('relationships.documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.documents.edit')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.documents.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('relationships.documents.delete')),
                 ]),
             ])
             ->toolbarActions([

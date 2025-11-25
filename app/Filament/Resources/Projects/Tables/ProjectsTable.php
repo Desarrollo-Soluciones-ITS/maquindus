@@ -67,13 +67,13 @@ class ProjectsTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('projects.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('projects.delete')),
                 ]),
             ])
-                ->toolbarActions([
-                    BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
 
-                    ]),
-                ]);
+                ]),
+            ]);
     }
 }

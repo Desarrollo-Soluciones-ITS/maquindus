@@ -46,9 +46,6 @@ class User extends Authenticatable
 
     public function hasPermission(string $name): bool
     {
-        $permission = $this->role->permissions
-            ->first(fn($perm) => $perm->slug === $name);
-
-        return !!$permission;
+        return $this->role->permissions()->where('slug', $name)->exists();
     }
 }

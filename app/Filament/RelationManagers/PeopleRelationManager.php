@@ -50,7 +50,7 @@ class PeopleRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.people.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.people.unsync')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.people.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.people.delete')),
                 ])
             ])
             ->toolbarActions([

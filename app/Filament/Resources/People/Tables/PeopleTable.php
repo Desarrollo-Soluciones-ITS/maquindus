@@ -45,7 +45,8 @@ class PeopleTable
                     ->searchable()
                     ->color(Color::Blue)
                     ->url(function (Model $record) {
-                        if (!$record->personable) return null;
+                        if (!$record->personable)
+                            return null;
                         $class = $record->personable::class;
 
                         $page = match ($class) {
@@ -82,7 +83,7 @@ class PeopleTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('people.edit')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('people.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('people.delete')),
                 ])
             ])
             ->toolbarActions([

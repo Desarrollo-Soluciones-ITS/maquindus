@@ -56,7 +56,7 @@ class ProjectsRelationManager extends RelationManager
                         ->hidden(!currentUserHasPermission('relationships.projects.edit')),
                     DetachAction::make()
                         ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.unsync')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.projects.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.projects.delete')),
                 ])
             ])
             ->toolbarActions([

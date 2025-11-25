@@ -52,7 +52,7 @@ class SuppliersRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.edit')),
                     DetachAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.unsync')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('relationships.suppliers.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('relationships.suppliers.delete')),
                 ])
             ])
             ->toolbarActions([

@@ -42,7 +42,7 @@ class EquipmentTable
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('equipments.edit')),
-                    ArchiveAction::make()->hidden(!currentUserHasPermission('equipments.delete')),
+                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('equipments.delete')),
                 ])
             ])
             ->toolbarActions([

@@ -16,7 +16,7 @@ class EditCustomer extends EditRecord
     {
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
-            ArchiveAction::make()->hidden(!currentUserHasPermission('customers.delete')),
+            ArchiveAction::make()->hidden(fn($record) => $record->trashed() || currentUserHasPermission('customers.delete')),
         ];
     }
 
