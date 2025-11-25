@@ -118,7 +118,6 @@ class RolesTable
                             ->label('Permisos')
                             ->multiple()
                             ->searchable()
-                            ->preload()
                             ->placeholder('Seleccionar permisos...')
                             ->options(function () {
                                 return Permission::orderBy('name')

@@ -46,8 +46,7 @@ class ProjectsRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Project))
                     ->hidden(!currentUserHasPermission('relationships.projects.create')),
-                AttachAction::make()
-                    ->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.sync')),
+                AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('relationships.projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([

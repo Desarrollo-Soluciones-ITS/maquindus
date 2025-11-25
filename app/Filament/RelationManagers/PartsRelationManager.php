@@ -46,8 +46,7 @@ class PartsRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(code_to_full(Prefix::Part))
                     ->hidden(!currentUserHasPermission('relationships.parts.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync'))
-                    ->preloadRecordSelect(),
+                AttachAction::make()->hidden(!currentUserHasPermission('relationships.parts.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
