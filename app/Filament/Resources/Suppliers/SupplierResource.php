@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Suppliers;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
@@ -51,6 +52,7 @@ class SupplierResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'documents' => DocumentsRelationManager::class,
             'equipment' => EquipmentRelationManager::class,
             'parts' => PartsRelationManager::class
         ];
