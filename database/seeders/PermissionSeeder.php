@@ -16,7 +16,7 @@ class PermissionSeeder extends Seeder
         'view' => 'Listar',
         'download' => 'Descargar',
         'upload' => 'Subir',
-        'open_in_folder' => 'Abrir en carpeta',
+        'open_in_folder' => 'Abrir carpeta de',
         'show_file' => 'Ver archivo',
         'sync' => 'Vincular',
         'unsync' => 'Desvincular',
@@ -25,7 +25,7 @@ class PermissionSeeder extends Seeder
 
     protected array $resourceLabels = [
         'equipments' => 'equipo',
-        'parts' => 'pieza',
+        'parts' => 'repuesto',
         'projects' => 'proyecto',
         'documents' => 'documento',
         'suppliers' => 'proveedor',

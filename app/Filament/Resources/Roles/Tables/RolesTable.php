@@ -400,7 +400,7 @@ class RolesTable
 
     protected static array $resourceLabels = [
         'equipments' => 'equipo',
-        'parts' => 'pieza',
+        'parts' => 'repuesto',
         'projects' => 'proyecto',
         'documents' => 'documento',
         'suppliers' => 'proveedor',
