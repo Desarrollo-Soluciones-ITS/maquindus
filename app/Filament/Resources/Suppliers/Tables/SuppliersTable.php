@@ -7,6 +7,7 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -40,6 +41,7 @@ class SuppliersTable
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('suppliers.restore')),
                 ])
             ])
             ->toolbarActions([

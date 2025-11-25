@@ -18,19 +18,19 @@ class FileSeeder extends Seeder
 
         $files = [
             [
-                'path' => 'docs/sample.pdf',
+                'path' => 'docs/sample1.pdf',
                 'mime' => 'PDF',
                 'version' => 1,
                 'document_id' => $documents[0]->id
             ],
             [
-                'path' => 'docs/sample.pdf',
+                'path' => 'docs/sample2.pdf',
                 'mime' => 'PDF',
                 'version' => 1,
                 'document_id' => $documents[1]->id
             ],
             [
-                'path' => 'docs/sample.pdf',
+                'path' => 'docs/sample3.pdf',
                 'mime' => 'PDF',
                 'version' => 1,
                 'document_id' => $documents[2]->id

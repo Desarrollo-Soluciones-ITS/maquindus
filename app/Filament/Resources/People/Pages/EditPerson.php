@@ -5,6 +5,7 @@ namespace App\Filament\Resources\People\Pages;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\People\PersonResource;
 use App\Models\Country;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -17,6 +18,7 @@ class EditPerson extends EditRecord
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.delete')),
+            RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('people.restore')),
         ];
     }
 

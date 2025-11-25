@@ -6,6 +6,7 @@ use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Equipment\EquipmentResource;
 use App\Services\Code;
+use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -18,6 +19,7 @@ class EditEquipment extends EditRecord
         return [
             ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.delete')),
+            RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('equipments.restore')),
         ];
     }
 

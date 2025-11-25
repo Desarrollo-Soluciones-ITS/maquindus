@@ -26,6 +26,8 @@ use App\Models\Project;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Actions\ActionGroup;
+use App\Filament\Actions\RestoreAction;
+use App\Filament\Resources\Documents\Pages\ListDocuments;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -143,7 +145,10 @@ class DocumentsTable
                         }
                         return $query;
                     }),
-                ArchivedFilter::make(),
+                ArchivedFilter::make()
+                    ->hidden(function (DocumentsRelationManager | ListDocuments $livewire) {
+                        return $livewire instanceof DocumentsRelationManager && $livewire->getOwnerRecord()->trashed();
+                    }),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -153,8 +158,9 @@ class DocumentsTable
                         DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make()->hidden(!currentUserHasPermission('documents.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
+                    RestoreAction::make()->hidden(fn($record) => $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
                 ])
             ]);
     }
