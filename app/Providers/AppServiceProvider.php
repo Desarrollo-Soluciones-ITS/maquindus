@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
@@ -37,7 +38,11 @@ class AppServiceProvider extends ServiceProvider
 
         Table::configureUsing(function (Table $table) {
             $table->filtersLayout(FiltersLayout::Modal)
-                ->defaultPaginationPageOption(5);
+                ->defaultPaginationPageOption(5)
+                ->filtersTriggerAction(function (Action $action) {
+                    $action->button()
+                        ->label('Filtros');
+                });
         });
 
         TextColumn::configureUsing(function (TextColumn $column) {

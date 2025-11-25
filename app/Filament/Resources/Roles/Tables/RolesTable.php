@@ -58,7 +58,7 @@ class RolesTable
                                 ->pluck('id')
                                 ->toArray(),
                         ])
-                        ->form([
+                        ->schema([
                             Select::make('users')
                                 ->label('Usuarios')
                                 ->multiple()
@@ -124,7 +124,7 @@ class RolesTable
                             $permissionIds = $record->permissions->pluck('id')->toArray();
 
                             $formData = [];
-                            $tree = static::getPermissionsTreeForFilament();
+                            $tree = Permission::$permissions;
                             $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
                             $slugToId = array_flip($permissionSlugs);
 
@@ -169,8 +169,8 @@ class RolesTable
 
                             return $formData;
                         })
-                        ->form(function () {
-                            $tree = static::getPermissionsTreeForFilament();
+                        ->schema(function () {
+                            $tree = Permission::$permissions;
                             $permissionOptions = Permission::orderBy('name')->pluck('name', 'id')->toArray();
                             $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
                             $slugToId = array_flip($permissionSlugs);
@@ -179,7 +179,7 @@ class RolesTable
 
                             foreach ($tree as $key => $value) {
                                 if (is_string($key) && is_array($value)) {
-                                    $groupLabel = ucfirst(static::$resourceLabels[$key] ?? $key);
+                                    $groupLabel = ucfirst(Permission::$resourceLabels[$key] ?? $key);
                                     $options = [];
                                     foreach ($value as $action) {
                                         if (!is_string($key) || !is_string($action))
@@ -205,7 +205,7 @@ class RolesTable
                                     }
                                 } elseif ($key === 'relationships') {
                                     foreach ($value as $relatedModel => $actions) {
-                                        $relatedLabel = static::$resourceLabels[$relatedModel] ?? $relatedModel;
+                                        $relatedLabel = Permission::$resourceLabels[$relatedModel] ?? $relatedModel;
                                         $groupLabel = "Relaciones de " . ucfirst($relatedLabel);
                                         $options = [];
                                         foreach ($actions as $action) {
@@ -286,63 +286,64 @@ class RolesTable
                             }
 
                             return [
-                                TextInput::make('permission_search')
-                                    ->label('Buscar permisos')
-                                    ->placeholder('Escriba para filtrar permisos...')
-                                    ->live()
-                                    ->debounce(300)
-                                    ->afterStateUpdated(function ($state, $set) {
-                                        $searchTerm = strtolower($state);
-                                        $script = "
-                                            const searchTerm = '{$searchTerm}';
-                                            const sections = document.querySelectorAll('.permission-section');
+                                // TODO -> comentado porque no funciona y por ahora no hay chance de arreglarlo
+                                // TextInput::make('permission_search')
+                                    // ->label('Buscar permisos')
+                                    // ->placeholder('Escriba para filtrar permisos...')
+                                    // ->live()
+                                    // ->debounce(300)
+                                    // ->afterStateUpdated(function ($state, $set) {
+                                    //     $searchTerm = strtolower($state);
+                                    //     $script = "
+                                    //         const searchTerm = '{$searchTerm}';
+                                    //         const sections = document.querySelectorAll('.permission-section');
                                             
-                                            sections.forEach(section => {
-                                                const sectionHeader = section.querySelector('.fi-section-header-heading');
-                                                const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
-                                                const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
-                                                let hasVisibleItems = false;
+                                    //         sections.forEach(section => {
+                                    //             const sectionHeader = section.querySelector('.fi-section-header-heading');
+                                    //             const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
+                                    //             const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
+                                    //             let hasVisibleItems = false;
                                                 
-                                                // Reset all options first
-                                                permissionOptions.forEach(optionLabel => {
-                                                    const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
-                                                    if (optionContainer) {
-                                                        optionContainer.style.display = 'flex';
-                                                    }
-                                                });
+                                    //             // Reset all options first
+                                    //             permissionOptions.forEach(optionLabel => {
+                                    //                 const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
+                                    //                 if (optionContainer) {
+                                    //                     optionContainer.style.display = 'flex';
+                                    //                 }
+                                    //             });
                                                 
-                                                // Show section by default
-                                                section.style.display = 'block';
+                                    //             // Show section by default
+                                    //             section.style.display = 'block';
                                                 
-                                                // Check if section header matches
-                                                if (sectionLabel.includes(searchTerm)) {
-                                                    hasVisibleItems = true;
-                                                } else {
-                                                    // Check individual options
-                                                    permissionOptions.forEach(optionLabel => {
-                                                        const labelText = optionLabel.textContent.toLowerCase();
-                                                        const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
+                                    //             // Check if section header matches
+                                    //             if (sectionLabel.includes(searchTerm)) {
+                                    //                 hasVisibleItems = true;
+                                    //             } else {
+                                    //                 // Check individual options
+                                    //                 permissionOptions.forEach(optionLabel => {
+                                    //                     const labelText = optionLabel.textContent.toLowerCase();
+                                    //                     const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
                                                         
-                                                        if (labelText.includes(searchTerm)) {
-                                                            hasVisibleItems = true;
-                                                            if (optionContainer) {
-                                                                optionContainer.style.display = 'flex';
-                                                            }
-                                                        } else if (optionContainer && searchTerm.length > 0) {
-                                                            optionContainer.style.display = 'none';
-                                                        }
-                                                    });
-                                                }
+                                    //                     if (labelText.includes(searchTerm)) {
+                                    //                         hasVisibleItems = true;
+                                    //                         if (optionContainer) {
+                                    //                             optionContainer.style.display = 'flex';
+                                    //                         }
+                                    //                     } else if (optionContainer && searchTerm.length > 0) {
+                                    //                         optionContainer.style.display = 'none';
+                                    //                     }
+                                    //                 });
+                                    //             }
                                                 
-                                                // Hide section if no matches found
-                                                if (!hasVisibleItems && searchTerm.length > 0) {
-                                                    section.style.display = 'none';
-                                                }
-                                            });
-                                        ";
-                                        $set('search_script', $script);
-                                    })
-                                    ->dehydrated(false),
+                                    //             // Hide section if no matches found
+                                    //             if (!hasVisibleItems && searchTerm.length > 0) {
+                                    //                 section.style.display = 'none';
+                                    //             }
+                                    //         });
+                                    //     ";
+                                    //     $set('search_script', $script);
+                                    // })
+                                    // ->dehydrated(false),
 
                                 Fieldset::make('Acciones rápidas')
                                     ->schema([
@@ -354,7 +355,7 @@ class RolesTable
                                                     ->button()
                                                     ->color('primary')
                                                     ->action(function ($livewire, $set) {
-                                                        $tree = static::getPermissionsTreeForFilament();
+                                                        $tree = Permission::$permissions;
                                                         $permissionSlugs = Permission::pluck('slug', 'id')->toArray();
                                                         $slugToId = array_flip($permissionSlugs);
 
@@ -417,7 +418,7 @@ class RolesTable
                                                     ->button()
                                                     ->color('danger')
                                                     ->action(function ($set) {
-                                                        $tree = static::getPermissionsTreeForFilament();
+                                                        $tree = Permission::$permissions;
 
                                                         foreach ($tree as $key => $value) {
                                                             if (is_string($key) && is_array($value)) {
@@ -466,121 +467,5 @@ class RolesTable
             ->toolbarActions([
                 BulkActionGroup::make([]),
             ]);
-    }
-
-    protected static array $actionLabels = [
-        'create' => 'Crear',
-        'edit' => 'Editar',
-        'show' => 'Ver',
-        'delete' => 'Archivar',
-        'view' => 'Listar',
-        'download' => 'Descargar',
-        'upload' => 'Subir',
-        'open_in_folder' => 'Abrir en carpeta',
-        'show_file' => 'Ver archivo',
-        'sync' => 'Vincular',
-        'unsync' => 'Desvincular',
-        'gallery' => 'Galería',
-    ];
-
-    protected static array $resourceLabels = [
-        'equipments' => 'equipo',
-        'parts' => 'repuesto',
-        'projects' => 'proyecto',
-        'documents' => 'documento',
-        'suppliers' => 'proveedor',
-        'customers' => 'cliente',
-        'people' => 'contacto',
-        'users' => 'usuario',
-        'activities' => 'actividad',
-        'files' => 'archivo',
-        'images' => 'imagen',
-        'activity_logs' => 'bitácora',
-    ];
-
-    protected static function getPermissionsTreeForFilament(): array
-    {
-        return [
-            'dashboard',
-            'roles',
-            'equipments' => [
-                'create',
-                'edit',
-                'show',
-                'delete',
-                'view',
-                'sync',
-                'unsync'
-            ],
-            'parts' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-                'sync',
-                'unsync'
-            ],
-            'projects' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-            ],
-            'documents' => [
-                'view',
-                'delete',
-                'edit',
-                'show',
-                'open_in_folder',
-                'show_file',
-                'download',
-                'upload',
-                'create',
-            ],
-            'suppliers' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-                'sync',
-                'unsync'
-            ],
-            'customers' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-            ],
-            'people' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-                'sync',
-                'unsync'
-            ],
-            'users' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-            ],
-            'activity_logs' => [
-                'create',
-                'show',
-                'view',
-                'delete',
-                'edit',
-            ],
-            'activities' => ['create', 'edit', 'show', 'delete', 'sync', 'unsync'],
-            'images' => ['download', 'edit', 'show', 'delete', 'create', 'gallery'],
-            'files' => ['download', 'show', 'delete', 'create', 'open_in_folder', 'show_file'],
-        ];
     }
 }

@@ -59,20 +59,9 @@ class ActivityLogResource extends Resource
     {
         return currentUserHasPermission('activity_logs.view');
     }
-    public static function canCreate(): bool
-    {
-        return currentUserHasPermission('activity_logs.create');
-    }
-    public static function canUpdate(): bool
-    {
-        return currentUserHasPermission('activity_logs.edit');
-    }
+
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
         return currentUserHasPermission('activity_logs.show');
-    }
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
-    {
-        return currentUserHasPermission('activity_logs.delete');
     }
 }

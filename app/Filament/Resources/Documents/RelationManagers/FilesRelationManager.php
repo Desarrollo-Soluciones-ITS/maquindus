@@ -141,19 +141,19 @@ class FilesRelationManager extends RelationManager
                             'mime' => mime_type($mime),
                             'version' => $latestVersion + 1,
                         ]);
-                    })->hidden(!currentUserHasPermission('relationships.files.create'))
+                    })->hidden(!currentUserHasPermission('files.create'))
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('relationships.files.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('relationships.files.open_in_folder')),
-                        DownloadAction::make()->hidden(!currentUserHasPermission('relationships.files.download')),
+                        PreviewAction::make()->hidden(!currentUserHasPermission('files.show_file')),
+                        OpenFolderAction::make()->hidden(!currentUserHasPermission('files.open_in_folder')),
+                        DownloadAction::make()->hidden(!currentUserHasPermission('files.download')),
                     ])->dropdown(false),
                     ViewAction::make()
                         ->color(Color::Blue)
                         ->modalHeading('Datos de la versión')
-                        ->hidden(!currentUserHasPermission('relationships.files.show')),
+                        ->hidden(!currentUserHasPermission('files.show')),
                 ]),
             ]);
     }
