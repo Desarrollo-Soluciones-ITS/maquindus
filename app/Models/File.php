@@ -48,7 +48,7 @@ class File extends Model
     public static function formatBytes(float $bytes): string
     {
         if (!$bytes) {
-            return 'Unknown';
+            return 0;
         }
 
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
