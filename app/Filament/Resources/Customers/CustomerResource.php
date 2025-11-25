@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
 use App\Filament\Resources\Customers\Pages\CreateCustomer;
 use App\Filament\Resources\Customers\Pages\EditCustomer;
@@ -48,6 +49,7 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'documents' => DocumentsRelationManager::class,
             'projects' => ProjectsRelationManager::class
         ];
     }
