@@ -59,10 +59,15 @@ return [
             'throw' => false,
             'report' => false,
         ],
-        
-        // --- DISCO PERSONALIZADO PARA BACKUP (Añadido) ---
-        // Este disco usa la ruta definida en la variable CUSTOM_BACKUP_PATH del .env
-        'backup_custom_disk' => [
+
+        'temp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/temp'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'backup' => [
             'driver' => 'local',
             'root' => env('CUSTOM_BACKUP_PATH', storage_path('app/backup')),
             'throw' => false,
