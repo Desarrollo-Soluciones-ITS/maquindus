@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
@@ -11,7 +12,6 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\EditAction;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;

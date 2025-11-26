@@ -4,6 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
+use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -12,7 +13,6 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
-use Filament\Actions\EditAction;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;

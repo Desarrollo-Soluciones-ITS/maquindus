@@ -17,20 +17,23 @@ class EditAction
                 $oldName = $record->name;
                 $newName = $data['name'];
                 $oldCategory = $record->category;
-                $newCategory = $data['category'];
+                $newCategory = $data->get('category');
 
                 if ($oldName !== $newName || $oldCategory !== $newCategory) {
                     $documentable = $record->documentable;
-
                     $parent = model_to_spanish($documentable::class, plural: true);
 
-                    $segments = collect([$parent, $documentable->name]);
-
-                    if ($newCategory) {
-                        $segments->push($newCategory);
+                    $oldSegments = collect([$parent, $documentable->name]);
+                    if ($oldCategory) {
+                        $oldSegments->push($oldCategory->value);
                     }
+                    $oldFolder = $oldSegments->join('/');
 
-                    $newFolder = $segments->join('/');
+                    $newSegments = collect([$parent, $documentable->name]);
+                    if ($newCategory) {
+                        $newSegments->push($newCategory);
+                    }
+                    $newFolder = $newSegments->join('/');
 
                     $record->files()->each(function ($file) use ($oldName, $newName, $newFolder) {
                         $oldPath = $file->path;
@@ -44,6 +47,8 @@ class EditAction
                             $file->update(['path' => $newPath]);
                         }
                     });
+
+                    cleanup_empty_folders($oldFolder);
                 }
 
                 $record->update($data->all());

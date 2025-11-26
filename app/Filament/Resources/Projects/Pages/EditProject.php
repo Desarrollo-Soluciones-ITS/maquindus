@@ -9,6 +9,7 @@ use App\Services\Code;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditProject extends EditRecord
 {
@@ -27,5 +28,22 @@ class EditProject extends EditRecord
     {
         $data['code'] = Code::full($data['code'], Prefix::Project);
         return $data;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $data = collect($data);
+        $oldName = $record->name;
+        $newName = $data['name'];
+
+        $isDocumentable = method_exists($record, 'documents');
+
+        if ($isDocumentable && $oldName !== $newName) {
+            handle_documentable_name_change($record, $oldName, $newName);
+        }
+
+        $record->update($data->all());
+
+        return $record;
     }
 }

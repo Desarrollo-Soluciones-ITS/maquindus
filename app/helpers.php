@@ -248,3 +248,78 @@ if (!function_exists('is_files_model')) {
         return $models->contains($model::class);
     }
 }
+
+if (!function_exists('cleanup_empty_folders')) {
+    function cleanup_empty_folders(string $folderPath): void
+    {
+        $disk = Storage::disk('local');
+
+        $deleteIfEmpty = function ($path) use ($disk, &$deleteIfEmpty) {
+            if (!$disk->exists($path)) {
+                return;
+            }
+
+            $contents = $disk->files($path);
+            $directories = $disk->directories($path);
+
+            if (count($contents) === 0 && count($directories) === 0) {
+                $disk->deleteDirectory($path);
+
+                $parentPath = dirname($path);
+                if ($parentPath !== '.' && $parentPath !== '') {
+                    $deleteIfEmpty($parentPath);
+                }
+            }
+        };
+
+        $deleteIfEmpty($folderPath);
+    }
+}
+
+if (!function_exists('handle_documentable_name_change')) {
+    function handle_documentable_name_change(Model $documentable, string $oldName, string $newName): void
+    {
+        $disk = Storage::disk('local');
+        $parent = model_to_spanish($documentable::class, plural: true);
+
+        $oldBaseFolder = $parent . '/' . $oldName;
+        $newBaseFolder = $parent . '/' . $newName;
+
+        if ($oldBaseFolder !== $newBaseFolder && $disk->exists($oldBaseFolder)) {
+            if (!$disk->exists($newBaseFolder)) {
+                $disk->makeDirectory($newBaseFolder);
+            }
+
+            $allFiles = $disk->allFiles($oldBaseFolder);
+            foreach ($allFiles as $oldPath) {
+                $newPath = str_replace($oldBaseFolder, $newBaseFolder, $oldPath);
+
+                $newDirectory = dirname($newPath);
+                if (!$disk->exists($newDirectory)) {
+                    $disk->makeDirectory($newDirectory);
+                }
+
+                $disk->move($oldPath, $newPath);
+            }
+
+            $documentable->documents->each(function ($document) use ($oldBaseFolder, $newBaseFolder) {
+                $document->files->each(function ($file) use ($oldBaseFolder, $newBaseFolder) {
+                    $oldPath = $file->path;
+                    $newPath = str_replace($oldBaseFolder, $newBaseFolder, $oldPath);
+
+                    if ($oldPath !== $newPath) {
+                        $file->update(['path' => $newPath]);
+                    }
+                });
+            });
+
+            $allDirectories = $disk->allDirectories($oldBaseFolder);
+
+            foreach (array_reverse($allDirectories) as $directory) {
+                cleanup_empty_folders($directory);
+            }
+
+            cleanup_empty_folders($oldBaseFolder);
+        }
+    }
+}
