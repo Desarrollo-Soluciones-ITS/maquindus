@@ -22,14 +22,9 @@ class PersonForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nombre')
-                    ->placeholder('Ej. Mario')
-                    ->maxLength(50)
-                    ->required(),
-                TextInput::make('surname')
-                    ->label('Apellido')
-                    ->placeholder('Ej. Gómez')
-                    ->maxLength(50)
+                    ->label('Nombre completo')
+                    ->placeholder('Ej. Mario Gómez')
+                    ->maxLength(80)
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
@@ -72,7 +67,8 @@ class PersonForm
                     ->label('Dirección')
                     ->placeholder('Ej. Calle 15, Avenida FG')
                     ->maxLength(255)
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
                 MorphToSelect::make('personable')
                     ->label('Empresa relacionada')
                     ->types([

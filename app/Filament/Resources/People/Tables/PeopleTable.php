@@ -25,10 +25,10 @@ class PeopleTable
     {
         return $table
             ->columns([
-                TextColumn::make('fullname')
+                TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(['name', 'surname'])
-                    ->sortable(['surname', 'name']),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
                     ->searchable()

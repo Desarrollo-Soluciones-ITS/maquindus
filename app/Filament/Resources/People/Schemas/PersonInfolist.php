@@ -11,7 +11,7 @@ class PersonInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('fullname')
+                TextEntry::make('name')
                     ->label('Nombre'),
                 TextEntry::make('email')
                     ->label('Correo electrónico'),

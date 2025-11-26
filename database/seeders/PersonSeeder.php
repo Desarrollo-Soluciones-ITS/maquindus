@@ -23,8 +23,8 @@ class PersonSeeder extends Seeder
         $city = $state->cities[0];
 
         $people = [
-            ['id' => Str::uuid()->toString(), 'name' => 'Carlos', 'surname' => 'Pérez', 'email' => 'carlos.perez@vega.com', 'phone' => '04141234567', 'address' => 'Oficina 12', 'position' => 'Gerente de Planta', 'personable_type' => 'App\\Models\\Customer', 'personable_id' => $customer->id, 'country_id' => $venId, 'state_id' => $state->id, 'city_id' => $city->id],
-            ['id' => Str::uuid()->toString(), 'name' => 'María', 'surname' => 'Gómez', 'email' => 'maria.gomez@suministros.com', 'phone' => '04149876543', 'address' => 'Sucursal', 'position' => 'Vendedora', 'personable_type' => 'App\\Models\\Supplier', 'personable_id' => $supplier->id, 'country_id' => $venId, 'state_id' => $state->id, 'city_id' => $city->id],
+            ['id' => Str::uuid()->toString(), 'name' => 'Carlos Pérez', 'email' => 'carlos.perez@vega.com', 'phone' => '04141234567', 'address' => 'Oficina 12', 'position' => 'Gerente de Planta', 'personable_type' => 'App\\Models\\Customer', 'personable_id' => $customer->id, 'country_id' => $venId, 'state_id' => $state->id, 'city_id' => $city->id],
+            ['id' => Str::uuid()->toString(), 'name' => 'María Gómez', 'email' => 'maria.gomez@suministros.com', 'phone' => '04149876543', 'address' => 'Sucursal', 'position' => 'Vendedora', 'personable_type' => 'App\\Models\\Supplier', 'personable_id' => $supplier->id, 'country_id' => $venId, 'state_id' => $state->id, 'city_id' => $city->id],
         ];
 
         foreach ($people as $p) {
