@@ -22,7 +22,7 @@ class SupplierSeeder extends Seeder
         $suppliers = [
             [
                 'rif' => 'J-10101010-2',
-                'name' => 'Suministros Técnicos S.A.',
+                'name' => 'Suministros Técnicos SA',
                 'email' => 'ventas@suministros.com',
                 'phone' => '02441234567',
                 'about' => 'Proveedor de repuestos y equipos',

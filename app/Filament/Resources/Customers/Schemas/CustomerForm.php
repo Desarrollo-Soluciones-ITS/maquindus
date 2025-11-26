@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Customers\Schemas;
 
 use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
@@ -30,7 +31,8 @@ class CustomerForm
                     ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Ej. Construcciones López C.A.')
+                    ->placeholder('Ej. Construcciones López CA')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
                     ->required(),
@@ -59,7 +61,7 @@ class CustomerForm
                     ->label('Estado')
                     ->relationship('state', 'name')
                     ->live()
-                    ->hidden(fn (Get $get) => $get('country_id') !== $venId)
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
                     ->required(),
                 Select::make('city_id')
                     ->label('Ciudad')
@@ -69,7 +71,7 @@ class CustomerForm
                         modifyQueryUsing: fn(Builder $query, Get $get) =>
                         $query->where('state_id', '=', $get('state_id'))
                     )
-                    ->hidden(fn (Get $get) => $get('country_id') !== $venId)
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')

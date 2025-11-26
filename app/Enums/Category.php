@@ -10,6 +10,7 @@ enum Category: string
     case Manual = 'Manuales';
     case Report = 'Reportes';
     case Specs = 'Fichas Técnicas';
+    case Offer = 'Oferta';
 
     public function color(): string
     {

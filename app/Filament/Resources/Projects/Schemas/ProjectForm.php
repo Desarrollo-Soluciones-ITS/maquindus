@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects\Schemas;
 use App\Enums\Prefix;
 use App\Enums\Status;
 use App\Filament\Inputs\CodeInput;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +20,7 @@ class ProjectForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Planta de ensayo')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
                     ->required(),
