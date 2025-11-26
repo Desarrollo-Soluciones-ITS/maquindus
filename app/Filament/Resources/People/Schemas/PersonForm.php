@@ -6,6 +6,7 @@ use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Supplier;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -25,6 +26,7 @@ class PersonForm
                     ->label('Nombre completo')
                     ->placeholder('Ej. Mario Gómez')
                     ->maxLength(80)
+                    ->rule(PreventIllegalCharacters::apply())
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')

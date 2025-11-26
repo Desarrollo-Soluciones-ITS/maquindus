@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Suppliers\Schemas;
 
 use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
+use App\Rules\PreventIllegalCharacters;
+use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
@@ -30,7 +32,8 @@ class SupplierForm
                     ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Ej. Suministros Industriales C.A.')
+                    ->placeholder('Ej. Suministros Industriales CA')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
                     ->required(),
@@ -59,7 +62,7 @@ class SupplierForm
                     ->label('Estado')
                     ->relationship('state', 'name')
                     ->live()
-                    ->hidden(fn (Get $get) => $get('country_id') !== $venId)
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
                     ->required(),
                 Select::make('city_id')
                     ->label('Ciudad')
@@ -69,7 +72,7 @@ class SupplierForm
                         modifyQueryUsing: fn(Builder $query, Get $get) =>
                         $query->where('state_id', '=', $get('state_id'))
                     )
-                    ->hidden(fn (Get $get) => $get('country_id') !== $venId)
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
                     ->required(),
                 TextInput::make('address')
                     ->label('Dirección')
