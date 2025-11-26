@@ -6,6 +6,7 @@ use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Supplier;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -22,14 +23,10 @@ class PersonForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nombre')
-                    ->placeholder('Ej. Mario')
-                    ->maxLength(50)
-                    ->required(),
-                TextInput::make('surname')
-                    ->label('Apellido')
-                    ->placeholder('Ej. Gómez')
-                    ->maxLength(50)
+                    ->label('Nombre completo')
+                    ->placeholder('Ej. Mario Gómez')
+                    ->maxLength(80)
+                    ->rule(PreventIllegalCharacters::apply())
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
@@ -72,7 +69,8 @@ class PersonForm
                     ->label('Dirección')
                     ->placeholder('Ej. Calle 15, Avenida FG')
                     ->maxLength(255)
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
                 MorphToSelect::make('personable')
                     ->label('Empresa relacionada')
                     ->types([

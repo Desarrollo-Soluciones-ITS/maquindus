@@ -47,8 +47,8 @@ class ActivitiesRelationManager extends RelationManager
                     ->label('Participantes')
                     ->multiple()
                     ->relationship()
-                    ->searchable(['name', 'surname', 'email'])
-                    ->getOptionLabelFromRecordUsing(fn($record) => $record->fullname . ' - ' . $record->email)
+                    ->searchable(['name', 'email'])
+                    ->getOptionLabelFromRecordUsing(fn($record) => $record->name . ' - ' . $record->email)
             ]);
     }
 
@@ -70,7 +70,7 @@ class ActivitiesRelationManager extends RelationManager
                     ->grid(3)
                     ->columnSpanFull()
                     ->schema([
-                        TextEntry::make('fullname')
+                        TextEntry::make('name')
                             ->label('Nombre'),
                         TextEntry::make('email')
                             ->label('Correo'),

@@ -52,9 +52,4 @@ class Person extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
-
-    protected function fullname(): Attribute
-    {
-        return Attribute::make(get: fn() => "$this->name $this->surname");
-    }
 }

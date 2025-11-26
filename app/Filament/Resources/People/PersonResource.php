@@ -27,7 +27,7 @@ class PersonResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Identification;
 
-    protected static ?string $recordTitleAttribute = 'fullname';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $modelLabel = 'contacto';
 
@@ -64,16 +64,6 @@ class PersonResource extends Resource
             'view' => ViewPerson::route('/{record}'),
             'edit' => EditPerson::route('/{record}/edit'),
         ];
-    }
-
-    public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
-    {
-        return $record->fullname;
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['name', 'surname'];
     }
 
     public static function canAccess(): bool
