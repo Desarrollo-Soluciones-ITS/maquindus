@@ -460,8 +460,7 @@ class RolesTable
                         })
                         ->hidden(fn(Role $role) => $role->name === 'Administrador'),
 
-                    EditAction::make()
-                        ->hidden(fn(Role $record) => $record->name === 'Administrador'),
+                    EditAction::make()->hidden(fn(Role $record) => $record->name === 'Administrador'),
                 ]),
             ])
             ->toolbarActions([

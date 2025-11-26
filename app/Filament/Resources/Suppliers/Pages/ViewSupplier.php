@@ -13,7 +13,7 @@ class ViewSupplier extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
+            EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.edit')),
         ];
     }
 }

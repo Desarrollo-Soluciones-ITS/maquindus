@@ -108,7 +108,7 @@ class ActivitiesRelationManager extends RelationManager
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('activities.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('activities.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('activities.edit')),
                 ])
             ]);
     }

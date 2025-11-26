@@ -13,7 +13,7 @@ class ViewEquipment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->hidden(!currentUserHasPermission('equipments.edit')),
+            EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.edit')),
         ];
     }
 }

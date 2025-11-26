@@ -13,7 +13,7 @@ class ViewPart extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
+            EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.edit')),
         ];
     }
 }

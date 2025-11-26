@@ -42,17 +42,15 @@ class PartsRelationManager extends RelationManager
         return PartsTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(code_to_full(Prefix::Part))
-                    ->hidden(!currentUserHasPermission('parts.create')),
+                CreateAction::make()->hidden(!currentUserHasPermission('parts.create'))
+                    ->mutateDataUsing(code_to_full(Prefix::Part)),
                 AttachAction::make()->hidden(!currentUserHasPermission('parts.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
-                    EditAction::make()
-                        ->mutateDataUsing(code_to_full(Prefix::Part))
-                        ->hidden(!currentUserHasPermission('parts.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.edit'))
+                        ->mutateDataUsing(code_to_full(Prefix::Part)),
                     DetachAction::make()->hidden(!currentUserHasPermission('parts.unsync')),
                 ])
             ])
