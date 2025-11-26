@@ -39,7 +39,7 @@ class SuppliersTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('suppliers.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.delete')),
                     RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('suppliers.restore')),
                 ])

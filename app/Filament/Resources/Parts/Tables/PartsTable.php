@@ -43,7 +43,7 @@ class PartsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('parts.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.delete')),
                     RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('parts.restore')),
                 ])

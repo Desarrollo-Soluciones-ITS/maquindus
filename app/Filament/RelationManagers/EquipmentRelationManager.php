@@ -42,17 +42,15 @@ class EquipmentRelationManager extends RelationManager
         return EquipmentTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(code_to_full(Prefix::Equipment))
-                    ->hidden(!currentUserHasPermission('equipments.create')),
+                CreateAction::make()->hidden(!currentUserHasPermission('equipments.create'))
+                    ->mutateDataUsing(code_to_full(Prefix::Equipment)),
                 AttachAction::make()->hidden(!currentUserHasPermission('equipments.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
-                    EditAction::make()
-                        ->mutateDataUsing(code_to_full(Prefix::Equipment))
-                        ->hidden(!currentUserHasPermission('equipments.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.edit'))
+                        ->mutateDataUsing(code_to_full(Prefix::Equipment)),
                     DetachAction::make()->hidden(!currentUserHasPermission('equipments.unsync')),
                 ])
             ])

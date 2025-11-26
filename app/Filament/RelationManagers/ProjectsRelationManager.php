@@ -52,9 +52,8 @@ class ProjectsRelationManager extends RelationManager
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-                    EditAction::make()
-                        ->mutateDataUsing(code_to_full(Prefix::Project))
-                        ->hidden(!currentUserHasPermission('projects.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.edit'))
+                        ->mutateDataUsing(code_to_full(Prefix::Project)),
                     DetachAction::make()
                         ->hidden(is_view_customer() || !currentUserHasPermission('projects.unsync')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),

@@ -67,7 +67,7 @@ class ProjectsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-                    EditAction::make()->hidden(!currentUserHasPermission('projects.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
                     RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
                 ]),
