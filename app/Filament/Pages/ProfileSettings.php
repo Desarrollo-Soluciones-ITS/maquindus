@@ -5,15 +5,13 @@ namespace App\Filament\Pages;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
-use Hash;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileSettings extends BaseEditProfile
 {
-    protected static ?string $title = 'Perfil';
+    protected static ?string $title = 'Cambiar contraseña';
 
     public function form(Schema $schema): Schema
     {
