@@ -23,7 +23,7 @@ class CustomerSeeder extends Seeder
         $customers = [
             [
                 'rif' => 'J-12345678-1',
-                'name' => 'Industrias Vega S.A.',
+                'name' => 'Industrias Vega SA',
                 'email' => 'contacto@vega.com',
                 'phone' => '02121234567',
                 'about' => 'Cliente industrial dedicado a manufactura',
@@ -34,7 +34,7 @@ class CustomerSeeder extends Seeder
             ],
             [
                 'rif' => 'J-87654321-0',
-                'name' => 'Construcciones López C.A.',
+                'name' => 'Construcciones López CA',
                 'email' => 'info@clopez.com',
                 'phone' => '02129876543',
                 'about' => 'Empresa constructora',
