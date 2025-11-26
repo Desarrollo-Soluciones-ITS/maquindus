@@ -6,6 +6,7 @@ use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Supplier;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -24,11 +25,13 @@ class PersonForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Ej. Mario')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(50)
                     ->required(),
                 TextInput::make('surname')
                     ->label('Apellido')
                     ->placeholder('Ej. Gómez')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(50)
                     ->required(),
                 TextInput::make('email')

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Parts\Schemas;
 
 use App\Enums\Prefix;
 use App\Filament\Inputs\CodeInput;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -18,6 +19,7 @@ class PartForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Ej. Bomba hidráulica')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
                     ->required(),

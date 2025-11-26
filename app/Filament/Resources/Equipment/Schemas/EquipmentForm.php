@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Equipment\Schemas;
 
 use App\Enums\Prefix;
 use App\Filament\Inputs\CodeInput;
+use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -18,6 +19,7 @@ class EquipmentForm
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Ej. Compresor Atlas')
+                    ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
                     ->required(),
