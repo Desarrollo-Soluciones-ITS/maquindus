@@ -46,7 +46,7 @@ class UsersTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('users.edit')),
+                    EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
                     DeleteAction::make()->hidden(function (Model $record) {
                         $nodelete = $record->id === Auth::user()->id
                             || $record->role->name === 'Administrador';
@@ -55,9 +55,7 @@ class UsersTable
                 ])
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-
-                ]),
+                BulkActionGroup::make([]),
             ]);
     }
 }

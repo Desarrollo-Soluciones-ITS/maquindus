@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Documents;
 
+use App\Models\Person;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction as FilamentEditAction;
 use Illuminate\Database\Eloquent\Model;
@@ -23,13 +24,17 @@ class EditAction
                     $documentable = $record->documentable;
                     $parent = model_to_spanish($documentable::class, plural: true);
 
-                    $oldSegments = collect([$parent, $documentable->name]);
+                    $documentableName = $documentable instanceof Person
+                        ? "{$documentable->name} - {$documentable->email}"
+                        : $documentable->name;
+
+                    $oldSegments = collect([$parent, $documentableName]);
                     if ($oldCategory) {
                         $oldSegments->push($oldCategory->value);
                     }
                     $oldFolder = $oldSegments->join('/');
 
-                    $newSegments = collect([$parent, $documentable->name]);
+                    $newSegments = collect([$parent, $documentableName]);
                     if ($newCategory) {
                         $newSegments->push($newCategory);
                     }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Documents\RelationManagers;
 use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\PreviewAction;
+use App\Models\Person;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ViewAction;
@@ -46,7 +47,12 @@ class FilesRelationManager extends RelationManager
                                 plural: true
                             );
 
-                            $segments = collect([$folder, $documentable->name]);
+                            if ($documentable instanceof Person) {
+                                $segments = collect([$folder, "{$documentable->name} - {$documentable->email}"]);
+                            } else {
+                                $segments = collect([$folder, $documentable->name]);
+                            }
+
                             $category = $document->category;
 
                             if ($category) {
@@ -64,7 +70,7 @@ class FilesRelationManager extends RelationManager
 
                             $extension = $file->getClientOriginalExtension();
                             $baseName = str($document->name);
-                
+
                             return str($baseName)
                                 ->append(" - V{$nextVersion}", '.', $extension);
                         }

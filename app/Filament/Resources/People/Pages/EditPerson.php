@@ -6,6 +6,7 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\People\PersonResource;
 use App\Models\Country;
 use App\Filament\Actions\RestoreAction;
+use App\Models\Person;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -38,11 +39,19 @@ class EditPerson extends EditRecord
         $data = collect($data);
         $oldName = $record->name;
         $newName = $data['name'];
+        $oldEmail = $record->email ?? null;
+        $newEmail = $data['email'] ?? null;
 
         $isDocumentable = method_exists($record, 'documents');
 
-        if ($isDocumentable && $oldName !== $newName) {
-            handle_documentable_name_change($record, $oldName, $newName);
+        if ($isDocumentable) {
+            if ($record instanceof Person && ($oldName !== $newName || $oldEmail !== $newEmail)) {
+                $oldFullName = $oldName . ' - ' . $oldEmail;
+                $newFullName = $newName . ' - ' . $newEmail;
+                handle_documentable_name_change($record, $oldFullName, $newFullName);
+            } else if ($oldName !== $newName) {
+                handle_documentable_name_change($record, $oldName, $newName);
+            }
         }
 
         $record->update($data->all());

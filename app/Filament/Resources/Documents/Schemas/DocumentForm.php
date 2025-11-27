@@ -6,6 +6,7 @@ use App\Enums\Category;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Models\Equipment;
 use App\Models\Part;
+use App\Models\Person;
 use App\Rules\UniquePath;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -56,7 +57,12 @@ class DocumentForm
                                 plural: true
                             );
 
-                            $segments = collect([$folder, $documentable->name]);
+                            if ($documentable instanceof Person) {
+                                $segments = collect([$folder, "{$documentable->name} - {$documentable->email}"]);
+                            } else {
+                                $segments = collect([$folder, $documentable->name]);
+                            }
+
                             $category = $get('category');
 
                             if ($category) {
