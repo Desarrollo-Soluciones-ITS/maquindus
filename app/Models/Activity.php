@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Activity extends Model
 {
+
+    use SoftDeletes;
+
     use HasFactory, HasUuids, LogsActivity, HasActivityLog;
 
     public function people(): BelongsToMany
