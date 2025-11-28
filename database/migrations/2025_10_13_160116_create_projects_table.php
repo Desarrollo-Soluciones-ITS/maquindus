@@ -14,12 +14,12 @@ return new class extends Migration {
         Schema::create('projects', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->unique();
-            $table->string('code')->unique();
+            $table->string('code')->unique()->nullable();
             $table->string('about')->nullable();
             $table->date('start')->nullable();
             $table->date('end')->nullable();
-            $table->enum('status', Status::cases());
-            $table->foreignUuid('customer_id')->constrained();
+            $table->enum('status', Status::cases())->nullable();
+            $table->foreignUuid('customer_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

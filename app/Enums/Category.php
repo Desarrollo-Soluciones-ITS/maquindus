@@ -9,8 +9,9 @@ enum Category: string
     case Blueprint = 'Planos';
     case Manual = 'Manuales';
     case Report = 'Reportes';
-    case Specs = 'Fichas Técnicas';
-    case Offer = 'Oferta';
+    case Specs = 'Especificaciones Tecnicas';
+    case Offer = 'Ofertas';
+    case Photo = 'Fotos';
 
     public function color(): string
     {
@@ -23,7 +24,9 @@ enum Category: string
             self::Blueprint => 'primary',
             self::Manual => 'warning',
             self::Report => 'success',
-            self::Specs => 'gray',
+            self::Specs => 'success',
+            self::Offer => 'warning',
+            self::Photo => 'gray',
         };
     }
 }

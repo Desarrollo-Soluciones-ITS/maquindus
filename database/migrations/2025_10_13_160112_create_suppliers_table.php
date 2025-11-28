@@ -12,13 +12,13 @@ return new class extends Migration {
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('rif')->unique();
-            $table->string('name')->unique();
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
+            $table->string('rif')->unique()->nullable();
+            $table->string('name')->unique()->nullable();
+            $table->string('email')->unique()->nullable();
+            $table->string('phone')->unique()->nullable();
             $table->string('about')->nullable();
-            $table->string('address');
-            $table->foreignUuid('country_id')->constrained();
+            $table->string('address')->nullable();
+            $table->foreignUuid('country_id')->nullable()->constrained();
             $table->foreignUuid('state_id')->nullable()->constrained();
             $table->foreignUuid('city_id')->nullable()->constrained();
             $table->timestamps();

@@ -13,12 +13,12 @@ return new class extends Migration {
         Schema::create('people', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->string('address');
+            $table->string('email')->nullable()->unique();
+            $table->string('phone')->nullable()->unique();
+            $table->string('address')->nullable();
             $table->string('position')->nullable();
             $table->nullableUuidMorphs('personable');
-            $table->foreignUuid('country_id')->constrained();
+            $table->foreignUuid('country_id')->nullable()->constrained();
             $table->foreignUuid('state_id')->nullable()->constrained();
             $table->foreignUuid('city_id')->nullable()->constrained();
             $table->timestamps();

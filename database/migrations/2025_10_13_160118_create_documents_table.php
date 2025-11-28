@@ -13,10 +13,12 @@ return new class extends Migration {
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->string('name', 511);
             $table->enum('category', Category::cases())->nullable();
-            $table->uuidMorphs('documentable');
+            $table->nullableUuidMorphs('documentable');
             $table->timestamps();
+
+            $table->index(['name', 'category', 'documentable_id']);
         });
     }
 
