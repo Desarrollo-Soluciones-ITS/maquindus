@@ -23,13 +23,7 @@ class ProjectForm
                     ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('name', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
                     ->label('Fecha de inicio')
@@ -50,13 +44,7 @@ class ProjectForm
                     ->label('Descripción')
                     ->placeholder('Proyecto piloto para nueva línea')
                     ->columnSpanFull()
-                    ->default(null)
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('about', $trimmed);
-                        }
-                    }),
+                    ->default(null),
             ]);
     }
 }

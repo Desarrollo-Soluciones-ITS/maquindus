@@ -22,26 +22,14 @@ class UserForm
                             ->label('Nombre')
                             ->placeholder('Ej. Miguel Pérez')
                             ->maxLength(80)
-                            ->required()
-                            ->afterStateUpdated(function ($state, $set) {
-                                $trimmed = trim($state);
-                                if ($trimmed !== $state) {
-                                    $set('name', $trimmed);
-                                }
-                            }),
+                            ->required(),
                         TextInput::make('email')
                             ->label('Correo electrónico')
                             ->placeholder('Ej. correo@ejemplo.com')
                             ->email()
                             ->unique()
                             ->maxLength(255)
-                            ->required()
-                            ->afterStateUpdated(function ($state, $set) {
-                                $trimmed = trim($state);
-                                if ($trimmed !== $state) {
-                                    $set('email', $trimmed);
-                                }
-                            }),
+                            ->required(),
                         Select::make('role_id')
                             ->label('Rol')
                             ->relationship('role', 'name')
@@ -54,26 +42,14 @@ class UserForm
                     ->rule('confirmed')
                     ->required()
                     ->revealable()
-                    ->hiddenOn(Operation::Edit)
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('password', $trimmed);
-                        }
-                    }),
+                    ->hiddenOn(Operation::Edit),
                 TextInput::make('password_confirmation')
                     ->label('Confirmar contraseña')
                     ->placeholder('Confirma la contraseña')
                     ->password()
                     ->required()
                     ->revealable()
-                    ->hiddenOn(Operation::Edit)
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('password_confirmation', $trimmed);
-                        }
-                    }),
+                    ->hiddenOn(Operation::Edit),
             ]);
     }
 }

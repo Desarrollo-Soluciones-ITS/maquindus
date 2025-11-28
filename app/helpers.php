@@ -323,3 +323,19 @@ if (!function_exists('handle_documentable_name_change')) {
         }
     }
 }
+
+
+if (!function_exists('key_value_trimmer')) {
+    function key_value_trimmer() {
+        return function ($state) {
+            $trimmed = [];
+    
+            foreach ($state as $key => $value) {
+                $trim = fn($str) => is_string($str) ? trim($str) : $str;
+                $trimmed[$trim($key)] = $trim($value);
+            }
+    
+            return $trimmed;
+        };
+    }
+}

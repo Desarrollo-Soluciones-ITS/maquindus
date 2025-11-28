@@ -22,25 +22,13 @@ class EquipmentForm
                     ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('name', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 CodeInput::make(Prefix::Equipment),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Ej. Compresor centrífugo')
                     ->maxLength(255)
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('about', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 KeyValue::make('details')
                     ->label('Características')
                     ->keyLabel('Nombre')

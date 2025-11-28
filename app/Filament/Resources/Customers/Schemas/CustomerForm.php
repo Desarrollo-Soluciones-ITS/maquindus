@@ -28,39 +28,21 @@ class CustomerForm
                     JS))
                     ->maxLength(12)
                     ->unique()
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('rif', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
                     ->placeholder('Ej. Construcciones López CA')
                     ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('name', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 TextInput::make('email')
                     ->label('Correo electrónico')
                     ->placeholder('Ej. info@clopez.com')
                     ->email()
                     ->unique()
                     ->maxLength(255)
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('email', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
@@ -95,24 +77,12 @@ class CustomerForm
                     ->label('Dirección')
                     ->placeholder('Ej. Calle 15, Avenida FG')
                     ->maxLength(255)
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('address', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Ej. Empresa de construcción de urbanizaciones.')
                     ->maxLength(255)
-                    ->default(null)
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('about', $trimmed);
-                        }
-                    }),
+                    ->default(null),
             ]);
     }
 }
