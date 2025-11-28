@@ -6,7 +6,7 @@ return [
 
     'backup' => [
 
-        'name' => env('BACKUP_NAME', env('APP_NAME', 'Laravel')),
+        'name' => env('BACKUP_NAME', env('APP_NAME', 'Maquindus')),
 
         'source' => [
             'files' => [
@@ -111,7 +111,7 @@ return [
      */
     'monitor_backups' => [
         [
-            'name' => env('APP_NAME', 'Laravel'), // <-- Fallback a 'Laravel'
+            'name' => env('APP_NAME', 'Maquindus'), // <-- Fallback a 'Laravel'
             
             /* * CORREGIDO: Monitorea el disco que definiste en BACKUP_DISK_NAME
              */

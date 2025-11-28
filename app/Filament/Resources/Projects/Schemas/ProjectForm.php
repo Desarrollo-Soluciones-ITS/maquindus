@@ -32,9 +32,11 @@ class ProjectForm
                     }),
                 CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
-                    ->label('Fecha de inicio'),
+                    ->label('Fecha de inicio')
+                    ->rules(['nullable', 'before_or_equal:end']),
                 DatePicker::make('end')
-                    ->label('Fecha de finalización'),
+                    ->label('Fecha de finalización')
+                    ->rules(['nullable', 'after_or_equal:start']),
                 Select::make('status')
                     ->label('Estado')
                     ->options(Status::options())
