@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\Css;
@@ -71,6 +74,23 @@ class AppServiceProvider extends ServiceProvider
 
         AttachAction::configureUsing(function (AttachAction $attach) {
             $attach->preloadRecordSelect();
+        });
+
+        TextInput::configureUsing(function (TextInput $input) {
+            $input->trim();
+        });
+
+        TextInput::configureUsing(function (TextInput $input) {
+            $input->trim();
+        });
+
+        Textarea::configureUsing(function (Textarea $input) {
+            $input->trim();
+        });
+
+        KeyValue::configureUsing(function (KeyValue $input) {
+            $input->mutateDehydratedState(key_value_trimmer());
+            $input->mutateStateForValidation(key_value_trimmer());
         });
 
         FilamentAsset::register([

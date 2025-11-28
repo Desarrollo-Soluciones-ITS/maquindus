@@ -16,13 +16,7 @@ class RoleForm
                     ->placeholder('Ej. Operador')
                     ->maxLength(80)
                     ->unique()
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('name', $trimmed);
-                        }
-                    }),
+                    ->required(),
             ]);
     }
 }

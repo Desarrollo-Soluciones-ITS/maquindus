@@ -35,12 +35,6 @@ class CodeInput
             })
             ->live()
             ->formatStateUsing(fn($state) => Code::short($state))
-            ->required()
-            ->afterStateUpdated(function ($state, $set) {
-                $trimmed = trim($state);
-                if ($trimmed !== $state) {
-                    $set('code', $trimmed);
-                }
-            });
+            ->required();
     }
 }

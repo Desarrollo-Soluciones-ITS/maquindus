@@ -29,13 +29,7 @@ class DocumentForm
                     ->maxLength(80)
                     ->placeholder('Ej. Manual de operación')
                     ->rule(UniquePath::apply())
-                    ->required()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $trimmed = trim($state);
-                        if ($trimmed !== $state) {
-                            $set('name', $trimmed);
-                        }
-                    }),
+                    ->required(),
                 Select::make('category')
                     ->label('Categoría')
                     ->options(Category::options())

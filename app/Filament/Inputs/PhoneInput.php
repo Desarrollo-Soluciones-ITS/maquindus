@@ -20,12 +20,6 @@ class PhoneInput
             ->maxLength(19)
             ->tel()
             ->unique()
-            ->required()
-            ->afterStateUpdated(function ($state, $set) {
-                $trimmed = trim($state);
-                if ($trimmed !== $state) {
-                    $set('phone', $trimmed);
-                }
-            });
+            ->required();
     }
 }
