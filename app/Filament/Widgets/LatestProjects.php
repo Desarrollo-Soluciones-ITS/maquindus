@@ -52,7 +52,7 @@ class LatestProjects extends TableWidget
                     ->label('Cliente')
                     ->color(Color::Blue)
                     ->url(
-                        fn($record) =>
+                        fn($record) => !$record->customer_id ? null :
                         ViewCustomer::getUrl(['record' => $record->customer_id])
                     ),
             ])

@@ -44,7 +44,7 @@ class ProjectsTable
                     ->color(Color::Blue)
                     ->hidden(is_view_customer())
                     ->url(
-                        fn($record) =>
+                        fn($record) => !$record->customer_id ? null :
                         ViewCustomer::getUrl(['record' => $record->customer_id])
                     )
                     ->searchable(),
