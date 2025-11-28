@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\GlobalSearchPage;
 use App\Filament\Pages\ProfileSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -29,6 +30,10 @@ class DashboardPanelProvider extends PanelProvider
             ->path('')
             ->login()
             ->profile(ProfileSettings::class)
+            ->globalSearch(false)
+            ->pages([
+                GlobalSearchPage::class
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -56,6 +61,7 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/dashboard/theme.css');
     }
 }

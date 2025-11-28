@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasActivityLog;
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +13,22 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog;
+    use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog, Searchable;
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->updateSearchIndex();
+        });
+
+        static::updated(function ($model) {
+            $model->updateSearchIndex();
+        });
+
+        static::deleted(function ($model) {
+            $model->removeFromSearchIndex();
+        });
+    }
 
     protected $with = ['role', 'role.permissions'];
 

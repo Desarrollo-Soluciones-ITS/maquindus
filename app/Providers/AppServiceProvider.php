@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\SearchIndexer;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Forms\Components\MorphToSelect;
@@ -26,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(SearchIndexer::class);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasActivityLog;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +16,22 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Person extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable;
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->updateSearchIndex();
+        });
+
+        static::updated(function ($model) {
+            $model->updateSearchIndex();
+        });
+
+        static::deleted(function ($model) {
+            $model->removeFromSearchIndex();
+        });
+    }
 
     public function personable(): MorphTo
     {
