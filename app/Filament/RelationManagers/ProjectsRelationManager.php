@@ -45,7 +45,20 @@ class ProjectsRelationManager extends RelationManager
             ->filters([])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateDataUsing(code_to_full(Prefix::Project))
+                    ->mutateDataUsing(function ($data) {
+                        $data = (code_to_full(Prefix::Project))($data);
+
+                        // If this relation manager is used from a Customer record,
+                        // set the customer_id automatically so the form doesn't need it.
+                        if (method_exists($this, 'getOwnerRecord')) {
+                            $owner = $this->getOwnerRecord();
+                            if ($owner && $owner::class === \App\Models\Customer::class) {
+                                $data['customer_id'] = $owner->id;
+                            }
+                        }
+
+                        return $data;
+                    })
                     ->hidden(!currentUserHasPermission('projects.create')),
                 AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('projects.sync')),
             ])

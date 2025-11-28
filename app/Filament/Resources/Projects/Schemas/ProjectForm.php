@@ -42,7 +42,8 @@ class ProjectForm
                 Select::make('customer_id')
                     ->label('Cliente')
                     ->relationship('customer', 'name')
-                    ->required(),
+                    ->hidden(fn($livewire) => $livewire instanceof \Filament\Resources\RelationManagers\RelationManager)
+                    ->required(fn($livewire) => !($livewire instanceof \Filament\Resources\RelationManagers\RelationManager)),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Proyecto piloto para nueva línea')
