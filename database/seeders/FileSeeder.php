@@ -14,7 +14,10 @@ class FileSeeder extends Seeder
      */
     public function run(): void
     {
-        $documents = Document::oldest()->get();
+        $documents = Document::query()
+            ->oldest()
+            ->whereHas('documentable')
+            ->get();
 
         $files = [
             [
@@ -44,7 +47,9 @@ class FileSeeder extends Seeder
         if (Storage::missing('sample.pdf'))
             return;
 
-        $files = File::with(['document', 'document.documentable'])
+        $files = File::query()
+            ->oldest()
+            ->limit(3)
             ->get();
 
         foreach ($files as $file) {
