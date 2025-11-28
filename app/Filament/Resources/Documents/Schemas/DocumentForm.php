@@ -58,9 +58,11 @@ class DocumentForm
                             );
 
                             if ($documentable instanceof Person) {
-                                $segments = collect([$folder, "{$documentable->name} - {$documentable->email}"]);
+                                $name = trim($documentable->name);
+                                $email = trim($documentable->email);
+                                $segments = collect([$folder, "{$name} - {$email}"]);
                             } else {
-                                $segments = collect([$folder, $documentable->name]);
+                                $segments = collect([$folder, trim($documentable->name)]);
                             }
 
                             $category = $get('category');
