@@ -29,7 +29,13 @@ class DocumentForm
                     ->maxLength(80)
                     ->placeholder('Ej. Manual de operación')
                     ->rule(UniquePath::apply())
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $trimmed = trim($state);
+                        if ($trimmed !== $state) {
+                            $set('name', $trimmed);
+                        }
+                    }),
                 Select::make('category')
                     ->label('Categoría')
                     ->options(Category::options())
@@ -58,11 +64,9 @@ class DocumentForm
                             );
 
                             if ($documentable instanceof Person) {
-                                $name = trim($documentable->name);
-                                $email = trim($documentable->email);
-                                $segments = collect([$folder, "{$name} - {$email}"]);
+                                $segments = collect([$folder, "{$documentable->name} - {$documentable->email}"]);
                             } else {
-                                $segments = collect([$folder, trim($documentable->name)]);
+                                $segments = collect([$folder, $documentable->name]);
                             }
 
                             $category = $get('category');
@@ -83,7 +87,7 @@ class DocumentForm
                                 ->append(" - V{$initialVersion}", '.', $extension);
                         }
                     )
-                    ->required(),
+                    ->required()
             ]);
     }
 }

@@ -8,8 +8,10 @@ use Closure;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\RawJs;
 
-class CodeInput {
-    public static function make(Prefix $prefix) {
+class CodeInput
+{
+    public static function make(Prefix $prefix)
+    {
         return TextInput::make('code')
             ->label('Código')
             ->prefix("$prefix->value-")
@@ -33,6 +35,12 @@ class CodeInput {
             })
             ->live()
             ->formatStateUsing(fn($state) => Code::short($state))
-            ->required();
+            ->required()
+            ->afterStateUpdated(function ($state, $set) {
+                $trimmed = trim($state);
+                if ($trimmed !== $state) {
+                    $set('code', $trimmed);
+                }
+            });
     }
 }

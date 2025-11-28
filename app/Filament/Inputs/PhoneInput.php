@@ -5,8 +5,10 @@ namespace App\Filament\Inputs;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\RawJs;
 
-class PhoneInput {
-    public static function make() {
+class PhoneInput
+{
+    public static function make()
+    {
         return TextInput::make('phone')
             ->label('Teléfono')
             ->placeholder('Ej. 0412-1234567')
@@ -18,6 +20,12 @@ class PhoneInput {
             ->maxLength(19)
             ->tel()
             ->unique()
-            ->required();
+            ->required()
+            ->afterStateUpdated(function ($state, $set) {
+                $trimmed = trim($state);
+                if ($trimmed !== $state) {
+                    $set('phone', $trimmed);
+                }
+            });
     }
 }

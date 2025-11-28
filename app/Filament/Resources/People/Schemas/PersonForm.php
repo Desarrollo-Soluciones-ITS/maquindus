@@ -27,14 +27,26 @@ class PersonForm
                     ->placeholder('Ej. Mario Gómez')
                     ->maxLength(80)
                     ->rule(PreventIllegalCharacters::apply())
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $trimmed = trim($state);
+                        if ($trimmed !== $state) {
+                            $set('name', $trimmed);
+                        }
+                    }),
                 TextInput::make('email')
                     ->label('Correo electrónico')
                     ->placeholder('Ej. contacto@correo.com')
                     ->email()
                     ->unique()
                     ->maxLength(255)
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $trimmed = trim($state);
+                        if ($trimmed !== $state) {
+                            $set('email', $trimmed);
+                        }
+                    }),
                 PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
@@ -70,7 +82,13 @@ class PersonForm
                     ->placeholder('Ej. Calle 15, Avenida FG')
                     ->maxLength(255)
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $trimmed = trim($state);
+                        if ($trimmed !== $state) {
+                            $set('address', $trimmed);
+                        }
+                    }),
                 MorphToSelect::make('personable')
                     ->label('Empresa relacionada')
                     ->types([
@@ -87,7 +105,13 @@ class PersonForm
                 TextInput::make('position')
                     ->label('Cargo')
                     ->placeholder('Ej. Responsable de ventas')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->afterStateUpdated(function ($state, $set) {
+                        $trimmed = trim($state);
+                        if ($trimmed !== $state) {
+                            $set('position', $trimmed);
+                        }
+                    }),
             ]);
     }
 }
