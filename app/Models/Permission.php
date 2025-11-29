@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Permission extends Model
 {
-    use HasUuids, LogsActivity, HasActivityLog;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog;
 
     public static array $actionLabels = [
         'create' => 'Crear',
@@ -38,11 +40,13 @@ class Permission extends Model
         'activities' => 'actividad',
         'files' => 'versión',
         'activity_logs' => 'bitácora',
+        'search' => 'buscador'
     ];
 
     public static array $permissions = [
         'dashboard',
         'roles',
+        'search',
         'equipments' => [
             'create',
             'edit',

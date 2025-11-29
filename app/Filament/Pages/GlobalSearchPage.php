@@ -273,4 +273,9 @@ class GlobalSearchPage extends Page implements HasForms
 
         return preg_replace($pattern, '<mark class="bg-yellow-50 text-gray-700 px-1 rounded underline decoration-yellow-300">$1</mark>', $text);
     }
+
+    public static function canAccess(): bool
+    {
+        return currentUserHasPermission('search');
+    }
 }
