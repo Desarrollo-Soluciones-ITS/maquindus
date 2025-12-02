@@ -127,11 +127,27 @@ trait Searchable
 
     public function updateSearchIndex()
     {
-        app(SearchIndexer::class)->update($this);
+        try {
+            app(SearchIndexer::class)->update($this);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('SearchIndexer update failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'model' => get_class($this),
+                'model_id' => (string) $this->getKey(),
+            ]);
+        }
     }
 
     public function removeFromSearchIndex()
     {
-        app(SearchIndexer::class)->delete($this);
+        try {
+            app(SearchIndexer::class)->delete($this);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('SearchIndexer delete failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'model' => get_class($this),
+                'model_id' => (string) $this->getKey(),
+            ]);
+        }
     }
 }

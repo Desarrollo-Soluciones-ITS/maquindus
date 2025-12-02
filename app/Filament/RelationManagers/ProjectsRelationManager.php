@@ -16,6 +16,8 @@ use Filament\Actions\DetachAction;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
@@ -46,7 +48,30 @@ class ProjectsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->mutateDataUsing(function ($data) {
+                        // Log incoming payload to help debug date validation issues
+                        try {
+                            Log::info('ProjectsRelationManager create payload (before):', (array) $data);
+                        } catch (\Throwable $e) {
+                            // ignore logging failures
+                        }
+
                         $data = (code_to_full(Prefix::Project))($data);
+
+                        // Normalize date formats: convert d/m/Y (display) to Y-m-d (storage)
+                        if (!empty($data['start']) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data['start'])) {
+                            try {
+                                $data['start'] = Carbon::createFromFormat('d/m/Y', $data['start'])->format('Y-m-d');
+                            } catch (\Throwable $e) {
+                                // leave as-is if parsing fails
+                            }
+                        }
+                        if (!empty($data['end']) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data['end'])) {
+                            try {
+                                $data['end'] = Carbon::createFromFormat('d/m/Y', $data['end'])->format('Y-m-d');
+                            } catch (\Throwable $e) {
+                                // leave as-is if parsing fails
+                            }
+                        }
 
                         // If this relation manager is used from a Customer record,
                         // set the customer_id automatically so the form doesn't need it.
@@ -55,6 +80,11 @@ class ProjectsRelationManager extends RelationManager
                             if ($owner && $owner::class === \App\Models\Customer::class) {
                                 $data['customer_id'] = $owner->id;
                             }
+                        }
+
+                        try {
+                            Log::info('ProjectsRelationManager create payload (after):', (array) $data);
+                        } catch (\Throwable $e) {
                         }
 
                         return $data;
