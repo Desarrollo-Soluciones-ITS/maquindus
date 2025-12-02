@@ -42,16 +42,16 @@ class PartsRelationManager extends RelationManager
         return PartsTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('parts.create'))
+                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.create'))
                     ->mutateDataUsing(code_to_full(Prefix::Part)),
-                AttachAction::make()->hidden(!currentUserHasPermission('parts.sync')),
+                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('parts.edit'))
+                    EditAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.edit'))
                         ->mutateDataUsing(code_to_full(Prefix::Part)),
-                    DetachAction::make()->hidden(!currentUserHasPermission('parts.unsync')),
+                    DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.unsync')),
                 ])
             ])
             ->toolbarActions([

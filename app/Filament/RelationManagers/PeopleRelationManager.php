@@ -43,16 +43,16 @@ class PeopleRelationManager extends RelationManager
         return PeopleTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('people.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('people.sync')),
+                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.create')),
+                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('people.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('people.restore')),
+                    EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.edit')),
+                    DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.unsync')),
+                    ArchiveAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.delete')),
+                    RestoreAction::make()->hidden(fn() => !$this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.restore')),
                 ])
             ])
             ->toolbarActions([

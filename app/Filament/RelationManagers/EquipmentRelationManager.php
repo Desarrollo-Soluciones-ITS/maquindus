@@ -42,16 +42,16 @@ class EquipmentRelationManager extends RelationManager
         return EquipmentTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('equipments.create'))
+                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.create'))
                     ->mutateDataUsing(code_to_full(Prefix::Equipment)),
-                AttachAction::make()->hidden(!currentUserHasPermission('equipments.sync')),
+                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.edit'))
+                    EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit'))
                         ->mutateDataUsing(code_to_full(Prefix::Equipment)),
-                    DetachAction::make()->hidden(!currentUserHasPermission('equipments.unsync')),
+                    DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.unsync')),
                 ])
             ])
             ->toolbarActions([

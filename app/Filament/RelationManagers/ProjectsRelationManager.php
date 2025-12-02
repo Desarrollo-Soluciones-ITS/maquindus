@@ -59,18 +59,18 @@ class ProjectsRelationManager extends RelationManager
 
                         return $data;
                     })
-                    ->hidden(!currentUserHasPermission('projects.create')),
+                    ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.create')),
                 AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.edit'))
+                    EditAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.edit'))
                         ->mutateDataUsing(code_to_full(Prefix::Project)),
                     DetachAction::make()
                         ->hidden(is_view_customer() || !currentUserHasPermission('projects.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
+                    ArchiveAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !$this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.restore')),
                 ])
             ])
             ->toolbarActions([
