@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
 class FilesReset extends Command
@@ -26,7 +27,11 @@ class FilesReset extends Command
      */
     public function handle()
     {
-        foreach (['Equipos', 'Repuestos', 'Proyectos', 'Contactos', 'Clientes', 'Proveedores', 'Superado'] as $folder) {
+        if (App::isProduction()) {
+            $this->error('This command is not for production environment.');
+            return;
+        }
+        foreach (['Equipos', 'Repuestos', 'Proyectos', 'Contactos', 'Clientes', 'Proveedores', 'Superado', 'Estructura previa'] as $folder) {
             Storage::disk('local')
                 ->deleteDirectory($folder);
             }

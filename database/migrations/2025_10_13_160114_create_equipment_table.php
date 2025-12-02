@@ -13,9 +13,9 @@ return new class extends Migration {
         Schema::create('equipment', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->unique();
-            $table->string('code')->unique();
-            $table->string('about');
-            $table->json('details');
+            $table->string('code')->unique()->nullable();
+            $table->string('about')->nullable();
+            $table->json('details')->nullable();
             $table->timestamps();
         });
     }

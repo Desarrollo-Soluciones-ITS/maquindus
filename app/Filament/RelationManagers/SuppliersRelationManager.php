@@ -45,16 +45,16 @@ class SuppliersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()->hidden(!currentUserHasPermission('suppliers.create')),
-                AttachAction::make()->hidden(!currentUserHasPermission('suppliers.sync')),
+                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.create')),
+                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.edit')),
-                    DetachAction::make()->hidden(!currentUserHasPermission('suppliers.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('suppliers.restore')),
+                    EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.edit')),
+                    DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.unsync')),
+                    ArchiveAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.delete')),
+                    RestoreAction::make()->hidden(fn() => !$this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.restore')),
                 ])
             ])
             ->toolbarActions([
