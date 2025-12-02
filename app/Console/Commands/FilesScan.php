@@ -65,20 +65,17 @@ class FilesScan extends Command
         $currentcontainer = '';
         $currentequipment = '';
 
-        File::lines('files.txt')->each(function ($line) use (
-            $base,
-            &$currentcontainer,
-            &$currentequipment,
-            &$equipments,
-        ) {
+        File::lines('files.txt')->each(function ($line) use ($base, &$currentcontainer, &$currentequipment, &$equipments, ) {
             $line = str($line)->trim();
 
-            if ($line->toString() === '') return;
+            if ($line->toString() === '')
+                return;
 
-            $line = $line->remove($base);
+            $line = $line->remove($base->replace('/', '\\'));
             $path = $line->toString();
 
-            if ($line->doesntStartWith('Estructura previa')) return;
+            if ($line->doesntStartWith('Estructura previa'))
+                return;
 
             $segs = $line->explode('\\');
             $segs->shift();
@@ -196,8 +193,14 @@ class FilesScan extends Command
 
         $dest = "Repuestos{$model}{$category}/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $part, category: $categoryenum);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $part,
+            category: $categoryenum
+        );
     }
 
     public function proveedores(string $line, string $path, Equipment $equipment)
@@ -268,8 +271,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Planos/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Blueprint);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Blueprint
+        );
     }
 
     public function manuales(string $line, string $path, Equipment $equipment)
@@ -284,8 +293,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Manuales/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Manual);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Manual
+        );
     }
 
     public function reportes(string $line, string $path, Equipment $equipment)
@@ -300,8 +315,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Reportes/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Report);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Report
+        );
     }
 
     public function especificaciones(string $line, string $path, Equipment $equipment)
@@ -316,8 +337,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Especificaciones Tecnicas/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Specs);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Specs
+        );
     }
 
     public function ofertas(string $line, string $path, Equipment $equipment)
@@ -332,8 +359,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Ofertas/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Offer);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Offer
+        );
     }
 
     public function fotos(string $line, string $path, Equipment $equipment)
@@ -348,8 +381,14 @@ class FilesScan extends Command
 
         $dest = "Equipos/{$equipment->name}/Planos/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime,
-            documentable: $equipment, category: Category::Photo);
+        $this->move(
+            $path,
+            $dest,
+            $name,
+            $mime,
+            documentable: $equipment,
+            category: Category::Photo
+        );
     }
 
     public function descripcion(string $line, string $path, Equipment $equipment)
