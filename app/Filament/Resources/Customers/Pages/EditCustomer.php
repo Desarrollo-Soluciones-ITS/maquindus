@@ -6,12 +6,15 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Models\Country;
 use App\Filament\Actions\RestoreAction;
+use App\Traits\PreventsEditingTrashed;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditCustomer extends EditRecord
 {
+    use PreventsEditingTrashed;
+
     protected static string $resource = CustomerResource::class;
 
     protected function getHeaderActions(): array

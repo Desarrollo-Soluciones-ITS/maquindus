@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Equipment\Pages;
 use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Equipment\EquipmentResource;
+use App\Traits\PreventsEditingTrashed;
 use App\Services\Code;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class EditEquipment extends EditRecord
 {
+    use PreventsEditingTrashed;
+
     protected static string $resource = EquipmentResource::class;
 
     protected function getHeaderActions(): array

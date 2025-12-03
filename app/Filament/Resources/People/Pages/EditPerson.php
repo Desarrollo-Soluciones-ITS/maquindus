@@ -7,12 +7,15 @@ use App\Filament\Resources\People\PersonResource;
 use App\Models\Country;
 use App\Filament\Actions\RestoreAction;
 use App\Models\Person;
+use App\Traits\PreventsEditingTrashed;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditPerson extends EditRecord
 {
+    use PreventsEditingTrashed;
+
     protected static string $resource = PersonResource::class;
 
     protected function getHeaderActions(): array

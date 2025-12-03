@@ -6,12 +6,15 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Suppliers\SupplierResource;
 use App\Models\Country;
 use App\Filament\Actions\RestoreAction;
+use App\Traits\PreventsEditingTrashed;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditSupplier extends EditRecord
 {
+    use PreventsEditingTrashed;
+
     protected static string $resource = SupplierResource::class;
 
     protected function getHeaderActions(): array

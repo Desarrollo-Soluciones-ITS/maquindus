@@ -7,12 +7,15 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Parts\PartResource;
 use App\Services\Code;
 use App\Filament\Actions\RestoreAction;
+use App\Traits\PreventsEditingTrashed;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
 class EditPart extends EditRecord
 {
+    use PreventsEditingTrashed;
+
     protected static string $resource = PartResource::class;
 
     protected function getHeaderActions(): array
