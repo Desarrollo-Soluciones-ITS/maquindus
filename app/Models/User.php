@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App;
 use App\Traits\HasActivityLog;
 use App\Traits\Searchable;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Panel;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog, Searchable;
@@ -66,5 +69,10 @@ class User extends Authenticatable
             ->first(fn($perm) => $perm->slug === $name);
 
         return !!$permission;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 }
