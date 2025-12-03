@@ -49,7 +49,7 @@ class UsersTable
                     EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
                     DeleteAction::make()->hidden(function (Model $record) {
                         $nodelete = $record->id === Auth::user()->id
-                            || $record->role->name === 'Administrador';
+                            || $record?->role?->name === 'Administrador';
                         return $nodelete || !currentUserHasPermission('users.delete');
                     }),
                 ])

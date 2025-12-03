@@ -94,7 +94,7 @@ class SearchIndexer
    */
   protected function normalizeText(string $text): string
   {
-    $text = strtolower(trim($text));
+    $text = mb_strtolower(trim($text));
     $accents = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ë', 'ï', 'ö', 'ü'];
     $noAccents = ['a', 'e', 'i', 'o', 'u', 'n', 'a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u'];
     $text = str_replace($accents, $noAccents, $text);

@@ -29,7 +29,8 @@ class PartsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('about')
-                    ->label('Descripción'),
+                    ->label('Descripción')
+                    ->limit(75),
                 TextColumn::make('created_at')
                     ->label('Fecha')
                     ->sortable(is_not_relation_manager())
