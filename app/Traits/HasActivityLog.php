@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 
 trait HasActivityLog
@@ -12,8 +13,7 @@ trait HasActivityLog
     public function getActivitylogOptions(): LogOptions
     {
         $spanishPlural = model_to_spanish($this::class, plural: true);
-        $spanishSingular = model_to_spanish($this::class);
-
+        $spanishSingular = strtolower(model_to_spanish($this::class));
         $fieldsToIgnore = ['id', 'created_at', 'updated_at'];
 
         if (property_exists($this, 'activityIgnoredAttributes')) {
@@ -21,14 +21,18 @@ trait HasActivityLog
             $fieldsToIgnore = array_unique($fieldsToIgnore);
         }
 
+        $article = $this::class === \App\Models\Activity::class
+            ? 'Una'
+            : 'Un';
+
         return LogOptions::defaults()
             ->useLogName($spanishPlural)
             ->logAll()
             ->logExcept($fieldsToIgnore)
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(function (string $eventName) use ($spanishSingular) {
-                $translatedEvent = translate_activity_verb($eventName);
-                return "Un {$spanishSingular} fue {$translatedEvent} en el sistema.";
+            ->setDescriptionForEvent(function (string $eventName) use ($article, $spanishSingular) {
+                $translatedEvent = Str::replaceLast('o', 'a', translate_activity_verb($eventName));
+                return "{$article} {$spanishSingular} fue {$translatedEvent} en el sistema.";
             })
             ->logOnlyDirty();
     }
