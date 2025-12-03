@@ -73,7 +73,7 @@ class StatsOverview extends StatsOverviewWidget
     private function getDiskStats(): array
     {
         return Cache::remember('disk_stats', 300, function () {
-            $path = '/';
+            $path = config('filesystems.disks.local.root', '');
 
             $freeSpaceBytes = @disk_free_space($path);
             $totalSpaceBytes = @disk_total_space($path);
@@ -109,10 +109,5 @@ class StatsOverview extends StatsOverviewWidget
                 return 0;
             }
         });
-    }
-
-    private function getSpacePercentage(int $fileCount): string
-    {
-        return $fileCount > 0 ? round(($fileCount / 1000) * 100, 2) . '%' : '0%';
     }
 }

@@ -30,6 +30,26 @@ class ArchiveAction
                 $name = model_to_spanish($record::class);
                 return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
             })
+            ->after(function (Model $record, $livewire) {
+                $modelClass = $record::class;
+
+                $map = [
+                    Document::class => route('filament.dashboard.resources.documents.view', ['record' => $record]),
+                    \App\Models\Project::class => route('filament.dashboard.resources.projects.view', ['record' => $record]),
+                    \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
+                    \App\Models\Equipment::class => route('filament.dashboard.resources.equipment.view', ['record' => $record]),
+                    \App\Models\Part::class => route('filament.dashboard.resources.parts.view', ['record' => $record]),
+                    \App\Models\Supplier::class => route('filament.dashboard.resources.suppliers.view', ['record' => $record]),
+                    \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
+                    \App\Models\Person::class => route('filament.dashboard.resources.people.view', ['record' => $record]),
+                ];
+
+                if ($livewire instanceof \Filament\Resources\Pages\EditRecord) {
+                    return redirect($map[$modelClass]);
+                }
+
+                return null;
+            })
             ->using(function (Model $record) {
                 DB::beginTransaction();
                 try {
