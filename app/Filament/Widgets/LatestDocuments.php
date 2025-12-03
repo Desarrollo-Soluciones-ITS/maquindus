@@ -67,7 +67,11 @@ class LatestDocuments extends TableWidget
                     })
                     ->color(Color::Blue)
                     ->url(function (Model $record) {
-                        $class = $record->documentable::class;
+                        $class = $record->documentable ? $record->documentable::class : null;
+
+                        if (empty($class)) {
+                            return null;
+                        }
 
                         $page = match ($class) {
                             Part::class => ViewPart::class,

@@ -67,7 +67,11 @@ class DocumentsTable
                     })
                     ->color(Color::Blue)
                     ->url(function (Model $record) {
-                        $class = $record->documentable::class;
+                        $class = $record->documentable ? $record->documentable::class : null;
+
+                        if (empty($class)) {
+                            return null;
+                        }
 
                         $page = match ($class) {
                             Part::class => ViewPart::class,
@@ -146,21 +150,21 @@ class DocumentsTable
                         return $query;
                     }),
                 ArchivedFilter::make()
-                    ->hidden(function (DocumentsRelationManager | ListDocuments $livewire) {
+                    ->hidden(function (DocumentsRelationManager|ListDocuments $livewire) {
                         return $livewire instanceof DocumentsRelationManager && $livewire->getOwnerRecord()->trashed();
                     }),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('documents.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('documents.open_in_folder')),
-                        DownloadAction::make()->hidden(!currentUserHasPermission('documents.download')),
+                        PreviewAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.show_file')),
+                        OpenFolderAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.open_in_folder')),
+                        DownloadAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.download')),
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
-                    RestoreAction::make()->hidden(fn($record) => $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
+                    RestoreAction::make()->hidden(fn($record) => $record->documentable && $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
                 ])
             ]);
     }
