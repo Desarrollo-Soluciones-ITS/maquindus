@@ -22,11 +22,20 @@ class ArchiveAction
             ->modalSubmitActionLabel('Archivar')
             ->modalCancelActionLabel('Cancelar')
             ->label('Archivar')
-            ->modalHeading(function (Model $record) {
+            ->beforeFormFilled(fn($record) => dd($record))
+            ->modalHeading(function (?Model $record) {
+                if (!$record) {
+                    return 'Archivar registro';
+                }
+
                 $name = model_to_spanish($record::class);
                 return "Archivar $name";
             })
-            ->modalDescription(function (Model $record) {
+            ->modalDescription(function (?Model $record) {
+                if (!$record) {
+                    return "¿Estás seguro de que deseas archivar este registro? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
+                }
+
                 $name = model_to_spanish($record::class);
                 return "¿Estás seguro de que deseas archivar este $name? Esta acción lo moverá a la carpeta 'Superado' y lo ocultará en la interfaz.";
             })
@@ -53,6 +62,8 @@ class ArchiveAction
             ->using(function (Model $record) {
                 DB::beginTransaction();
                 try {
+                    $record->lockRecord();
+
                     if ($record instanceof Document) {
                         $files = $record->files()->get();
 
@@ -115,9 +126,13 @@ class ArchiveAction
                         ->success()
                         ->send();
 
+                    $record->unlockRecord();
+
                     DB::commit();
                 } catch (\Throwable $e) {
                     DB::rollBack();
+
+                    $record->unlockRecord();
                     throw $e;
                 }
             });

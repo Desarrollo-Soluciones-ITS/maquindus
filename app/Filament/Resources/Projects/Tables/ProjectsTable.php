@@ -9,7 +9,7 @@ use App\Filament\Filters\DateFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
+use App\Filament\Actions\EditAction;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App;
 use App\Traits\HasActivityLog;
+use App\Traits\Lockable;
 use App\Traits\Searchable;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,7 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog, Searchable;
+    use HasFactory, Notifiable, HasUuids, LogsActivity, HasActivityLog, Searchable, Lockable;
 
     protected static function booted()
     {

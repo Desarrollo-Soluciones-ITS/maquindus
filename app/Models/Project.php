@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\HasActivityLog;
+use App\Traits\Lockable;
 use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable;
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
 
     protected static function booted()
     {

@@ -29,6 +29,8 @@ trait PreventsEditingTrashed
         $record = $this->record;
         $recordTrashed = $record->trashed();
 
+        $record->unlockRecord();
+
         if ($recordTrashed) {
             $modelClass = $record::class;
 
@@ -74,5 +76,25 @@ trait PreventsEditingTrashed
         return Notification::make()
             ->success()
             ->title($title);
+    }
+
+    public function mount($record): void
+    {
+        parent::mount($record);
+
+        if ($this->record->isRecordLocked() && !$this->record->isRecordLockedByCurrentUser()) {
+            $message = $this->record->getLockStatusMessage();
+
+            Notification::make()
+                ->title('Acceso Denegado')
+                ->body(Str::markdown($message))
+                ->danger()
+                ->send();
+
+            $this->redirect(static::getResource()::getUrl('index'));
+            return;
+        } else {
+            $this->record->lockRecord();
+        }
     }
 }

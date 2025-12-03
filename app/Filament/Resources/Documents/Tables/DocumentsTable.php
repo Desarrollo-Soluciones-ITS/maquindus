@@ -25,15 +25,18 @@ use App\Models\Person;
 use App\Models\Project;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use App\Filament\Actions\RestoreAction;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
+use Filament\Notifications\Notification;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class DocumentsTable
 {
@@ -157,13 +160,80 @@ class DocumentsTable
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.show_file')),
-                        OpenFolderAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.open_in_folder')),
-                        DownloadAction::make()->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.download')),
+                        PreviewAction::make()
+                            ->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.show_file'))
+                            ->before(function (Action $action, Model $record) {
+                                if ($record->isRecordLocked()) {
+                                    $message = $record->getLockStatusMessage();
+
+                                    Notification::make()
+                                        ->title('Acceso Denegado')
+                                        ->body(Str::markdown($message))
+                                        ->danger()
+                                        ->send();
+
+                                    $action->halt();
+                                }
+                            }),
+                        OpenFolderAction::make()
+                            ->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.open_in_folder'))
+                            ->before(function (Action $action, Model $record) {
+                                dd($record->isRecordLocked());
+                                if ($record->isRecordLocked()) {
+                                    $message = $record->getLockStatusMessage();
+
+                                    Notification::make()
+                                        ->title('Acceso Denegado')
+                                        ->body(Str::markdown($message))
+                                        ->danger()
+                                        ->send();
+
+                                    $action->halt();
+                                }
+                            }),
+                        DownloadAction::make()
+                            ->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.download'))
+                            ->before(function (Action $action, Model $record) {
+                                if ($record->isRecordLocked()) {
+                                    $message = $record->getLockStatusMessage();
+
+                                    Notification::make()
+                                        ->title('Acceso Denegado')
+                                        ->body(Str::markdown($message))
+                                        ->danger()
+                                        ->send();
+
+                                    $action->halt();
+                                }
+                            }),
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete')),
+                    EditAction::make()->hidden(fn($record) => empty($record) || $record->trashed() || !currentUserHasPermission('documents.edit')),
+                    ArchiveAction::make()
+                        ->hidden(fn($record) => empty($record) || $record->trashed() || !currentUserHasPermission('documents.delete'))
+                        ->before(function (Action $action, Model $record) {
+                            if (empty($record)) {
+                                Notification::make()
+                                    ->title('Registro archivado')
+                                    ->body("Este registro se encuentra ya archivado.")
+                                    ->warning()
+                                    ->send();
+
+                                $action->halt();
+                            }
+
+                            if ($record->isRecordLocked()) {
+                                $message = $record->getLockStatusMessage();
+
+                                Notification::make()
+                                    ->title('Acceso Denegado')
+                                    ->body(Str::markdown($message))
+                                    ->danger()
+                                    ->send();
+
+                                $action->halt();
+                            }
+                        }),
                     RestoreAction::make()->hidden(fn($record) => $record->documentable && $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
                 ])
             ]);

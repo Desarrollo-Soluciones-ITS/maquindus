@@ -9,10 +9,9 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
+use App\Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
@@ -288,63 +287,63 @@ class RolesTable
                             return [
                                 // TODO -> comentado porque no funciona y por ahora no hay chance de arreglarlo
                                 // TextInput::make('permission_search')
-                                    // ->label('Buscar permisos')
-                                    // ->placeholder('Escriba para filtrar permisos...')
-                                    // ->live()
-                                    // ->debounce(300)
-                                    // ->afterStateUpdated(function ($state, $set) {
-                                    //     $searchTerm = strtolower($state);
-                                    //     $script = "
-                                    //         const searchTerm = '{$searchTerm}';
-                                    //         const sections = document.querySelectorAll('.permission-section');
-                                            
-                                    //         sections.forEach(section => {
-                                    //             const sectionHeader = section.querySelector('.fi-section-header-heading');
-                                    //             const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
-                                    //             const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
-                                    //             let hasVisibleItems = false;
-                                                
-                                    //             // Reset all options first
-                                    //             permissionOptions.forEach(optionLabel => {
-                                    //                 const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
-                                    //                 if (optionContainer) {
-                                    //                     optionContainer.style.display = 'flex';
-                                    //                 }
-                                    //             });
-                                                
-                                    //             // Show section by default
-                                    //             section.style.display = 'block';
-                                                
-                                    //             // Check if section header matches
-                                    //             if (sectionLabel.includes(searchTerm)) {
-                                    //                 hasVisibleItems = true;
-                                    //             } else {
-                                    //                 // Check individual options
-                                    //                 permissionOptions.forEach(optionLabel => {
-                                    //                     const labelText = optionLabel.textContent.toLowerCase();
-                                    //                     const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
-                                                        
-                                    //                     if (labelText.includes(searchTerm)) {
-                                    //                         hasVisibleItems = true;
-                                    //                         if (optionContainer) {
-                                    //                             optionContainer.style.display = 'flex';
-                                    //                         }
-                                    //                     } else if (optionContainer && searchTerm.length > 0) {
-                                    //                         optionContainer.style.display = 'none';
-                                    //                     }
-                                    //                 });
-                                    //             }
-                                                
-                                    //             // Hide section if no matches found
-                                    //             if (!hasVisibleItems && searchTerm.length > 0) {
-                                    //                 section.style.display = 'none';
-                                    //             }
-                                    //         });
-                                    //     ";
-                                    //     $set('search_script', $script);
-                                    // })
-                                    // ->dehydrated(false),
-
+                                // ->label('Buscar permisos')
+                                // ->placeholder('Escriba para filtrar permisos...')
+                                // ->live()
+                                // ->debounce(300)
+                                // ->afterStateUpdated(function ($state, $set) {
+                                //     $searchTerm = strtolower($state);
+                                //     $script = "
+                                //         const searchTerm = '{$searchTerm}';
+                                //         const sections = document.querySelectorAll('.permission-section');
+                
+                                //         sections.forEach(section => {
+                                //             const sectionHeader = section.querySelector('.fi-section-header-heading');
+                                //             const sectionLabel = sectionHeader ? sectionHeader.textContent.toLowerCase() : '';
+                                //             const permissionOptions = section.querySelectorAll('.fi-fo-checkbox-list-option-label');
+                                //             let hasVisibleItems = false;
+                
+                                //             // Reset all options first
+                                //             permissionOptions.forEach(optionLabel => {
+                                //                 const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
+                                //                 if (optionContainer) {
+                                //                     optionContainer.style.display = 'flex';
+                                //                 }
+                                //             });
+                
+                                //             // Show section by default
+                                //             section.style.display = 'block';
+                
+                                //             // Check if section header matches
+                                //             if (sectionLabel.includes(searchTerm)) {
+                                //                 hasVisibleItems = true;
+                                //             } else {
+                                //                 // Check individual options
+                                //                 permissionOptions.forEach(optionLabel => {
+                                //                     const labelText = optionLabel.textContent.toLowerCase();
+                                //                     const optionContainer = optionLabel.closest('.fi-fo-checkbox-list-option-ctn');
+                
+                                //                     if (labelText.includes(searchTerm)) {
+                                //                         hasVisibleItems = true;
+                                //                         if (optionContainer) {
+                                //                             optionContainer.style.display = 'flex';
+                                //                         }
+                                //                     } else if (optionContainer && searchTerm.length > 0) {
+                                //                         optionContainer.style.display = 'none';
+                                //                     }
+                                //                 });
+                                //             }
+                
+                                //             // Hide section if no matches found
+                                //             if (!hasVisibleItems && searchTerm.length > 0) {
+                                //                 section.style.display = 'none';
+                                //             }
+                                //         });
+                                //     ";
+                                //     $set('search_script', $script);
+                                // })
+                                // ->dehydrated(false),
+                
                                 Fieldset::make('Acciones rápidas')
                                     ->schema([
                                         Grid::make()

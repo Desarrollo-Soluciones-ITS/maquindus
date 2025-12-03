@@ -7,7 +7,7 @@ use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
+use App\Filament\Actions\EditAction;
 use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;

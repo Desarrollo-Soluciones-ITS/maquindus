@@ -5,6 +5,7 @@ namespace App\Filament\Actions;
 use App\Models\Person;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction as FilamentEditAction;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 
 class EditAction
@@ -34,6 +35,36 @@ class EditAction
                 $record->update($data->all());
 
                 return $record;
+            })
+            ->label(function (Model $record) {
+                if (!$record->isRecordLockedByCurrentUser()) {
+                    $timeLeft = $record->getLockTimeLeft();
+                    return $timeLeft ? "⏰ {$timeLeft}" : 'Editar';
+                }
+
+                return 'Editar';
+            })
+            ->beforeFormFilled(function (FilamentEditAction $action, Model $record) {
+                if ($record->isRecordLocked() && !$record->isRecordLockedByCurrentUser()) {
+                    $message = $record->getLockStatusMessage();
+                    $model = model_to_spanish($record::class);
+
+                    Notification::make()
+                        ->title("{$model} en uso")
+                        ->body($message)
+                        ->warning()
+                        ->send();
+
+                    $action->halt();
+                    return;
+                }
+
+                $record->lockRecord();
+            })
+            ->after(function (Model $record) {
+                if ($record->isRecordLockedByCurrentUser()) {
+                    $record->unlockRecord();
+                }
             });
     }
 }
