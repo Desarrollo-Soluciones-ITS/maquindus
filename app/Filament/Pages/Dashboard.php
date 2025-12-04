@@ -9,9 +9,12 @@ use App\Filament\Widgets\LatestEquipments;
 use App\Filament\Widgets\LatestParts;
 use App\Filament\Widgets\LatestProjects;
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\Welcome;
 use Filament\Pages\Page;
 use BackedEnum;
 use Filament\Support\Icons\Heroicon;
+use Filament\Widgets\WidgetConfiguration;
+use Illuminate\Support\Arr;
 
 class Dashboard extends Page
 {
@@ -33,25 +36,41 @@ class Dashboard extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            'stats' => StatsOverview::class,
-            'chart' => DocumentsChart::class,
-        ];
+        if (currentUserHasPermission('dashboard')) {
+            return [
+                'stats' => StatsOverview::class,
+                'chart' => DocumentsChart::class,
+            ];
+        }
+
+        return [Welcome::class];
     }
 
     protected function getFooterWidgets(): array
     {
-        return [
-            LatestActivityLogs::class,
-            LatestEquipments::class,
-            LatestParts::class,
-            LatestProjects::class,
-            LatestDocuments::class,
-        ];
-    }
+        $widgets = [];
 
-    public static function canAccess(): bool
-    {
-        return currentUserHasPermission('dashboard');
+        if (currentUserHasPermission('dashboard.view')) {
+            $widgets[] = LatestActivityLogs::class;
+        }
+
+        if (currentUserHasPermission('equipments.view')) {
+            $widgets[] = LatestEquipments::class;
+        }
+
+        if (currentUserHasPermission('parts.view')) {
+            $widgets[] = LatestParts::class;
+        }
+
+        if (currentUserHasPermission('projects.view')) {
+            $widgets[] = LatestProjects::class;
+        }
+
+        if (currentUserHasPermission('documents.view')) {
+            $widgets[] = LatestDocuments::class;
+        }
+
+        return $widgets;
+
     }
 }

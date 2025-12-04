@@ -156,6 +156,7 @@ if (!function_exists('translate_activity_verb')) {
             'created' => 'creado',
             'updated' => 'actualizado',
             'deleted' => 'archivado',
+            'restored' => 'desarchivado',
             // Eventos de Autenticación
             'authenticated' => 'inició sesión',
             'logged_out' => 'cerró sesión',
@@ -173,6 +174,7 @@ if (!function_exists('translate_activity_event')) {
             'created' => 'Creación',
             'updated' => 'Actualización',
             'deleted' => 'Archivado',
+            'restored' => 'Desarchivado',
             // Eventos de Autenticación
             'authenticated' => 'Inicio de Sesión',
             'logged_out' => 'Cierre de Sesión',
@@ -190,6 +192,7 @@ if (!function_exists('get_activity_color')) {
             'created' => 'success',
             'updated' => 'warning',
             'deleted' => 'danger',
+            'restored' => 'success',
             // Eventos de Autenticación
             'authenticated' => 'success',
             'logged_out' => 'info',
@@ -226,8 +229,9 @@ if (!function_exists('code_to_full')) {
 if (!function_exists('is_view_customer')) {
     function is_view_customer()
     {
-        return function (RelationManager | ListProjects $livewire) {
-            if ($livewire instanceof ListProjects) return false;
+        return function (RelationManager|ListProjects $livewire) {
+            if ($livewire instanceof ListProjects)
+                return false;
             return $livewire->getPageClass() === ViewCustomer::class;
         };
     }
@@ -326,15 +330,16 @@ if (!function_exists('handle_documentable_name_change')) {
 
 
 if (!function_exists('key_value_trimmer')) {
-    function key_value_trimmer() {
+    function key_value_trimmer()
+    {
         return function ($state) {
             $trimmed = [];
-    
+
             foreach ($state as $key => $value) {
                 $trim = fn($str) => is_string($str) ? trim($str) : $str;
                 $trimmed[$trim($key)] = $trim($value);
             }
-    
+
             return $trimmed;
         };
     }
