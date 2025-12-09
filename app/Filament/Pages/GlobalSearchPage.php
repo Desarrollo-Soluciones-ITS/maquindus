@@ -27,7 +27,9 @@ class GlobalSearchPage extends Page implements HasForms
 
     protected static ?string $title = 'Buscador';
 
-    protected string $view = 'filament.pages.global-search-page';
+    protected string $view = 'filament.pages.search';
+
+    protected static ?string $slug = 'search';
 
     #[Url]
     public ?string $query = '';
