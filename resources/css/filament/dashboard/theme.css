@@ -1,4 +1,6 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
+
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+@source '../../../../vendor/malzariey/filament-daterangepicker-filter/resources/views/**/*.blade.php';

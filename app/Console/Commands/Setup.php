@@ -30,5 +30,6 @@ class Setup extends Command
         $this->call('files:mockup');
         $this->call('files:scan');
         $this->call('db:seed');
+        $this->call('search:index', ['--rebuild']);
     }
 }
