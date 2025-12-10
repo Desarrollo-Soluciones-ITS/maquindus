@@ -237,10 +237,10 @@ if (!function_exists('is_view_customer')) {
     }
 }
 
-if (!function_exists('is_files_model')) {
-    function is_files_model(Model $model)
+if (!function_exists('documentables')) {
+    function documentables()
     {
-        $models = collect([
+        return collect([
             Project::class,
             Equipment::class,
             Person::class,
@@ -248,8 +248,6 @@ if (!function_exists('is_files_model')) {
             Part::class,
             Supplier::class,
         ]);
-
-        return $models->contains($model::class);
     }
 }
 

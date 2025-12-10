@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Documents;
 
+use App\Filament\Filters\DocumentableFilter;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Filament\Resources\Documents\Pages\ViewDocument;
 use App\Filament\Resources\Documents\RelationManagers\FilesRelationManager;
@@ -46,7 +47,11 @@ class DocumentResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return DocumentsTable::configure($table);
+        return DocumentsTable::configure($table)
+            ->filtersFormColumns(2)
+            ->pushFilters([
+                DocumentableFilter::make(),
+            ]);
     }
 
     public static function getRelations(): array
