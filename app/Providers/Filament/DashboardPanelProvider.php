@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use Illuminate\Contracts\View\View;
+
 use App\Filament\Pages\GlobalSearchPage;
 use App\Filament\Pages\ProfileSettings;
 use Filament\Http\Middleware\Authenticate;
@@ -20,6 +22,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+
 class DashboardPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -37,6 +40,8 @@ class DashboardPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->brandLogo(asset('images/logo (1).png'))
+            ->brandLogoHeight('3rem') 
             ->resourceEditPageRedirect('index')
             ->resourceCreatePageRedirect('index')
             ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
