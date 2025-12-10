@@ -2,8 +2,7 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
-@source '../../../../vendor/malzariey/filament-daterangepicker-filter/resources/views*.blade.php';
-
+@source '../../../../vendor/malzariey/filament-daterangepicker-filter/resources/views/**/*.blade.php';
 
 .fi-topbar {
     background: yellow !important;
