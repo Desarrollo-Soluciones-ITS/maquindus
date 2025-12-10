@@ -8,7 +8,7 @@ class ArchivedFilter
 {
     public static function make()
     {
-        return TrashedFilter::make('Archivados')
+        return TrashedFilter::make('trashed')
             ->label('Archivados')
             ->placeholder('Ocultar archivados')
             ->trueLabel('Incluir archivados')

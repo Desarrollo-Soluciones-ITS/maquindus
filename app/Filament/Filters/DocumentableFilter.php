@@ -12,6 +12,7 @@ class DocumentableFilter
 {
     public static function make()
     {
+        // TODO -> se hace multiples veces la misma query (getSearchResultsUsing, getOptionLabelUsing y indicateUsing)
         $options = documentables()->mapWithKeys(function (string $model) {
             return [$model => model_to_spanish($model, plural: true)];
         });
@@ -27,7 +28,7 @@ class DocumentableFilter
                     ->live(),
                 Select::make('documentable_id')
                     ->searchable()
-                    ->hidden(fn(Get $get) => ! $get('documentable_type'))
+                    ->hidden(fn(Get $get) => !$get('documentable_type'))
                     ->label(function (Get $get) {
                         $type = $get('documentable_type');
                         return model_to_spanish($type) . ' relacionado';
