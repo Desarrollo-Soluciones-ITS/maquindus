@@ -1,37 +1,42 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
-
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+@source '../../../../vendor/malzariey/filament-daterangepicker-filter/resources/views*.blade.php';
 
-/* ===== CUSTOM STYLES ===== */
 
-/* Topbar background */
 .fi-topbar {
     background: yellow !important;
 }
 
-/* Sidebar background */
 .fi-sidebar {
-    background: #000 !important;
+    background-color: var(--gray-900);
 }
 
-/* Sidebar navigation links */
-.fi-sidebar .fi-nav-item-label,
-.fi-sidebar .fi-dropdown-trigger .fi-nav-item-label {
-    color: #fff !important;
-}
+.fi-sidebar-item {
+    .fi-sidebar-item-label {
+        color: var(--gray-200);
+    }
 
-/* Sidebar icons */
-.fi-sidebar .fi-nav-item-icon,
-.fi-sidebar .fi-dropdown-trigger .fi-nav-item-icon {
-    color: #fff !important;
-}
+    &.fi-active > .fi-sidebar-item-btn {
+        background-color: color-mix(
+            in oklab,
+            var(--color-white) 5%,
+            transparent
+        );
 
-/* Header Brand Name */
-.fi-brand {
-    background-color: transparent !important; /* Remove individual background */
-    color: black !important; /* Keep text black */
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
+        .fi-icon {
+            color: var(--primary-400);
+        }
+    }
+
+    &.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover {
+        @media (hover: hover) {
+            background-color: color-mix(
+                in oklab,
+                var(--color-white) 5%,
+                transparent
+            );
+        }
+    }
 }
