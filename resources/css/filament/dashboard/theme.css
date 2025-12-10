@@ -3,3 +3,35 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/* ===== CUSTOM STYLES ===== */
+
+/* Topbar background */
+.fi-topbar {
+    background: yellow !important;
+}
+
+/* Sidebar background */
+.fi-sidebar {
+    background: #000 !important;
+}
+
+/* Sidebar navigation links */
+.fi-sidebar .fi-nav-item-label,
+.fi-sidebar .fi-dropdown-trigger .fi-nav-item-label {
+    color: #fff !important;
+}
+
+/* Sidebar icons */
+.fi-sidebar .fi-nav-item-icon,
+.fi-sidebar .fi-dropdown-trigger .fi-nav-item-icon {
+    color: #fff !important;
+}
+
+/* Header Brand Name */
+.fi-brand {
+    background-color: transparent !important; /* Remove individual background */
+    color: black !important; /* Keep text black */
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+}
