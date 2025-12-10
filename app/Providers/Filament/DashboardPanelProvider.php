@@ -40,8 +40,12 @@ class DashboardPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->brandLogo(asset('images/logo (1).png'))
-            ->brandLogoHeight('3rem') 
+            
+            ->brandLogo(new \Illuminate\Support\HtmlString(
+                '<img src="'.asset('images/logo (1).png').'" alt="Maquindus logo" style="display:inline-block;vertical-align:middle;" />'
+                .'<span class="fi-brand-title" style="margin-left:.25rem;">Gestor De Archivos Mquindus</span>'
+            ))
+            ->brandLogoHeight('2rem')
             ->resourceEditPageRedirect('index')
             ->resourceCreatePageRedirect('index')
             ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
