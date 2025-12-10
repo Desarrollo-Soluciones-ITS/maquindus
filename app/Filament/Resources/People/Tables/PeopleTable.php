@@ -61,6 +61,7 @@ class PeopleTable
                     }),
             ])
             ->filters([
+                // TODO -> se hace multiples veces la misma query (getSearchResultsUsing, getOptionLabelUsing y indicateUsing)
                 SelectFilter::make('personable_id')
                     ->label('Empresa')
                     ->searchable()
@@ -68,16 +69,39 @@ class PeopleTable
                         fn(string $search): array =>
                         Customer::query()
                             ->where('name', 'like', "%{$search}%")
-                            ->limit(20)
+                            ->limit(10)
                             ->unionAll(
                                 Supplier::query()
                                     ->select('name', 'id')
                                     ->where('name', 'like', "%{$search}%")
-                                    ->limit(20)
+                                    ->limit(10)
                             )
                             ->pluck('name', 'id')
                             ->all()
-                    ),
+                    )
+                    ->getOptionLabelUsing(function ($value) {
+                        $model = Customer::find($value, ['name']);
+
+                        if (!$model) {
+                            $model = Supplier::find($value, ['name']);
+                        }
+
+                        if (!$model) return;
+
+                        return $model->name;
+                    })
+                    ->indicateUsing(function (array $data) {
+                        $value = $data['value'] ?? null;
+                        $model = Customer::find($value, ['name']);
+
+                        if (!$model) {
+                            $model = Supplier::find($value, ['name']);
+                        }
+
+                        if (!$model) return;
+
+                        return "Empresa: {$model->name}";
+                    }),
                 ArchivedFilter::make(),
             ])
             ->recordActions([

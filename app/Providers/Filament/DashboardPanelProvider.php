@@ -43,7 +43,7 @@ class DashboardPanelProvider extends PanelProvider
             
             ->brandLogo(new \Illuminate\Support\HtmlString(
                 '<img src="'.asset('images/logo (1).png').'" alt="Maquindus logo" style="display:inline-block;vertical-align:middle;" />'
-                .'<span class="fi-brand-title" style="margin-left:.25rem;">Gestor De Archivos Mquindus</span>'
+                .'<span class="fi-brand-title" style="margin-left:.25rem;">Gestor De Archivos Maquindus</span>'
             ))
             ->brandLogoHeight('2rem')
             ->resourceEditPageRedirect('index')

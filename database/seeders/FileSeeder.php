@@ -15,7 +15,7 @@ class FileSeeder extends Seeder
     public function run(): void
     {
         $documents = Document::query()
-            ->oldest()
+            ->latest()
             ->whereHas('documentable')
             ->get();
 
