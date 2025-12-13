@@ -106,7 +106,7 @@ class FilesRelationManager extends RelationManager
     {
         return $table
             ->recordUrl(null)
-            ->recordAction(is_not_localhost() ? 'download' : 'preview')
+            ->recordAction('preview')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('version')

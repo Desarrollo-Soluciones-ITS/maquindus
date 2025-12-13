@@ -10,7 +10,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Carbon\Carbon;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class ProjectForm
 {
@@ -20,7 +20,7 @@ class ProjectForm
             ->components([
                 TextInput::make('name')
                     ->label('Nombre')
-                    ->placeholder('Planta de ensayo')
+                    ->placeholder('Ej. Planta de ensayo')
                     ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
                     ->unique()
@@ -28,75 +28,20 @@ class ProjectForm
                 CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
                     ->label('Fecha de inicio')
+                    ->placeholder('Selecciona una fecha...')
                     ->format('Y-m-d')
                     ->displayFormat('d/m/Y')
                     ->native(false)
-                    ->rules([
-                        'nullable',
-                        function ($attribute, $value, $fail) {
-                            if (empty($value)) {
-                                return;
-                            }
-
-                            $end = request()->input('end');
-
-                            try {
-                                $s = Carbon::createFromFormat('d/m/Y', $value);
-                            } catch (\Throwable $e) {
-                                $fail('Formato de fecha de inicio inválido.');
-                                return;
-                            }
-
-                            if (!empty($end)) {
-                                try {
-                                    $eDate = Carbon::createFromFormat('d/m/Y', $end);
-                                } catch (\Throwable $e) {
-                                    // If end is present but invalid, let end's validator report it
-                                    return;
-                                }
-
-                                if ($s->gt($eDate)) {
-                                    $fail('El campo fecha de inicio debe ser una fecha anterior o igual a end.');
-                                }
-                            }
-                        }
-                    ]),
-
+                    ->nullable()
+                    ->before('end'),
                 DatePicker::make('end')
                     ->label('Fecha de finalización')
+                    ->placeholder('Selecciona una fecha...')
                     ->format('Y-m-d')
                     ->displayFormat('d/m/Y')
                     ->native(false)
-                    ->rules([
-                        'nullable',
-                        function ($attribute, $value, $fail) {
-                            if (empty($value)) {
-                                return;
-                            }
-
-                            $start = request()->input('start');
-
-                            try {
-                                $e = Carbon::createFromFormat('d/m/Y', $value);
-                            } catch (\Throwable $e) {
-                                $fail('Formato de fecha de finalización inválido.');
-                                return;
-                            }
-
-                            if (!empty($start)) {
-                                try {
-                                    $sDate = Carbon::createFromFormat('d/m/Y', $start);
-                                } catch (\Throwable $e) {
-                                    // If start is present but invalid, let start's validator report it
-                                    return;
-                                }
-
-                                if ($e->lt($sDate)) {
-                                    $fail('El campo fecha de finalización debe ser una fecha posterior o igual a start.');
-                                }
-                            }
-                        }
-                    ]),
+                    ->nullable()
+                    ->after('start'),
                 Select::make('status')
                     ->label('Estado')
                     ->options(Status::options())
@@ -104,8 +49,8 @@ class ProjectForm
                 Select::make('customer_id')
                     ->label('Cliente')
                     ->relationship('customer', 'name')
-                    ->hidden(fn($livewire) => $livewire instanceof \Filament\Resources\RelationManagers\RelationManager)
-                    ->required(fn($livewire) => !($livewire instanceof \Filament\Resources\RelationManagers\RelationManager)),
+                    ->hidden(fn($livewire) => $livewire instanceof RelationManager)
+                    ->required(),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Proyecto piloto para nueva línea')

@@ -45,7 +45,7 @@ class DocumentsTable
         return $table
             ->recordTitleAttribute('name')
             ->recordUrl(null)
-            ->recordAction(is_not_localhost() ? 'download' : 'preview')
+            ->recordAction('preview')
             ->defaultSort('current_created_at', 'desc')
             ->columns([
                 TextColumn::make('name')
@@ -178,7 +178,6 @@ class DocumentsTable
                         OpenFolderAction::make()
                             ->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.open_in_folder'))
                             ->before(function (Action $action, Model $record) {
-                                dd($record->isRecordLocked());
                                 if ($record->isRecordLocked()) {
                                     $message = $record->getLockStatusMessage();
 
@@ -208,9 +207,9 @@ class DocumentsTable
                             }),
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make()->hidden(fn($record) => empty($record) || $record->trashed() || !currentUserHasPermission('documents.edit')),
+                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.edit')),
                     ArchiveAction::make()
-                        ->hidden(fn($record) => empty($record) || $record->trashed() || !currentUserHasPermission('documents.delete'))
+                        ->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete'))
                         ->before(function (Action $action, Model $record) {
                             if (empty($record)) {
                                 Notification::make()

@@ -13,7 +13,6 @@ class OpenFolderAction
         return Action::make('folder')
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
-            ->hidden(is_not_localhost())
             ->action(function ($record) {
                 $file = $record->current ?? $record;
                 try {
