@@ -111,6 +111,10 @@ class FilesScan extends Command
 
             DB::beginTransaction();
             try {
+                if (!method_exists($this, $container)) {
+                    DB::rollBack();
+                    return;
+                }
                 $this->$container($line, $path, $equipment);
             } catch (\Throwable $th) {
                 DB::rollBack();
