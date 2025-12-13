@@ -48,7 +48,7 @@ class FileSeeder extends Seeder
             return;
 
         $files = File::query()
-            ->oldest()
+            ->latest()
             ->limit(3)
             ->get();
 
