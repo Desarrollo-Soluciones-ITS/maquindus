@@ -15,13 +15,16 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -97,8 +100,17 @@ class AppServiceProvider extends ServiceProvider
         FilamentAsset::register([
             Css::make('glightbox-style', asset('vendor/glightbox/css/glightbox.min.css')),
             Js::make('glightbox-script', asset('vendor/glightbox/js/glightbox.min.js')),
-            Css::make('main', asset('css/main.css'))
         ], package: 'app');
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): View => view('vite'),
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::TOPBAR_LOGO_AFTER,
+            fn (): View => view('brand'),
+        );
 
         Password::defaults(function () {
             return Password::min(8)

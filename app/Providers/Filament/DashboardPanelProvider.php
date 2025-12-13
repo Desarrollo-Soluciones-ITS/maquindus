@@ -40,12 +40,9 @@ class DashboardPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            
-            ->brandLogo(new \Illuminate\Support\HtmlString(
-                '<img src="'.asset('images/logo (1).png').'" alt="Maquindus logo" style="display:inline-block;vertical-align:middle;" />'
-                .'<span class="fi-brand-title" style="margin-left:.25rem;">Gestor De Archivos Maquindus</span>'
-            ))
-            ->brandLogoHeight('2rem')
+            ->brandLogo(asset('logo.png'))
+            ->brandLogoHeight('2.5rem')
+            ->viteTheme('resources/css/app.css')
             ->resourceEditPageRedirect('index')
             ->resourceCreatePageRedirect('index')
             ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
@@ -70,7 +67,6 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->viteTheme('resources/css/filament/dashboard/theme.css');
+            ]);
     }
 }
