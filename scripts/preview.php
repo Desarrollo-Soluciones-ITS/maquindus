@@ -6,11 +6,4 @@ if (!$input) return;
 $path = urldecode($input);
 $arg = escapeshellarg($path);
 
-$app = match ($file->mime) {
-    'Excel' => 'excel',
-    'Word' => 'winword',
-    'PowerPoint' => 'powerpnt',
-    default => "\"\"",
-};
-
-exec("start $app $arg");
+exec("start \"\" $arg");
