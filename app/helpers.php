@@ -318,7 +318,6 @@ if (!function_exists('handle_documentable_name_change')) {
     }
 }
 
-
 if (!function_exists('key_value_trimmer')) {
     function key_value_trimmer()
     {
@@ -332,5 +331,20 @@ if (!function_exists('key_value_trimmer')) {
 
             return $trimmed;
         };
+    }
+}
+
+if (!function_exists('exec_url')) {
+    function exec_url(string $filepath, string $endpoint)
+    {
+        $server = env('SERVER_PRE_PATH', 'C:\\data\\');
+        $client = env('CLIENT_PRE_PATH', 'Z:\\');
+        $base = env('SHELL_API_URL', 'http://localhost:8970');
+
+        $replaced = path($filepath)
+            ->replace($server, $client);
+
+        $path = urlencode($replaced);
+        return "$base/$endpoint.php?path=$path";
     }
 }

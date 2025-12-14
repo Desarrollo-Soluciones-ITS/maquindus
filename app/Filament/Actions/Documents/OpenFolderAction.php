@@ -16,9 +16,8 @@ class OpenFolderAction
             ->action(function ($record, $livewire) {
                 $file = $record->current ?? $record;
                 try {
-                    $path = urlencode(path($file->path));
-                    $base = env('EXEC_URL');
-                    $livewire->js("fetch('$base/folder.php?path=$path')");
+                    $url = exec_url($file->path, endpoint: 'folder');
+                    $livewire->js("fetch('$url')");
                 } catch (\Throwable $th) {
                     dd($th);
                     Notification::make()

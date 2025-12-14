@@ -16,9 +16,8 @@ class PreviewAction
             ->action(function ($record, $livewire) {
                 $file = $record->current ?? $record;
                 try {
-                    $path = urlencode(path($file->path));
-                    $base = env('EXEC_URL');
-                    $livewire->js("fetch('$base/preview.php?path=$path')");
+                    $url = exec_url($file->path, endpoint: 'preview');
+                    $livewire->js("fetch('$url')");
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')
