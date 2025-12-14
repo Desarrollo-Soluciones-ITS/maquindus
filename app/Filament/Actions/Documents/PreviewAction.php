@@ -13,20 +13,12 @@ class PreviewAction
         return Action::make('preview')
             ->label('Abrir archivo')
             ->icon(Heroicon::OutlinedEye)
-            ->action(function ($record) {
+            ->action(function ($record, $livewire) {
                 $file = $record->current ?? $record;
                 try {
-                    $path = path($file->path);
-                    $app = match ($file->mime) {
-                        'Excel' => 'excel',
-                        'Word' => 'winword',
-                        'PowerPoint' => 'powerpnt',
-                        default => "\"\"",
-                    };
-
-                    $command = "start $app \"$path\"";
-
-                    exec($command);
+                    $path = urlencode(path($file->path));
+                    $base = env('EXEC_URL');
+                    $livewire->js("fetch('$base/preview.php?path=$path', { mode: 'no-cors' })");
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')

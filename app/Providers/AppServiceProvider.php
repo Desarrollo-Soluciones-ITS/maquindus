@@ -97,7 +97,7 @@ class AppServiceProvider extends ServiceProvider
         FilamentAsset::register([
             Css::make('glightbox-style', asset('vendor/glightbox/css/glightbox.min.css')),
             Js::make('glightbox-script', asset('vendor/glightbox/js/glightbox.min.js')),
-            Css::make('main', asset('css/main.css'))
+            Css::make('main', asset('css/main.css')),
         ], package: 'app');
 
         Password::defaults(function () {

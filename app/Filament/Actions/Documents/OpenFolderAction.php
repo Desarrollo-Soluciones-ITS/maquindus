@@ -13,12 +13,14 @@ class OpenFolderAction
         return Action::make('folder')
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
-            ->action(function ($record) {
+            ->action(function ($record, $livewire) {
                 $file = $record->current ?? $record;
                 try {
-                    $path = path($file->path);
-                    exec("explorer /select,\"$path\"");
+                    $path = urlencode(path($file->path));
+                    $base = env('EXEC_URL');
+                    $livewire->js("fetch('$base/folder.php?path=$path', { mode: 'no-cors' })");
                 } catch (\Throwable $th) {
+                    dd($th);
                     Notification::make()
                         ->title('No se encontró el documento.')
                         ->danger()
