@@ -115,7 +115,7 @@ if (!function_exists('model_to_spanish')) {
 }
 
 if (!function_exists('path')) {
-    function path(string $path, $asFolder = false)
+    function path(string $path, $asFolder = false, $base = true)
     {
         $segments = str($path)
             ->explode('/');
@@ -134,7 +134,7 @@ if (!function_exists('path')) {
             throw new Error('path() helper error: file is missing');
         }
 
-        return str(Storage::path($folder))
+        return str($base ? Storage::path($folder) : $folder)
             ->replace('/', DIRECTORY_SEPARATOR)
             ->replace('\\', DIRECTORY_SEPARATOR);
     }
@@ -337,13 +337,8 @@ if (!function_exists('key_value_trimmer')) {
 if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
-        $server = env('SERVER_PRE_PATH', 'C:\\data\\');
-        $client = env('CLIENT_PRE_PATH', 'Z:\\');
         $base = env('SHELL_API_URL', 'http://localhost:8970');
-
-        $replaced = path($filepath)
-            ->replace($server, $client);
-
+        $replaced = path($filepath, base: false);
         $path = urlencode($replaced);
         return "$base/$endpoint.php?path=$path";
     }
