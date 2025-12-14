@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('files', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('path', 1023)->unique();
+            $table->string('path', 760)->unique();
             $table->string('mime');
             $table->integer('version');
             $table->foreignUuid('document_id')->constrained();
