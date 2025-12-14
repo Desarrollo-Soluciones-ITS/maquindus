@@ -340,6 +340,6 @@ if (!function_exists('exec_url')) {
         $base = env('SHELL_API_URL', 'http://localhost:8970');
         $replaced = path($filepath, base: false);
         $path = urlencode($replaced);
-        return "$base?path=$path&op=$endpoint";
+        return "$base/$endpoint.php?path=$path";
     }
 }
