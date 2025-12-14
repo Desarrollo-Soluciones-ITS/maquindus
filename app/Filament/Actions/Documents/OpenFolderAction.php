@@ -18,7 +18,7 @@ class OpenFolderAction
                 try {
                     $path = urlencode(path($file->path));
                     $base = env('EXEC_URL');
-                    $livewire->js("fetch('$base/folder.php?path=$path', { mode: 'no-cors' })");
+                    $livewire->js("fetch('$base/folder.php?path=$path')");
                 } catch (\Throwable $th) {
                     dd($th);
                     Notification::make()

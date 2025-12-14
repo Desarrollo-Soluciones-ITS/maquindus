@@ -18,7 +18,7 @@ class PreviewAction
                 try {
                     $path = urlencode(path($file->path));
                     $base = env('EXEC_URL');
-                    $livewire->js("fetch('$base/preview.php?path=$path', { mode: 'no-cors' })");
+                    $livewire->js("fetch('$base/preview.php?path=$path')");
                 } catch (\Throwable $th) {
                     Notification::make()
                         ->title('No se encontró el documento.')
