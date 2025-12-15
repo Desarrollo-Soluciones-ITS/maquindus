@@ -337,7 +337,7 @@ if (!function_exists('key_value_trimmer')) {
 if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
-        $base = env('SHELL_API_URL', 'http://localhost:8970');
+        $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
         $replaced = path($filepath, base: false);
         $path = urlencode($replaced);
         return "$base/$endpoint.php?path=$path";
