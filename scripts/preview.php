@@ -3,8 +3,7 @@
 $input = $_GET['path'] ?? null;
 if (!$input) return;
 
-// Reemplazar ruta en prod
-$path = "\\\\192.168.56.10\\data\\Proyecto Base de Datos\\" . urldecode($input);
+$path = "\\\\192.168.56.10\\Proyecto Base de Datos\\" . urldecode($input);
 $arg = escapeshellarg($path);
 
 $out = null;
