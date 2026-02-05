@@ -15,7 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
+use Filament\Tables\Table; 
 
 class ProjectsTable
 {
@@ -31,6 +31,11 @@ class ProjectsTable
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('start')
+                    ->label('Fecha de inicio')
+                    ->sortable()
+                    ->date('d/m/Y')
+                    ->timezone('America/Caracas'),
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
@@ -55,7 +60,10 @@ class ProjectsTable
                     ->timezone('America/Caracas'),
             ])
             ->filters([
-                DateFilter::make(),
+                DateFilter::make()
+                    ->label('Fecha de carga'),
+                DateFilter::make('start')
+                    ->label('Fecha de inicio'),
                 SelectFilter::make('status')
                     ->label('Estado')
                     ->options(Status::options()),
