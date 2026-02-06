@@ -8,6 +8,8 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class ActivityLogsTable
 {
@@ -20,6 +22,30 @@ class ActivityLogsTable
                     ->date('d/m/Y - g:i A')
                     ->timezone('America/Caracas')
                     ->sortable(),
+                TextColumn::make('subject_type')
+                    ->label('Registro')
+                    ->formatStateUsing(function (string $state, $record) {
+                        if (!$record->subject) {
+                            return 'N/A';
+                        }
+
+                        $shouldShow = method_exists($record->subject, 'shouldShowInActivityLog')
+                            ? $record->subject->shouldShowInActivityLog()
+                            : true;
+
+                        return $shouldShow ? 'Ver registro' : 'N/A';
+                    })
+                    ->url(function ($record) {
+                        if (!$record->subject) {
+                            return null;
+                        }
+
+                        if (method_exists($record->subject, 'getActivityLogUrl')) {
+                            return $record->subject->getActivityLogUrl();
+                        }
+
+                        return null;
+                    }),
                 TextColumn::make('log_name')
                     ->label('Módulo')
                     ->badge()
@@ -31,7 +57,29 @@ class ActivityLogsTable
                     ->color(fn(string $state): string => get_activity_color($state))
                     ->searchable(),
                 TextColumn::make('description')
-                    ->label('Descripción'),
+                    ->label('Descripción')
+                    ->limit(50)
+                    ->html(true)
+                    ->formatStateUsing(function (string $state, $record) {
+                        if (!$record->subject) {
+                            return $state;
+                        }
+
+                        if (method_exists($record->subject, 'getActivityLogDescription')) {
+                            return new HtmlString(
+                                $record->subject->getActivityLogDescription($record->event, $record->description, $record->properties->toArray())
+                            );
+                        }
+
+                        return $state;
+                    })
+                    ->tooltip(function (TextColumn $column) {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return new HtmlString($state);
+                    }),
                 TextColumn::make('causer.name')
                     ->label('Causado por')
                     ->default('Sistema'),

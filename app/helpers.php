@@ -153,6 +153,7 @@ if (!function_exists('translate_activity_verb')) {
             'authenticated' => 'inició sesión',
             'logged_out' => 'cerró sesión',
             'login_failed' => 'falló el inicio de sesión',
+            'code_updated' => 'código actualizado',
             default => $eventName,
         };
     }
@@ -171,6 +172,7 @@ if (!function_exists('translate_activity_event')) {
             'authenticated' => 'Inicio de Sesión',
             'logged_out' => 'Cierre de Sesión',
             'login_failed' => 'Fallo de Inicio de Sesión',
+            'code_updated' => 'Código Actualizado',
             default => $eventName,
         };
     }
@@ -189,6 +191,7 @@ if (!function_exists('get_activity_color')) {
             'authenticated' => 'success',
             'logged_out' => 'info',
             'login_failed' => 'danger',
+            'code_updated' => 'warning',
             default => 'secondary',
         };
     }
