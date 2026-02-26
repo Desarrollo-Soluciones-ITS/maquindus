@@ -6,6 +6,7 @@ use App\Models\Person;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction as FilamentEditAction;
 use Filament\Notifications\Notification;
+use Hash;
 use Illuminate\Database\Eloquent\Model;
 
 class EditAction
@@ -19,6 +20,11 @@ class EditAction
                 $newName = $data['name'];
                 $oldEmail = $record->email ?? null;
                 $newEmail = $data['email'] ?? null;
+
+                if (isset($data['password']) && $data['password'] && $data['password_confirmation'] && $data['password'] === $data['password_confirmation']) {
+                    $data['password'] = Hash::make($data['password']);
+                    unset($data['password_confirmation']);
+                }
 
                 $isDocumentable = method_exists($record, 'documents');
 

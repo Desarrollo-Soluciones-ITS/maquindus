@@ -26,6 +26,7 @@ class Permission extends Model
         'sync' => 'Vincular',
         'unsync' => 'Desvincular',
         'restore' => 'Restaurar',
+        'update_password' => 'Actualizar contraseña',
     ];
 
     public static array $resourceLabels = [
@@ -120,6 +121,7 @@ class Permission extends Model
             'view',
             'delete',
             'edit',
+            'update_password'
         ],
         'activity_logs' => [
             'show',
