@@ -8,6 +8,7 @@ use App\Models\Equipment;
 use App\Models\Part;
 use App\Models\Person;
 use App\Rules\UniquePath;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -81,7 +82,25 @@ class DocumentForm
                                 ->append(" - V{$initialVersion}", '.', $extension);
                         }
                     )
+                    ->required(),
+                DatePicker::make('review_date')
+                    ->label('Fecha de revisión')
+                    ->placeholder('Selecciona una fecha...')
+                    ->format('Y-m-d')
+                    ->displayFormat('d/m/Y')
+                    ->native(false)
                     ->required()
+                    ->hidden(function (RelationManager|ListDocuments $livewire, Model|null $record) {
+                        $documentable = null;
+                        if ($livewire instanceof RelationManager) {
+                            $documentable = $livewire->getOwnerRecord();
+                        } else if ($record !== null) {
+                            $documentable = $record->documentable;
+                        }
+
+                        return !$documentable instanceof Equipment
+                            && !$documentable instanceof Part;
+                    }),
             ]);
     }
 }

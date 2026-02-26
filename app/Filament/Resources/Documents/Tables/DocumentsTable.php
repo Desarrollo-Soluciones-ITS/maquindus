@@ -30,6 +30,7 @@ use Filament\Actions\ActionGroup;
 use App\Filament\Actions\RestoreAction;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use Filament\Notifications\Notification;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -98,7 +99,24 @@ class DocumentsTable
                             ->orderBy('current_created_at', $direction)
                     )
                     ->date('d/m/Y - g:i A')
+                    ->timezone('America/Caracas'),
+                TextColumn::make('review_date')
+                    ->label('Fecha de revisión')
+                    ->sortable()
+                    ->date('d/m/Y')
                     ->timezone('America/Caracas')
+                    ->hidden(function (RelationManager|ListDocuments $livewire, Model|null $record) {
+                        $documentable = null;
+                        if ($livewire instanceof RelationManager) {
+                            $documentable = $livewire->getOwnerRecord();
+                        } else if ($record !== null) {
+                            $documentable = $record->documentable;
+                        }
+
+                        return !$documentable instanceof Equipment
+                            && !$documentable instanceof Part
+                            && $documentable != null;
+                    })
             ])
             ->filters([
                 DateFilter::make('current.created_at')
