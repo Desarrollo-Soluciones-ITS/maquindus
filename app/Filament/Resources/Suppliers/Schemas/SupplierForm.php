@@ -5,9 +5,9 @@ namespace App\Filament\Resources\Suppliers\Schemas;
 use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
 use App\Rules\PreventIllegalCharacters;
-use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\RawJs;
@@ -84,6 +84,28 @@ class SupplierForm
                     ->placeholder('Ej. Empresa de suministro de equipamiento.')
                     ->maxLength(255)
                     ->default(null),
+                Section::make('Información del contacto')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('contact_name')
+                            ->label('Nombre')
+                            ->placeholder('Ej. Juan Pérez')
+                            ->maxLength(80),
+                        TextInput::make('contact_position')
+                            ->label('Cargo')
+                            ->placeholder('Ej. Responsable de ventas')
+                            ->maxLength(255),
+                        TextInput::make('contact_phone')
+                            ->label('Teléfono')
+                            ->placeholder('Ej. 0412-1234567')
+                            ->mask(RawJs::make(<<<'JS'
+                                $input.startsWith('0')
+                                    ? '99999999999'
+                                    : '+999999999999999999'
+                            JS))
+                            ->maxLength(19)
+                            ->tel(),
+                    ]),
             ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Suppliers\Schemas;
 
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class SupplierInfolist
@@ -29,6 +30,16 @@ class SupplierInfolist
                     ->label('Dirección'),
                 TextEntry::make('about')
                     ->label('Descripción'),
+                Section::make('Información del contacto')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('contact_name')
+                            ->label('Nombre'),
+                        TextEntry::make('contact_position')
+                            ->label('Cargo'),
+                        TextEntry::make('contact_phone')
+                            ->label('Teléfono'),
+                    ]),
             ]);
     }
 }

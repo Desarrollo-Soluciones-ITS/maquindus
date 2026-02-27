@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\RawJs;
@@ -83,6 +84,28 @@ class CustomerForm
                     ->placeholder('Ej. Empresa de construcción de urbanizaciones.')
                     ->maxLength(255)
                     ->default(null),
+                Section::make('Información del contacto')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('contact_name')
+                            ->label('Nombre')
+                            ->placeholder('Ej. Juan Pérez')
+                            ->maxLength(80),
+                        TextInput::make('contact_position')
+                            ->label('Cargo')
+                            ->placeholder('Ej. Responsable de compras')
+                            ->maxLength(255),
+                        TextInput::make('contact_phone')
+                            ->label('Teléfono')
+                            ->placeholder('Ej. 0412-1234567')
+                            ->mask(RawJs::make(<<<'JS'
+                                $input.startsWith('0')
+                                    ? '99999999999'
+                                    : '+999999999999999999'
+                            JS))
+                            ->maxLength(19)
+                            ->tel(),
+                    ]),
             ]);
     }
 }
