@@ -82,8 +82,29 @@ class ProjectsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
                 ]),
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $projects = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($projects) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $projects;
+                            public function __construct($projects) { $this->projects = $projects; }
+                            public function collection() { return $this->projects->map(function($project) {
+                                return [
+                                    'Código' => $project->code,
+                                    'Nombre' => $project->name,
+                                    'Fecha de inicio' => $project->start,
+                                    'Estado' => $project->status,
+                                    'Cliente' => optional($project->customer)->name,
+                                    'Fecha' => $project->created_at,
+                                ];
+                            }); }
+                            public function headings(): array { return ['Código', 'Nombre', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
+                        }, 'proyectos.xlsx');
+                    }),
             ]);
     }
 }

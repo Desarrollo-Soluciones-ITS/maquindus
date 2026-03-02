@@ -24,6 +24,26 @@ class PurchaseOrdersTable
             ])
             ->toolbarActions([
                 \Filament\Actions\CreateAction::make(),
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $orders = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($orders) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $orders;
+                            public function __construct($orders) { $this->orders = $orders; }
+                            public function collection() { return $this->orders->map(function($order) {
+                                return [
+                                    'N° de Orden' => $order->order_no,
+                                    'Descripción' => $order->description,
+                                    'Proyecto' => optional($order->project)->name,
+                                    'Creado el' => $order->created_at,
+                                ];
+                            }); }
+                            public function headings(): array { return ['N° de Orden', 'Descripción', 'Proyecto', 'Creado el']; }
+                        }, 'ordenes.xlsx');
+                    }),
             ]);
     }
 }

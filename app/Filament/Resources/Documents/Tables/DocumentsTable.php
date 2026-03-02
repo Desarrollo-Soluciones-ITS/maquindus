@@ -253,6 +253,30 @@ class DocumentsTable
                         }),
                     RestoreAction::make()->hidden(fn($record) => $record->documentable && $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
                 ])
+            ])
+            ->toolbarActions([
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $documents = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($documents) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $documents;
+                            public function __construct($documents) { $this->documents = $documents; }
+                            public function collection() { return $this->documents->map(function($doc) {
+                                return [
+                                    'Nombre' => $doc->name,
+                                    'Tipo de archivo' => optional($doc->current)->mime,
+                                    'Categoría' => $doc->category,
+                                    'Pertenece a' => optional($doc->documentable)->name,
+                                    'Última versión' => $doc->current_created_at,
+                                    'Fecha de revisión' => $doc->review_date,
+                                ];
+                            }); }
+                            public function headings(): array { return ['Nombre', 'Tipo de archivo', 'Categoría', 'Pertenece a', 'Última versión', 'Fecha de revisión']; }
+                        }, 'documentos.xlsx');
+                    }),
             ]);
     }
 }

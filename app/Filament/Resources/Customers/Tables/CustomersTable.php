@@ -46,8 +46,27 @@ class CustomersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
                 ]),
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $customers = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($customers) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $customers;
+                            public function __construct($customers) { $this->customers = $customers; }
+                            public function collection() { return $this->customers->map(function($customer) {
+                                return [
+                                    'RIF' => $customer->rif,
+                                    'Nombre' => $customer->name,
+                                    'Correo' => $customer->email,
+                                    'Teléfono' => $customer->phone,
+                                ];
+                            }); }
+                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
+                        }, 'clientes.xlsx');
+                    }),
             ]);
     }
 }

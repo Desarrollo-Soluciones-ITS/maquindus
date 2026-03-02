@@ -46,8 +46,27 @@ class SuppliersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
                 ]),
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $suppliers = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($suppliers) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $suppliers;
+                            public function __construct($suppliers) { $this->suppliers = $suppliers; }
+                            public function collection() { return $this->suppliers->map(function($supplier) {
+                                return [
+                                    'RIF' => $supplier->rif,
+                                    'Nombre' => $supplier->name,
+                                    'Correo' => $supplier->email,
+                                    'Teléfono' => $supplier->phone,
+                                ];
+                            }); }
+                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
+                        }, 'proveedores.xlsx');
+                    }),
             ]);
     }
 }
