@@ -26,11 +26,6 @@ class PurchaseOrderForm
                     ->label('Descripción')
                     ->placeholder('Descripción de la orden')
                     ->maxLength(255),
-                Select::make('project_id')
-                    ->label('Proyecto')
-                    ->relationship('project', 'name')
-                    ->searchable()
-                    ->required(),
             ]);
     }
 }
