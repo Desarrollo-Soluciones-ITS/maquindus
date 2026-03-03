@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\PurchaseOrders\Tables;
 
+use App\Filament\Actions\ArchiveAction;
+use App\Filament\Filters\ArchivedFilter;
+use Filament\Actions\RestoreAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -16,11 +19,14 @@ class PurchaseOrdersTable
                 TextColumn::make('project.name')->label('Proyecto')->searchable()->sortable(),
                 TextColumn::make('created_at')->label('Creado el')->dateTime('d/m/Y H:i'),
             ])
-            ->filters([])
+            ->filters([
+                ArchivedFilter::make(),
+            ])
             ->recordActions([
                 \Filament\Actions\ViewAction::make(),
                 \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('purchase_orders.delete')),
+                RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('purchase_orders.restore')),
             ])
             ->toolbarActions([
                 \Filament\Actions\CreateAction::make(),
@@ -30,19 +36,28 @@ class PurchaseOrdersTable
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $orders = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($orders) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new class ($orders) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $orders;
-                            public function __construct($orders) { $this->orders = $orders; }
-                            public function collection() { return $this->orders->map(function($order) {
-                                return [
-                                    'N° de Orden' => $order->order_no,
-                                    'Descripción' => $order->description,
-                                    'Proyecto' => optional($order->project)->name,
-                                    'Creado el' => $order->created_at,
-                                ];
-                            }); }
-                            public function headings(): array { return ['N° de Orden', 'Descripción', 'Proyecto', 'Creado el']; }
-                        }, 'ordenes.xlsx');
+                            public function __construct($orders)
+                            {
+                                $this->orders = $orders; }
+                            public function collection()
+                            {
+                                return $this->orders->map(function ($order) {
+                                    return [
+                                        'N° de Orden' => $order->order_no,
+                                        'Descripción' => $order->description,
+                                        'Proyecto' => optional($order->project)->name,
+                                        'Creado el' => $order->created_at,
+                                    ];
+                                }); }
+                            public function headings(): array
+                            {
+                                return ['N° de Orden', 'Descripción', 'Proyecto', 'Creado el']; }
+                            },
+                            'ordenes.xlsx'
+                        );
                     }),
             ]);
     }

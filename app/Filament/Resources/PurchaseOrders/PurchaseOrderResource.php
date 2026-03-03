@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PurchaseOrderResource extends Resource
 {
@@ -61,6 +62,30 @@ class PurchaseOrderResource extends Resource
 
     public static function canAccess(): bool
     {
-        return true;
+        return currentUserHasPermission('purchase_orders.view');
+    }
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('purchase_orders.create');
+    }
+    public static function canUpdate(): bool
+    {
+        return currentUserHasPermission('purchase_orders.edit');
+    }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('purchase_orders.show');
+    }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('purchase_orders.delete');
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }
