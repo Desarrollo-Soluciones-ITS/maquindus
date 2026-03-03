@@ -145,7 +145,8 @@ class Permission extends Model
             'create',
             'edit',
             'delete',
-            'view'
+            'view',
+            'restore',
         ]
     ];
 

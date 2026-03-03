@@ -43,14 +43,8 @@ class AddNewModulePermissions extends Seeder
             'slug' => 'purchase_orders.restore'
         ]));
 
-        Role::where('name', 'Administrador')->first()->permissions()->attach(Permission::whereIn('slug', [
-            'users.update_password',
-            'purchase_orders.read',
-            'purchase_orders.create',
-            'purchase_orders.delete',
-            'purchase_orders.edit',
-            'purchase_orders.view',
-            'purchase_orders.restore',
-        ])->pluck('id')->toArray());
+        $adminRole = Role::where('name', 'Administrador')->first();
+        $purchaseOrderPermissions = Permission::where('slug', 'like', 'purchase_orders.%')->pluck('id')->toArray();
+        $adminRole->permissions()->syncWithoutDetaching($purchaseOrderPermissions);
     }
 }

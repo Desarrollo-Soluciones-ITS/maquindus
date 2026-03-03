@@ -16,8 +16,8 @@ class PurchaseOrdersTable
             ->columns([
                 TextColumn::make('order_no')->label('N° de Orden')->searchable()->sortable(),
                 TextColumn::make('description')->label('Descripción')->limit(40),
-                TextColumn::make('project.name')->label('Proyecto')->searchable()->sortable(),
                 TextColumn::make('created_at')->label('Creado el')->dateTime('d/m/Y H:i'),
+
             ])
             ->filters([
                 ArchivedFilter::make(),
@@ -48,13 +48,13 @@ class PurchaseOrdersTable
                                     return [
                                         'N° de Orden' => $order->order_no,
                                         'Descripción' => $order->description,
-                                        'Proyecto' => optional($order->project)->name,
                                         'Creado el' => $order->created_at,
                                     ];
                                 }); }
                             public function headings(): array
                             {
-                                return ['N° de Orden', 'Descripción', 'Proyecto', 'Creado el']; }
+                                return ['N° de Orden', 'Descripción', 'Creado el'];
+                            }
                             },
                             'ordenes.xlsx'
                         );
