@@ -268,7 +268,7 @@ class DocumentsTable
                                 return [
                                     'Nombre' => $doc->name,
                                     'Tipo de archivo' => optional($doc->current)->mime,
-                                    'Categoría' => $doc->category,
+                                    'Categoría' => $doc->category?->value,
                                     'Pertenece a' => optional($doc->documentable)->name,
                                     'Última versión' => $doc->current_created_at,
                                     'Fecha de revisión' => $doc->review_date,

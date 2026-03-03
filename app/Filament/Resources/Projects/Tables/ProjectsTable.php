@@ -97,7 +97,7 @@ class ProjectsTable
                                     'Código' => $project->code,
                                     'Nombre' => $project->name,
                                     'Fecha de inicio' => $project->start,
-                                    'Estado' => $project->status,
+                                    'Estado' => $project->status?->value,
                                     'Cliente' => optional($project->customer)->name,
                                     'Fecha' => $project->created_at,
                                 ];
