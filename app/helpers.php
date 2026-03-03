@@ -14,6 +14,7 @@ use App\Models\Part;
 use App\Models\Permission;
 use App\Models\Person;
 use App\Models\Project;
+use App\Models\PurchaseOrder;
 use App\Models\Role;
 use App\Models\State;
 use App\Models\Supplier;
@@ -100,6 +101,7 @@ if (!function_exists('model_to_spanish')) {
             State::class => 'Estado',
             Supplier::class => 'Proveedor',
             User::class => 'Usuario',
+            PurchaseOrder::class => 'Orden de Compra',
         };
 
         if (!$spanish)

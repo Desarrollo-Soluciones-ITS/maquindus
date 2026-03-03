@@ -41,7 +41,8 @@ class Permission extends Model
         'activities' => 'actividad',
         'files' => 'versión',
         'activity_logs' => 'bitácora',
-        'search' => 'buscador'
+        'search' => 'buscador',
+        'purchase_orders' => 'órden de compra',
     ];
 
     public static array $permissions = [
@@ -139,6 +140,13 @@ class Permission extends Model
             'open_in_folder',
             'show_file',
         ],
+        'purchase_orders' => [
+            'read',
+            'create',
+            'edit',
+            'delete',
+            'view'
+        ]
     ];
 
     public function roles()

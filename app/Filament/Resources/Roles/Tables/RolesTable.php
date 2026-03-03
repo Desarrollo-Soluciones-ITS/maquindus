@@ -189,6 +189,10 @@ class RolesTable
                                         }
                                     }
                                     if (!empty($options)) {
+                                        if ($groupLabel === 'órden de compra') {
+                                            $groupLabel = 'Órdenes de compra';
+                                        }
+
                                         $groups[$groupLabel] = CheckboxList::make("permissions_group_$key")
                                             ->label($groupLabel)
                                             ->selectAllAction(

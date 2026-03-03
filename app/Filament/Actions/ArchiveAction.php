@@ -88,31 +88,33 @@ class ArchiveAction
 
                         $record->delete();
                     } else {
-                        $documents = $record->documents()->get();
+                        if (method_exists($record, 'documents')) {
+                            $documents = $record->documents()->get();
 
-                        foreach ($documents as $document) {
-                            $files = $document->files()->get();
+                            foreach ($documents as $document) {
+                                $files = $document->files()->get();
 
-                            foreach ($files as $file) {
-                                $newPath = "Superado/{$file->path}";
-                                $oldPath = $file->path;
+                                foreach ($files as $file) {
+                                    $newPath = "Superado/{$file->path}";
+                                    $oldPath = $file->path;
 
-                                if (Storage::exists($newPath)) {
-                                    Notification::make()
-                                        ->title('No se pudo archivar el registro')
-                                        ->body("Ya existe un registro con esta ruta en la carpeta \"Superado\".")
-                                        ->danger()
-                                        ->send();
+                                    if (Storage::exists($newPath)) {
+                                        Notification::make()
+                                            ->title('No se pudo archivar el registro')
+                                            ->body("Ya existe un registro con esta ruta en la carpeta \"Superado\".")
+                                            ->danger()
+                                            ->send();
 
-                                    DB::rollBack();
-                                    return;
+                                        DB::rollBack();
+                                        return;
+                                    }
+
+                                    $file->update(['path' => $newPath]);
+                                    Storage::move($oldPath, $newPath);
                                 }
 
-                                $file->update(['path' => $newPath]);
-                                Storage::move($oldPath, $newPath);
+                                $document->delete();
                             }
-
-                            $document->delete();
                         }
 
                         $record->delete();
