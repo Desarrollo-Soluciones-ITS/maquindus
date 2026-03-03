@@ -37,11 +37,12 @@ class ProjectForm
                 DatePicker::make('end')
                     ->label('Fecha de finalización')
                     ->placeholder('Selecciona una fecha...')
-                    ->format('Y-m-d')
-                    ->displayFormat('d/m/Y')
-                    ->native(false)
-                    ->nullable()
-                    ->after('start'),
+                    ->format('Y-m-d'),
+                Select::make('purchaseOrders')
+                    ->label('Órdenes de compra vinculadas')
+                    ->relationship('purchaseOrders', 'order_no')
+                    ->multiple()
+                    ->searchable(),
                 Select::make('status')
                     ->label('Estado')
                     ->options(Status::options())

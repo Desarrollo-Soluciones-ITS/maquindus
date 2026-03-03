@@ -7,6 +7,7 @@ use App\Filament\Inputs\CodeInput;
 use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 
 class PartForm
@@ -35,6 +36,11 @@ class PartForm
                     ->keyPlaceholder('Ej. Material')
                     ->valuePlaceholder('Ej. Acero')
                     ->columnSpanFull(),
+                Select::make('purchaseOrders')
+                    ->label('Órdenes de compra vinculadas')
+                    ->relationship('purchaseOrders', 'order_no')
+                    ->multiple()
+                    ->searchable(),
             ]);
     }
 }

@@ -34,6 +34,6 @@ class ProjectInfolist
                     }),
                 TextEntry::make('about')
                     ->label('Descripción'),
-            ]);
+               ]);
     }
 }

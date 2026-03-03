@@ -60,6 +60,7 @@ class ProjectResource extends Resource
             'parts' => PartsRelationManager::class,
             'people' => PeopleRelationManager::class,
             'activities' => ActivitiesRelationManager::class,
+            'purchaseOrders' => \App\Filament\Resources\Projects\RelationManagers\PurchaseOrdersRelationManager::class,
         ];
     }
 

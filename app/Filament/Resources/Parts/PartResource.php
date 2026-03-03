@@ -58,6 +58,7 @@ class PartResource extends Resource
             'equipment' => EquipmentRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
+            'purchaseOrders' => \App\Filament\Resources\Parts\RelationManagers\PurchaseOrdersRelationManager::class,
         ];
     }
 

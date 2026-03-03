@@ -23,6 +23,7 @@ class EquipmentInfolist
                     ->label('Características')
                     ->keyLabel('Nombre')
                     ->columnSpanFull(),
+            
             ]);
     }
 }

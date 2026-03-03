@@ -23,6 +23,6 @@ class PartInfolist
                     ->label('Características')
                     ->keyLabel('Nombre')
                     ->columnSpanFull(),
-            ]);
+               ]);
     }
 }
