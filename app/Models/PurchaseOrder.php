@@ -15,11 +15,20 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'order_no',
         'description',
-        'project_id',
     ];
 
-    public function project(): BelongsTo
+    public function projects()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsToMany(Project::class, 'project_purchase_order');
+    }
+
+    public function equipment()
+    {
+        return $this->belongsToMany(Equipment::class, 'equipment_purchase_order');
+    }
+
+    public function parts()
+    {
+        return $this->belongsToMany(Part::class, 'part_purchase_order');
     }
 }

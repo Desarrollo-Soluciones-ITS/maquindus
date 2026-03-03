@@ -20,6 +20,12 @@ class Project extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
 
+    public function purchaseOrders()
+    {
+        return $this->belongsToMany(PurchaseOrder::class, 'project_purchase_order');
+    }
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
+
     protected static function booted()
     {
         static::created(function ($model) {

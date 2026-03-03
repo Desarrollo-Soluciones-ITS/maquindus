@@ -17,6 +17,12 @@ class Part extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
 
+    public function purchaseOrders()
+    {
+        return $this->belongsToMany(PurchaseOrder::class, 'part_purchase_order');
+    }
+    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
+
     protected static function booted()
     {
         static::created(function ($model) {
