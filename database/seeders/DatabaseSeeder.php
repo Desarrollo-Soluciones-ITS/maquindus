@@ -14,6 +14,7 @@ use Database\Seeders\PersonSeeder;
 use Database\Seeders\ProjectSeeder;
 use Database\Seeders\ActivitySeeder;
 use Database\Seeders\DocumentSeeder;
+use Database\Seeders\PurchaseOrderSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,7 +38,8 @@ class DatabaseSeeder extends Seeder
             DocumentSeeder::class,
             FileSeeder::class,
             RoleSeeder::class,
-            PermissionSeeder::class
+            PermissionSeeder::class,
+            PurchaseOrderSeeder::class,
         ]);
     }
 }
