@@ -47,6 +47,8 @@ class LatestProjects extends TableWidget
                         Status::Planning => 'primary',
                         Status::Ongoing => 'warning',
                         Status::Finished => 'success',
+                        Status::Posible => 'secondary',
+                        Status::awarded => 'danger',
                     }),
                 TextColumn::make('customer.name')
                     ->label('Cliente')

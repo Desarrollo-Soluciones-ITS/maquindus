@@ -31,6 +31,9 @@ class ProjectInfolist
                         Status::Planning => 'primary',
                         Status::Ongoing => 'warning',
                         Status::Finished => 'success',
+                        Status::Posible => 'secondary',
+                        Status::awarded => 'danger',
+
                     }),
                 TextEntry::make('about')
                     ->label('Descripción'),
