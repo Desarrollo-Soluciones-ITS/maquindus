@@ -7,6 +7,7 @@ use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\RelationManagers\PeopleRelationManager;
+use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
@@ -60,7 +61,7 @@ class ProjectResource extends Resource
             'parts' => PartsRelationManager::class,
             'people' => PeopleRelationManager::class,
             'activities' => ActivitiesRelationManager::class,
-            'purchaseOrders' => \App\Filament\Resources\Projects\RelationManagers\PurchaseOrdersRelationManager::class,
+            'purchaseOrders' => PurchaseOrdersRelationManager::class,
         ];
     }
 

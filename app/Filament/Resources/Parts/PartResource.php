@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Parts;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
+use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
 use App\Filament\RelationManagers\SuppliersRelationManager;
 use App\Filament\Resources\Parts\Pages\CreatePart;
 use App\Filament\Resources\Parts\Pages\EditPart;
@@ -58,7 +59,7 @@ class PartResource extends Resource
             'equipment' => EquipmentRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
-            'purchaseOrders' => \App\Filament\Resources\Parts\RelationManagers\PurchaseOrdersRelationManager::class,
+            'purchaseOrders' => PurchaseOrdersRelationManager::class,
         ];
     }
 

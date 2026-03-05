@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Equipment;
 
 use App\Filament\RelationManagers\DocumentsRelationManager;
+use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
@@ -58,7 +59,7 @@ class EquipmentResource extends Resource
             'parts' => PartsRelationManager::class,
             'projects' => ProjectsRelationManager::class,
             'suppliers' => SuppliersRelationManager::class,
-            'purchaseOrders' => \App\Filament\Resources\Equipment\RelationManagers\PurchaseOrdersRelationManager::class,
+            'purchaseOrders' => PurchaseOrdersRelationManager::class,
         ];
     }
 
