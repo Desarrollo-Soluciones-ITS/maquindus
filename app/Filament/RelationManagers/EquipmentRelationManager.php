@@ -4,18 +4,20 @@ namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
 use App\Filament\Actions\EditAction;
-use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
-use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\ViewAction;
+use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
+use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class EquipmentRelationManager extends RelationManager
 {
@@ -52,11 +54,6 @@ class EquipmentRelationManager extends RelationManager
                     EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit'))
                         ->mutateDataUsing(code_to_full(Prefix::Equipment)),
                     DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.unsync')),
-                ])
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-
                 ])
             ]);
     }

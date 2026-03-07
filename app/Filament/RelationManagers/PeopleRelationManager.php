@@ -7,6 +7,7 @@ use App\Filament\Actions\EditAction;
 use App\Filament\Resources\People\Schemas\PersonForm;
 use App\Filament\Resources\People\Schemas\PersonInfolist;
 use App\Filament\Resources\People\Tables\PeopleTable;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -17,6 +18,7 @@ use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class PeopleRelationManager extends RelationManager
 {
@@ -59,6 +61,30 @@ class PeopleRelationManager extends RelationManager
                 BulkActionGroup::make([
 
                 ]),
+                Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
+                        $fileName = "{$ownerName}-contactos.xlsx";
+                        $people = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($people) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $people;
+                            public function __construct($people) { $this->people = $people; }
+                            public function collection() { return $this->people->map(function($person) {
+                                return [
+                                    'Nombre' => $person->name,
+                                    'Apellido' => $person->surname,
+                                    'Correo' => $person->email,
+                                    'Teléfono' => $person->phone,
+                                    'Cargo' => $person->position,
+                                ];
+                            }); }
+                            public function headings(): array { return ['Nombre', 'Apellido', 'Correo', 'Teléfono', 'Cargo']; }
+                        }, $fileName);
+                    }),
             ]);
     }
 }

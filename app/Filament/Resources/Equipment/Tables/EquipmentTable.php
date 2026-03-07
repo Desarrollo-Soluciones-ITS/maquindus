@@ -49,27 +49,25 @@ class EquipmentTable
                 ])
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                ]),
+                BulkActionGroup::make([]),
                 \Filament\Actions\Action::make('export')
                     ->label('Exportar')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $equipments = $query->get();
+                        $fileName = 'equipos.xlsx';
+                        if (method_exists($livewire, 'getOwnerRecord')) {
+                            $ownerRecord = $livewire->getOwnerRecord();
+                            $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
+                            $fileName = "{$ownerName}-equipos.xlsx";
+                        }
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($equipments) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $equipments;
                             public function __construct($equipments) { $this->equipments = $equipments; }
-                            public function collection() { return $this->equipments->map(function($equipment) {
-                                return [
-                                    'Código' => $equipment->code,
-                                    'Nombre' => $equipment->name,
-                                    'Descripción' => $equipment->about,
-                                    'Fecha' => $equipment->created_at,
-                                ];
-                            }); }
+                            public function collection() { return $this->equipments->map(fn($equipment) => ['Código' => $equipment->code, 'Nombre' => $equipment->name, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
                             public function headings(): array { return ['Código', 'Nombre', 'Descripción', 'Fecha']; }
-                        }, 'equipos.xlsx');
+                        }, $fileName);
                     }),
             ]);
     }

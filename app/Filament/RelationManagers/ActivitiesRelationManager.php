@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Filters\DateFilter;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
@@ -16,6 +17,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -110,6 +112,32 @@ class ActivitiesRelationManager extends RelationManager
                     ViewAction::make()->hidden(!currentUserHasPermission('activities.show')),
                     EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('activities.edit')),
                 ])
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([]),
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery()->with('people');
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
+                        $fileName = "{$ownerName}-actividades.xlsx";
+                        $activities = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($activities) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $activities;
+                            public function __construct($activities) { $this->activities = $activities; }
+                            public function collection() { return $this->activities->map(function($activity) {
+                                return [
+                                    'Título' => $activity->title,
+                                    'Comentario' => $activity->comment,
+                                    'Participantes' => $activity->people->pluck('name')->join(', '),
+                                    'Fecha' => $activity->created_at,
+                                ];
+                            }); }
+                            public function headings(): array { return ['Título', 'Comentario', 'Participantes', 'Fecha']; }
+                        }, $fileName);
+                    }),
             ]);
     }
 }

@@ -49,27 +49,25 @@ class PartsTable
                 ])
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                ]),
+                BulkActionGroup::make([]),
                 \Filament\Actions\Action::make('export')
                     ->label('Exportar')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $parts = $query->get();
+                        $fileName = 'repuestos.xlsx';
+                        if (method_exists($livewire, 'getOwnerRecord')) {
+                            $ownerRecord = $livewire->getOwnerRecord();
+                            $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
+                            $fileName = "{$ownerName}-repuestos.xlsx";
+                        }
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($parts) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $parts;
                             public function __construct($parts) { $this->parts = $parts; }
-                            public function collection() { return $this->parts->map(function($part) {
-                                return [
-                                    'Código' => $part->code,
-                                    'Nombre' => $part->name,
-                                    'Descripción' => $part->about,
-                                    'Fecha' => $part->created_at,
-                                ];
-                            }); }
+                            public function collection() { return $this->parts->map(fn($part) => ['Código' => $part->code, 'Nombre' => $part->name, 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
                             public function headings(): array { return ['Código', 'Nombre', 'Descripción', 'Fecha']; }
-                        }, 'repuestos.xlsx');
+                        }, $fileName);
                     }),
             ]);
     }

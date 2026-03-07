@@ -7,6 +7,7 @@ use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -17,6 +18,7 @@ use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class SuppliersRelationManager extends RelationManager
 {
@@ -61,6 +63,29 @@ class SuppliersRelationManager extends RelationManager
                 BulkActionGroup::make([
 
                 ]),
+                Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
+                        $fileName = "{$ownerName}-proveedores.xlsx";
+                        $suppliers = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($suppliers) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $suppliers;
+                            public function __construct($suppliers) { $this->suppliers = $suppliers; }
+                            public function collection() { return $this->suppliers->map(function($supplier) {
+                                return [
+                                    'RIF' => $supplier->rif,
+                                    'Nombre' => $supplier->name,
+                                    'Correo' => $supplier->email,
+                                    'Teléfono' => $supplier->phone,
+                                ];
+                            }); }
+                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
+                        }, $fileName);
+                    }),
             ]);
     }
 }

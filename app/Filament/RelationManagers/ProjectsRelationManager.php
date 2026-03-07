@@ -8,6 +8,7 @@ use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -19,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 use Filament\Tables\Table;
 
 class ProjectsRelationManager extends RelationManager
@@ -106,7 +108,32 @@ class ProjectsRelationManager extends RelationManager
             ->toolbarActions([
                 BulkActionGroup::make([
 
-                ])
+                ]),
+                Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
+                        $fileName = "{$ownerName}-proyectos.xlsx";
+                        $projects = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($projects) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $projects;
+                            public function __construct($projects) { $this->projects = $projects; }
+                            public function collection() { return $this->projects->map(function($project) {
+                                return [
+                                    'Código' => $project->code,
+                                    'Nombre' => $project->name,
+                                    'Fecha de inicio' => $project->start,
+                                    'Estado' => $project->status?->value,
+                                    'Cliente' => optional($project->customer)->name,
+                                    'Fecha' => $project->created_at,
+                                ];
+                            }); }
+                            public function headings(): array { return ['Código', 'Nombre', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
+                        }, $fileName);
+                    }),
             ]);
     }
 }

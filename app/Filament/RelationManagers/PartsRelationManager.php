@@ -4,18 +4,20 @@ namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
 use App\Filament\Actions\EditAction;
-use App\Filament\Resources\Parts\Schemas\PartForm;
-use App\Filament\Resources\Parts\Schemas\PartInfolist;
 use App\Filament\Resources\Parts\Tables\PartsTable;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\ViewAction;
+use App\Filament\Resources\Parts\Schemas\PartForm;
+use App\Filament\Resources\Parts\Schemas\PartInfolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class PartsRelationManager extends RelationManager
 {
@@ -52,11 +54,6 @@ class PartsRelationManager extends RelationManager
                     EditAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.edit'))
                         ->mutateDataUsing(code_to_full(Prefix::Part)),
                     DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.unsync')),
-                ])
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-
                 ])
             ]);
     }
