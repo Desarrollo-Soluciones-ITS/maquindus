@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Equipment\RelationManagers;
+namespace App\Filament\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -13,7 +13,13 @@ class PurchaseOrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'purchaseOrders';
 
+<<<<<<< HEAD:app/Filament/Resources/Equipment/RelationManagers/PurchaseOrdersRelationManager.php
     protected static ?string $title = 'Órdenes de compra';
+=======
+    protected static ?string $recordTitleAttribute = 'order_no';
+
+    protected static ?string $title = 'Órdenes de Compra';
+>>>>>>> 7ef429d5478add2da5977c05a41a267d6e839ff6:app/Filament/RelationManagers/PurchaseOrdersRelationManager.php
 
     protected static ?string $modelLabel = 'orden de compra';
 

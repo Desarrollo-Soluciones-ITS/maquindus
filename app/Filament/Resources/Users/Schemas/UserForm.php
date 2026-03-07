@@ -6,6 +6,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 
 class UserForm
@@ -34,14 +35,14 @@ class UserForm
                             ->label('Rol')
                             ->relationship('role', 'name')
                             ->searchable()
-                            ->hidden(fn() => Auth()->user()->role->name !== 'Administrador'),
+                            ->hidden(fn() => optional(auth()->user()->role)->name !== 'Administrador'),
                     ]),
                 TextInput::make('password')
                     ->label('Contraseña')
                     ->placeholder('Escribe la contraseña')
                     ->password()
                     ->rules([Password::default(), 'confirmed'])
-                    ->required()
+                    ->required(fn($operation) => $operation === 'create')
                     ->revealable()
                     ->hidden(fn() => !currentUserHasPermission('users.update_password')),
                 TextInput::make('password_confirmation')
@@ -49,7 +50,7 @@ class UserForm
                     ->placeholder('Confirma la contraseña')
                     ->password()
                     ->rule(Password::default())
-                    ->required()
+                    ->required(fn($operation) => $operation === 'create')
                     ->revealable()
                     ->hidden(fn() => !currentUserHasPermission('users.update_password')),
             ]);
