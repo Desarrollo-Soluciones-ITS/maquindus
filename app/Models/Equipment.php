@@ -21,7 +21,51 @@ class Equipment extends Model
     {
         return $this->belongsToMany(PurchaseOrder::class, 'equipment_purchase_order');
     }
-    use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
+
+    public function supplierPurchaseOrders()
+    {
+        return $this->belongsToMany(SupplierPurchaseOrder::class, 'equipment_supplier_purchase_order');
+    }
+
+    public function dataSheets()
+    {
+        return $this->hasMany(EquipmentDataSheet::class);
+    }
+
+    public function blueprints()
+    {
+        return $this->hasMany(EquipmentBlueprint::class);
+    }
+
+    public function catalogs()
+    {
+        return $this->hasMany(EquipmentCatalog::class);
+    }
+
+    public function technicalSpecifications()
+    {
+        return $this->hasMany(EquipmentTechnicalSpecification::class);
+    }
+
+    public function standards()
+    {
+        return $this->hasMany(EquipmentStandard::class);
+    }
+
+    public function fieldQueries()
+    {
+        return $this->hasMany(EquipmentFieldQuery::class);
+    }
+
+    public function equipmentSpareParts()
+    {
+        return $this->hasMany(EquipmentSparePart::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(EquipmentReport::class);
+    }
 
     protected static function booted()
     {
@@ -36,25 +80,6 @@ class Equipment extends Model
         static::deleted(function ($model) {
             $model->removeFromSearchIndex();
         });
-    }
-
-    /**
-     * Additional attributes to ignore in the activity log.
-     */
-    protected $activityIgnoredAttributes = [
-        'details',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'details' => 'array',
-        ];
     }
 
     public function parts(): BelongsToMany

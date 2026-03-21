@@ -1,9 +1,8 @@
 # Base de conocimiento del proyecto
 
-- Estructura de códigos para Equipos, Repuestos y Proyectos
-  * EQ-XXX-2025-10-10-001
-  * RE-XXX-2025-10-10-001
-  * PR-XXX-2025-10-10-001
+- Estructura de códigos vigente
+  * Repuestos: RE-XXX-2025-10-10-001
+  * Equipos y proyectos ya no usan código propio; su identificación operativa se hace por nombre y relaciones
 
 - El acceso a los documentos debe hacerse de tres formas:
   * Previsualizacion sin descargar el documento

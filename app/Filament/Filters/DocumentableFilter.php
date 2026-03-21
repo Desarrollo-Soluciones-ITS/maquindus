@@ -35,17 +35,21 @@ class DocumentableFilter
                     })
                     ->getSearchResultsUsing(function (string $search, Get $get) {
                         $type = $get('documentable_type');
+                        $labelColumn = documentable_name_column($type);
+
                         return $type::query()
-                            ->where('name', 'like', "%{$search}%")
+                            ->where($labelColumn, 'like', "%{$search}%")
                             ->limit(10)
-                            ->pluck('name', 'id')
+                            ->pluck($labelColumn, 'id')
                             ->all();
                     })
                     ->getOptionLabelUsing(function ($value, Get $get) {
                         $type = $get('documentable_type');
+                        $labelColumn = documentable_name_column($type);
 
                         return $type::query()
-                            ->find($value, ['name']);
+                            ->find($value, [$labelColumn])
+                            ?->{$labelColumn};
                     }),
             ])
             ->query(function (Builder $query, array $data): Builder {
@@ -74,13 +78,14 @@ class DocumentableFilter
 
                 if ($hasType && $hasId) {
                     $id = $data['documentable_id'];
+                    $labelColumn = documentable_name_column($type);
 
-                    $record = $type::find($id, ['name']);
+                    $record = $type::find($id, [$labelColumn]);
 
                     if (!$record) return $indicators;
 
                     $model = model_to_spanish($type);
-                    $name = $record->name;
+                    $name = $record->{$labelColumn};
                     $label = "{$model} relacionado: {$name}";
 
                     $indicators[] = Indicator::make($label)

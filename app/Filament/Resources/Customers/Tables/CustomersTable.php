@@ -2,12 +2,9 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
-use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use App\Filament\Actions\EditAction;
-use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,6 +26,11 @@ class CustomersTable
                     ->label('Correo')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('projects.name')
+                    ->label('Proyectos relacionados')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(),
                 TextColumn::make('phone')
                     ->label('Teléfono')
                     ->searchable(),
@@ -39,9 +41,6 @@ class CustomersTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('customers.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('customers.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('customers.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('customers.restore')),
                 ])
             ])
             ->toolbarActions([
@@ -61,10 +60,11 @@ class CustomersTable
                                     'RIF' => $customer->rif,
                                     'Nombre' => $customer->name,
                                     'Correo' => $customer->email,
+                                    'Proyectos relacionados' => $customer->projects->pluck('name')->join(', '),
                                     'Teléfono' => $customer->phone,
                                 ];
                             }); }
-                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
+                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Proyectos relacionados', 'Teléfono']; }
                         }, 'clientes.xlsx');
                     }),
             ]);

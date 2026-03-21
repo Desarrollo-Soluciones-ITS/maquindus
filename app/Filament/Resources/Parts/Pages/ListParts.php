@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Parts\Pages;
 
 use App\Filament\Resources\Parts\PartResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListParts extends ListRecords
@@ -12,8 +11,6 @@ class ListParts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make()->hidden(!currentUserHasPermission('parts.create')),
-        ];
+        return [];
     }
 }

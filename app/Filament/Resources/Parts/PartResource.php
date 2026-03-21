@@ -7,8 +7,6 @@ use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
 use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
 use App\Filament\RelationManagers\SuppliersRelationManager;
-use App\Filament\Resources\Parts\Pages\CreatePart;
-use App\Filament\Resources\Parts\Pages\EditPart;
 use App\Filament\Resources\Parts\Pages\ListParts;
 use App\Filament\Resources\Parts\Pages\PartGallery;
 use App\Filament\Resources\Parts\Pages\ViewPart;
@@ -67,9 +65,7 @@ class PartResource extends Resource
     {
         return [
             'index' => ListParts::route('/'),
-            'create' => CreatePart::route('/create'),
             'view' => ViewPart::route('/{record}'),
-            'edit' => EditPart::route('/{record}/edit'),
             'gallery' => PartGallery::route('/{record}/gallery'),
         ];
     }
@@ -80,11 +76,11 @@ class PartResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return currentUserHasPermission('parts.create');
+        return false;
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('parts.edit');
+        return false;
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
@@ -92,7 +88,7 @@ class PartResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('parts.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

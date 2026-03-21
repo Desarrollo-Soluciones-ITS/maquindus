@@ -19,12 +19,21 @@ class EquipmentTable
     {
         return $table
             ->columns([
-                TextColumn::make('code')
-                    ->label('Código')
+                TextColumn::make('projects.name')
+                    ->label('Nombre proyecto')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(),
+                TextColumn::make('name')
+                    ->label('Nombre equipo')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('name')
-                    ->label('Nombre')
+                TextColumn::make('model')
+                    ->label('Modelo')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('serial')
+                    ->label('Serial')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('about')
@@ -65,8 +74,8 @@ class EquipmentTable
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($equipments) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $equipments;
                             public function __construct($equipments) { $this->equipments = $equipments; }
-                            public function collection() { return $this->equipments->map(fn($equipment) => ['Código' => $equipment->code, 'Nombre' => $equipment->name, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
-                            public function headings(): array { return ['Código', 'Nombre', 'Descripción', 'Fecha']; }
+                            public function collection() { return $this->equipments->map(fn($equipment) => ['Nombre proyecto' => $equipment->projects->pluck('name')->join(', '), 'Nombre equipo' => $equipment->name, 'Modelo' => $equipment->model, 'Serial' => $equipment->serial, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
+                            public function headings(): array { return ['Nombre proyecto', 'Nombre equipo', 'Modelo', 'Serial', 'Descripción', 'Fecha']; }
                         }, $fileName);
                     }),
             ]);

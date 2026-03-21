@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Documents;
 
+use App\Models\File;
 use Filament\Actions\Action;
-use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 
 class PreviewAction
@@ -13,18 +13,15 @@ class PreviewAction
         return Action::make('preview')
             ->label('Abrir archivo')
             ->icon(Heroicon::OutlinedEye)
-            ->action(function ($record, $livewire) {
+            ->url(function ($record): ?string {
                 $file = $record->current ?? $record;
-                try {
-                    $url = exec_url($file->path, endpoint: 'preview');
-                    $livewire->js("fetch('$url')");
-                } catch (\Throwable $th) {
-                    Notification::make()
-                        ->title('No se encontró el documento.')
-                        ->danger()
-                        ->send();
+
+                if (! $file instanceof File || blank($file->path)) {
+                    return null;
                 }
-            });
+
+                return route('files.preview', ['file' => $file]);
+            }, shouldOpenInNewTab: true);
 
     }
 }

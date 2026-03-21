@@ -2,7 +2,6 @@
 
 namespace App\Filament\RelationManagers;
 
-use App\Enums\Prefix;
 use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
 use Filament\Actions\Action;
@@ -44,16 +43,14 @@ class EquipmentRelationManager extends RelationManager
         return EquipmentTable::configure($table)
             ->filters([])
             ->headerActions([
-                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.create'))
-                    ->mutateDataUsing(code_to_full(Prefix::Equipment)),
-                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.sync')),
+                CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.create')),
+                AttachAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
-                    EditAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit'))
-                        ->mutateDataUsing(code_to_full(Prefix::Equipment)),
-                    DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.unsync')),
+                    EditAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
+                    DetachAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.unsync')),
                 ])
             ]);
     }

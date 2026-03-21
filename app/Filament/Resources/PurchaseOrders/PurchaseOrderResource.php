@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\PurchaseOrders;
 
-use App\Filament\Resources\PurchaseOrders\Pages\CreatePurchaseOrder;
-use App\Filament\Resources\PurchaseOrders\Pages\EditPurchaseOrder;
 use App\Filament\Resources\PurchaseOrders\Pages\ListPurchaseOrders;
 use App\Filament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
@@ -26,8 +24,8 @@ class PurchaseOrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'order_no';
 
-    protected static ?string $modelLabel = 'orden de compra';
-    protected static ?string $pluralModelLabel = 'órdenes de compra';
+    protected static ?string $modelLabel = 'orden de compra cliente';
+    protected static ?string $pluralModelLabel = 'órdenes de compra cliente';
     protected static ?int $navigationSort = 7;
 
     public static function form(Schema $schema): Schema
@@ -54,8 +52,6 @@ class PurchaseOrderResource extends Resource
     {
         return [
             'index' => ListPurchaseOrders::route('/'),
-            'create' => CreatePurchaseOrder::route('/create'),
-            'edit' => EditPurchaseOrder::route('/{record}/edit'),
             'view' => ViewPurchaseOrder::route('/{record}'),
         ];
     }
@@ -66,11 +62,11 @@ class PurchaseOrderResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return currentUserHasPermission('purchase_orders.create');
+        return false;
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('purchase_orders.edit');
+        return false;
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
@@ -78,7 +74,7 @@ class PurchaseOrderResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('purchase_orders.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

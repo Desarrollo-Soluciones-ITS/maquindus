@@ -19,7 +19,7 @@ class LatestEquipments extends TableWidget
         return Cache::remember('latest_equipments_widget', 120, function () {
             return Equipment::latest()
                 ->limit(5)
-                ->get(['id', 'code', 'about', 'name']);
+                ->get(['id', 'name', 'model', 'serial', 'type', 'about']);
         });
     }
 
@@ -32,10 +32,14 @@ class LatestEquipments extends TableWidget
                 fn(): Builder => Equipment::whereIn('id', $equipments->pluck('id'))
             )
             ->columns([
-                TextColumn::make('code')
-                    ->label('Código'),
                 TextColumn::make('name')
-                    ->label('Nombre'),
+                    ->label('Equipo'),
+                TextColumn::make('model')
+                    ->label('Modelo'),
+                TextColumn::make('serial')
+                    ->label('Serial'),
+                TextColumn::make('type')
+                    ->label('Tipo'),
                 TextColumn::make('about')
                     ->label('Descripción'),
             ])

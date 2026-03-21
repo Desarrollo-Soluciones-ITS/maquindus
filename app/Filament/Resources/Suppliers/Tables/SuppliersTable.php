@@ -3,11 +3,8 @@
 namespace App\Filament\Resources\Suppliers\Tables;
 
 use Filament\Actions\ActionGroup;
-use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\BulkActionGroup;
-use App\Filament\Actions\EditAction;
-use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,6 +26,16 @@ class SuppliersTable
                     ->label('Correo')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('equipment.name')
+                    ->label('Equipos relacionados')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(),
+                TextColumn::make('parts.name')
+                    ->label('Repuestos relacionados')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')
                     ->label('Teléfono')
                     ->searchable(),
@@ -39,9 +46,6 @@ class SuppliersTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('suppliers.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('suppliers.restore')),
                 ])
             ])
             ->toolbarActions([
@@ -61,10 +65,12 @@ class SuppliersTable
                                     'RIF' => $supplier->rif,
                                     'Nombre' => $supplier->name,
                                     'Correo' => $supplier->email,
+                                    'Equipos relacionados' => $supplier->equipment->pluck('name')->join(', '),
+                                    'Repuestos relacionados' => $supplier->parts->pluck('name')->join(', '),
                                     'Teléfono' => $supplier->phone,
                                 ];
                             }); }
-                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
+                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono']; }
                         }, 'proveedores.xlsx');
                     }),
             ]);

@@ -75,7 +75,7 @@ class DocumentResource extends Resource
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('documents.edit');
+        return false;
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
@@ -83,7 +83,7 @@ class DocumentResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('documents.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

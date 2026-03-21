@@ -12,18 +12,8 @@ use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
 use App\Filament\RelationManagers\DocumentsRelationManager;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
-use App\Filament\Resources\Equipment\Pages\ViewEquipment;
-use App\Filament\Resources\Parts\Pages\ViewPart;
-use App\Filament\Resources\People\Pages\ViewPerson;
-use App\Filament\Resources\Projects\Pages\ViewProject;
-use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
-use App\Models\Customer;
 use App\Models\Equipment;
 use App\Models\Part;
-use App\Models\Person;
-use App\Models\Project;
-use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -70,26 +60,7 @@ class DocumentsTable
                         return "($spanish) $state";
                     })
                     ->color(Color::Blue)
-                    ->url(function (Model $record) {
-                        $class = $record->documentable ? $record->documentable::class : null;
-
-                        if (empty($class)) {
-                            return null;
-                        }
-
-                        $page = match ($class) {
-                            Part::class => ViewPart::class,
-                            Person::class => ViewPerson::class,
-                            Project::class => ViewProject::class,
-                            Supplier::class => ViewSupplier::class,
-                            Customer::class => ViewCustomer::class,
-                            Equipment::class => ViewEquipment::class,
-                        };
-
-                        return $page::getUrl([
-                            'record' => $record->documentable->id
-                        ]);
-                    }),
+                    ->url(fn(Model $record) => documentable_view_url($record->documentable)),
                 TextColumn::make('current_created_at')
                     ->label('Última versión')
                     ->sortable(
@@ -225,9 +196,9 @@ class DocumentsTable
                             }),
                         ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.edit')),
+                    EditAction::make()->hidden(fn($livewire, $record) => !managed_from_equipment($livewire) || $record->trashed() || !currentUserHasPermission('documents.edit')),
                     ArchiveAction::make()
-                        ->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('documents.delete'))
+                        ->hidden(fn($livewire, $record) => !managed_from_equipment($livewire) || $record->trashed() || !currentUserHasPermission('documents.delete'))
                         ->before(function (Action $action, Model $record) {
                             if (empty($record)) {
                                 Notification::make()
@@ -251,7 +222,7 @@ class DocumentsTable
                                 $action->halt();
                             }
                         }),
-                    RestoreAction::make()->hidden(fn($record) => $record->documentable && $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
+                    RestoreAction::make()->hidden(fn($livewire, $record) => !managed_from_equipment($livewire) || $record->documentable && $record->documentable->trashed() || !$record->trashed() || !currentUserHasPermission('documents.restore')),
                 ])
             ])
             ->toolbarActions([

@@ -11,10 +11,10 @@ trait Searchable
         return [
             'App\Models\Customer' => ['rif', 'name', 'email', 'phone', 'about', 'address'],
             'App\Models\Document' => ['name', 'category'],
-            'App\Models\Equipment' => ['name', 'code', 'about', 'details'],
+            'App\Models\Equipment' => ['name', 'model', 'serial', 'type', 'year', 'about'],
             'App\Models\Part' => ['name', 'code', 'details', 'about'],
             'App\Models\Person' => ['name', 'email', 'address', 'phone', 'position'],
-            'App\Models\Project' => ['name', 'code', 'about', 'status'],
+            'App\Models\Project' => ['name', 'about', 'status'],
             'App\Models\Supplier' => ['rif', 'name', 'email', 'phone', 'about', 'address'],
             'App\Models\User' => ['name', 'email'],
         ];

@@ -2,10 +2,8 @@
 
 namespace App\Filament\Resources\Projects\Pages;
 
-use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Resources\Projects\ProjectResource;
-use App\Services\Code;
 use App\Filament\Actions\RestoreAction;
 use App\Traits\PreventsEditingTrashed;
 use Filament\Actions\ViewAction;
@@ -25,12 +23,6 @@ class EditProject extends EditRecord
             ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
             RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
         ];
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data['code'] = Code::full($data['code'], Prefix::Project);
-        return $data;
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model

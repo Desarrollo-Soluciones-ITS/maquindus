@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Suppliers\Pages;
 
 use App\Filament\Resources\Suppliers\SupplierResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListSuppliers extends ListRecords
@@ -12,8 +11,6 @@ class ListSuppliers extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make()->hidden(!currentUserHasPermission('suppliers.create')),
-        ];
+        return [];
     }
 }

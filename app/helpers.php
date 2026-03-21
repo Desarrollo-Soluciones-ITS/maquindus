@@ -2,13 +2,26 @@
 
 use App\Enums\Prefix;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
+use App\Filament\Resources\Equipment\Pages\ViewEquipment;
+use App\Filament\Resources\Parts\Pages\ViewPart;
+use App\Filament\Resources\People\Pages\ViewPerson;
+use App\Filament\Resources\Projects\Pages\ViewProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Activity;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Document;
 use App\Models\Equipment;
+use App\Models\EquipmentBlueprint;
+use App\Models\EquipmentCatalog;
+use App\Models\EquipmentDataSheet;
+use App\Models\EquipmentFieldQuery;
+use App\Models\EquipmentReport;
+use App\Models\EquipmentSparePart;
+use App\Models\EquipmentStandard;
+use App\Models\EquipmentTechnicalSpecification;
 use App\Models\File;
 use App\Models\Part;
 use App\Models\Permission;
@@ -22,6 +35,7 @@ use App\Models\User;
 use App\Services\Code;
 use Filament\Resources\RelationManagers\RelationManager;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -85,34 +99,84 @@ if (!function_exists('check_solidworks')) {
 if (!function_exists('model_to_spanish')) {
     function model_to_spanish(string $model, $plural = false)
     {
-        $spanish = match ($model) {
+        $singularMap = [
             Activity::class => 'Actividad',
             City::class => 'Ciudad',
             Country::class => 'País',
             Customer::class => 'Cliente',
             Document::class => 'Documento',
             Equipment::class => 'Equipo',
+            EquipmentBlueprint::class => 'Plano',
+            EquipmentCatalog::class => 'Catálogo',
+            EquipmentDataSheet::class => 'Hoja de datos',
+            EquipmentFieldQuery::class => 'Consulta de campo',
+            EquipmentReport::class => 'Reporte',
+            EquipmentSparePart::class => 'Repuesto',
+            EquipmentStandard::class => 'Norma',
+            EquipmentTechnicalSpecification::class => 'Especificación técnica',
             File::class => 'Archivo',
             Part::class => 'Repuesto',
             Permission::class => 'Permiso',
             Person::class => 'Contacto',
             Project::class => 'Proyecto',
+            PurchaseOrder::class => 'Orden de compra cliente',
             Role::class => 'Rol',
             State::class => 'Estado',
             Supplier::class => 'Proveedor',
             User::class => 'Usuario',
-            PurchaseOrder::class => 'Orden de Compra',
-        };
+        ];
 
-        if (!$spanish)
+        $pluralMap = [
+            Activity::class => 'Actividades',
+            City::class => 'Ciudades',
+            Country::class => 'Países',
+            Customer::class => 'Clientes',
+            Document::class => 'Documentos',
+            Equipment::class => 'Equipos',
+            EquipmentBlueprint::class => 'Planos',
+            EquipmentCatalog::class => 'Catálogos',
+            EquipmentDataSheet::class => 'Hojas de datos',
+            EquipmentFieldQuery::class => 'Consultas de campo',
+            EquipmentReport::class => 'Reportes',
+            EquipmentSparePart::class => 'Repuestos',
+            EquipmentStandard::class => 'Normas',
+            EquipmentTechnicalSpecification::class => 'Especificaciones técnicas',
+            File::class => 'Archivos',
+            Part::class => 'Repuestos',
+            Permission::class => 'Permisos',
+            Person::class => 'Contactos',
+            Project::class => 'Proyectos',
+            PurchaseOrder::class => 'Órdenes de compra cliente',
+            Role::class => 'Roles',
+            State::class => 'Estados',
+            Supplier::class => 'Proveedores',
+            User::class => 'Usuarios',
+        ];
+
+        $spanish = $plural ? ($pluralMap[$model] ?? null) : ($singularMap[$model] ?? null);
+
+        if (!$spanish) {
             return null;
-        if (!$plural)
-            return $spanish;
+        }
 
-        $str = str($spanish);
-        $last = $str->charAt($str->length() - 1);
-        $suffix = $last === 'd' || $last === 'r' || $last === 'l' ? 'es' : 's';
-        return $str->append($suffix);
+        return $spanish;
+    }
+}
+
+if (!function_exists('documentable_name_column')) {
+    function documentable_name_column(string $model): string
+    {
+        return match ($model) {
+            EquipmentDataSheet::class => 'sheet_number',
+            EquipmentBlueprint::class => 'name',
+            EquipmentCatalog::class => 'name',
+            EquipmentTechnicalSpecification::class => 'revision_name',
+            EquipmentStandard::class => 'name',
+            EquipmentFieldQuery::class => 'document_name',
+            EquipmentSparePart::class => 'part_number',
+            EquipmentReport::class => 'document_name',
+            default => 'name',
+        };
     }
 }
 
@@ -202,7 +266,20 @@ if (!function_exists('get_activity_color')) {
 if (!function_exists('hasPermission')) {
     function currentUserHasPermission(string $permission)
     {
-        return auth()->user()->hasPermission($permission);
+        return Auth::user()?->hasPermission($permission) ?? false;
+    }
+}
+
+if (!function_exists('currentUserHasAnyPermission')) {
+    function currentUserHasAnyPermission(array|string $permissions): bool
+    {
+        foreach ((array) $permissions as $permission) {
+            if (currentUserHasPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
@@ -217,7 +294,15 @@ if (!function_exists('code_to_full')) {
     function code_to_full(Prefix $prefix)
     {
         return function ($data) use ($prefix) {
-            $data['code'] = Code::full($data['code'], $prefix);
+            $value = $data['code'] ?? null;
+
+            if (!filled($value)) {
+                $data['code'] = null;
+
+                return $data;
+            }
+
+            $data['code'] = Code::full($value, $prefix);
             return $data;
         };
     }
@@ -234,6 +319,22 @@ if (!function_exists('is_view_customer')) {
     }
 }
 
+if (!function_exists('relation_manager_owner_is_equipment')) {
+    function relation_manager_owner_is_equipment(RelationManager $livewire): bool
+    {
+        return method_exists($livewire, 'getOwnerRecord')
+            && $livewire->getOwnerRecord() instanceof Equipment;
+    }
+}
+
+if (!function_exists('managed_from_equipment')) {
+    function managed_from_equipment(mixed $livewire): bool
+    {
+        return $livewire instanceof RelationManager
+            && relation_manager_owner_is_equipment($livewire);
+    }
+}
+
 if (!function_exists('documentables')) {
     function documentables()
     {
@@ -244,7 +345,42 @@ if (!function_exists('documentables')) {
             Customer::class,
             Part::class,
             Supplier::class,
+            EquipmentDataSheet::class,
+            EquipmentBlueprint::class,
+            EquipmentCatalog::class,
+            EquipmentTechnicalSpecification::class,
+            EquipmentStandard::class,
+            EquipmentFieldQuery::class,
+            EquipmentSparePart::class,
+            EquipmentReport::class,
         ]);
+    }
+}
+
+if (!function_exists('documentable_view_url')) {
+    function documentable_view_url(?Model $documentable): ?string
+    {
+        if (!$documentable) {
+            return null;
+        }
+
+        return match ($documentable::class) {
+            Part::class => ViewPart::getUrl(['record' => $documentable->id]),
+            Person::class => ViewPerson::getUrl(['record' => $documentable->id]),
+            Project::class => ViewProject::getUrl(['record' => $documentable->id]),
+            Supplier::class => ViewSupplier::getUrl(['record' => $documentable->id]),
+            Customer::class => ViewCustomer::getUrl(['record' => $documentable->id]),
+            Equipment::class => ViewEquipment::getUrl(['record' => $documentable->id]),
+            EquipmentDataSheet::class,
+            EquipmentBlueprint::class,
+            EquipmentCatalog::class,
+            EquipmentTechnicalSpecification::class,
+            EquipmentStandard::class,
+            EquipmentFieldQuery::class,
+            EquipmentSparePart::class,
+            EquipmentReport::class => ViewEquipment::getUrl(['record' => $documentable->equipment_id]),
+            default => null,
+        };
     }
 }
 

@@ -79,12 +79,14 @@ Almacena las personas que están relacionadas con los clientes, proveedores o pr
 
 ## Equipos (equipment)
 
-Almacena cada modelo de equipo con el cual trabaja Maquindus. Cabe destacar que almacena un **MODELO** de un equipo, no un **EJEMPLAR** de un equipo
+Almacena cada equipo gestionado por Maquindus y funciona como entidad principal del sistema
 
 - **name**: Nombre del equipo (único)
-- **code**: Código del equipo (único), formato: EQ-ABC-2025-11-11-001
+- **model**: Modelo del equipo
+- **serial**: Serial del equipo
+- **type**: Tipo de equipo
+- **year**: Año del equipo
 - **about**: Descripción corta del equipo
-- **details**: Ficha técnica del equipo (número ilimitado de características con su nombre y valor)
 
 ## Repuesto (parts)
 
@@ -100,8 +102,6 @@ Almacena cada modelo de repuesto con el cual trabaja Maquindus. Cabe destacar qu
 Almacena los proyectos realizados por Maquindus a clientes
 
 - **name**: Nombre del proyecto
-- **code**: Código del proyecto (único), formato:
-PR-ABC-2025-11-11-001
 - **about**: Descripción del proyecto (opcional)
 - **start**: Fecha de inicio
 - **end**: Fecha de finalización (opcional)

@@ -22,7 +22,7 @@ class LatestProjects extends TableWidget
         return Cache::remember('latest_projects_widget', 120, function () {
             return Project::latest()
                 ->limit(5)
-                ->get(['id', 'code', 'name', 'status', 'customer_id', 'created_at']);
+                ->get(['id', 'name', 'status', 'customer_id', 'created_at']);
         });
     }
 
@@ -36,8 +36,6 @@ class LatestProjects extends TableWidget
                     ->whereIn('id', $projects->pluck('id'))
             )
             ->columns([
-                TextColumn::make('code')
-                    ->label('Código'),
                 TextColumn::make('name')
                     ->label('Nombre'),
                 TextColumn::make('status')

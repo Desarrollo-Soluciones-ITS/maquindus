@@ -14,8 +14,6 @@ class ProjectInfolist
             ->components([
                 TextEntry::make('name')
                     ->label('Nombre'),
-                TextEntry::make('code')
-                    ->label('Código'),
                 TextEntry::make('customer.name')
                     ->label('Cliente'),
                 TextEntry::make('start')
@@ -33,7 +31,7 @@ class ProjectInfolist
                         Status::Finished => 'success',
                         Status::Posible => 'secondary',
                         Status::awarded => 'danger',
-
+                        default => 'secondary',
                     }),
                 TextEntry::make('about')
                     ->label('Descripción'),

@@ -5,8 +5,6 @@ namespace App\Filament\Resources\Suppliers;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
-use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
-use App\Filament\Resources\Suppliers\Pages\EditSupplier;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
@@ -64,9 +62,7 @@ class SupplierResource extends Resource
     {
         return [
             'index' => ListSuppliers::route('/'),
-            'create' => CreateSupplier::route('/create'),
             'view' => ViewSupplier::route('/{record}'),
-            'edit' => EditSupplier::route('/{record}/edit'),
         ];
     }
 
@@ -76,11 +72,11 @@ class SupplierResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return currentUserHasPermission('suppliers.create');
+        return false;
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('suppliers.edit');
+        return false;
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
@@ -88,7 +84,7 @@ class SupplierResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('suppliers.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

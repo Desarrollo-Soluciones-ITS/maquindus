@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
-use App\Enums\Prefix;
 use App\Enums\Status;
-use App\Filament\Inputs\CodeInput;
 use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -25,7 +23,6 @@ class ProjectForm
                     ->maxLength(80)
                     ->unique()
                     ->required(),
-                CodeInput::make(Prefix::Project),
                 DatePicker::make('start')
                     ->label('Fecha de inicio')
                     ->placeholder('Selecciona una fecha...')
@@ -39,19 +36,17 @@ class ProjectForm
                     ->placeholder('Selecciona una fecha...')
                     ->format('Y-m-d'),
                 Select::make('purchaseOrders')
-                    ->label('Órdenes de compra vinculadas')
+                    ->label('Órdenes de compra cliente')
                     ->relationship('purchaseOrders', 'order_no')
                     ->multiple()
                     ->searchable(),
                 Select::make('status')
                     ->label('Estado')
-                    ->options(Status::options())
-                    ->required(),
+                    ->options(Status::options()),
                 Select::make('customer_id')
                     ->label('Cliente')
                     ->relationship('customer', 'name')
-                    ->hidden(fn($livewire) => $livewire instanceof RelationManager)
-                    ->required(),
+                    ->hidden(fn($livewire) => $livewire instanceof RelationManager),
                 TextInput::make('about')
                     ->label('Descripción')
                     ->placeholder('Proyecto piloto para nueva línea')

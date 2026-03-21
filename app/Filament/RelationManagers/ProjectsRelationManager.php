@@ -2,7 +2,6 @@
 
 namespace App\Filament\RelationManagers;
 
-use App\Enums\Prefix;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\EditAction;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
@@ -57,8 +56,6 @@ class ProjectsRelationManager extends RelationManager
                             // ignore logging failures
                         }
 
-                        $data = (code_to_full(Prefix::Project))($data);
-
                         // Normalize date formats: convert d/m/Y (display) to Y-m-d (storage)
                         if (!empty($data['start']) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data['start'])) {
                             try {
@@ -91,18 +88,17 @@ class ProjectsRelationManager extends RelationManager
 
                         return $data;
                     })
-                    ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.create')),
-                AttachAction::make()->hidden(is_view_customer() || !currentUserHasPermission('projects.sync')),
+                    ->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.create')),
+                AttachAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || is_view_customer()($this) || !currentUserHasPermission('projects.sync')),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-                    EditAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.edit'))
-                        ->mutateDataUsing(code_to_full(Prefix::Project)),
+                    EditAction::make()->hidden(fn($record) => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.edit')),
                     DetachAction::make()
-                        ->hidden(is_view_customer() || !currentUserHasPermission('projects.unsync')),
-                    ArchiveAction::make()->hidden(fn($record) => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.restore')),
+                        ->hidden(fn() => !relation_manager_owner_is_equipment($this) || is_view_customer()($this) || !currentUserHasPermission('projects.unsync')),
+                    ArchiveAction::make()->hidden(fn($record) => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.delete')),
+                    RestoreAction::make()->hidden(fn($record) => !relation_manager_owner_is_equipment($this) || !$this->getOwnerRecord()->trashed() || !currentUserHasPermission('projects.restore')),
                 ])
             ])
             ->toolbarActions([
@@ -123,7 +119,6 @@ class ProjectsRelationManager extends RelationManager
                             public function __construct($projects) { $this->projects = $projects; }
                             public function collection() { return $this->projects->map(function($project) {
                                 return [
-                                    'Código' => $project->code,
                                     'Nombre' => $project->name,
                                     'Fecha de inicio' => $project->start,
                                     'Estado' => $project->status?->value,
@@ -131,7 +126,7 @@ class ProjectsRelationManager extends RelationManager
                                     'Fecha' => $project->created_at,
                                 ];
                             }); }
-                            public function headings(): array { return ['Código', 'Nombre', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
+                            public function headings(): array { return ['Nombre', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
                         }, $fileName);
                     }),
             ]);

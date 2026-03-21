@@ -11,9 +11,8 @@ class PurchaseOrderInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('order_no')->label('N° de Orden'),
+                TextEntry::make('order_no')->label('Código de orden'),
                 TextEntry::make('description')->label('Descripción'),
-                TextEntry::make('project.name')->label('Proyecto'),
                 TextEntry::make('created_at')->label('Creado el'),
                 TextEntry::make('updated_at')->label('Actualizado el'),
             ]);

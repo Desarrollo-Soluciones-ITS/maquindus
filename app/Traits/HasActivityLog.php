@@ -10,7 +10,11 @@ trait HasActivityLog
     public static function bootHasActivityLog()
     {
         static::updating(function ($model) {
-            if ($model->isDirty('code')) {
+            $currentAttributes = $model->getAttributes();
+            $originalAttributes = $model->getOriginal();
+            $hasCodeAttribute = array_key_exists('code', $currentAttributes) || array_key_exists('code', $originalAttributes);
+
+            if ($hasCodeAttribute && $model->isDirty('code')) {
                 $spanishPlural = model_to_spanish($model::class, plural: true);
                 $fieldsToIgnore = ['id', 'created_at', 'updated_at'];
 

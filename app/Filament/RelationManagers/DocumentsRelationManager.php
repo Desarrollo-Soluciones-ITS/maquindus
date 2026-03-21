@@ -50,7 +50,7 @@ class DocumentsRelationManager extends RelationManager
                     ->with(['documentable' => fn($query) => $query->withTrashed()]);
             })
             ->headerActions([
-                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('documents.create')),
+                CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('documents.create')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

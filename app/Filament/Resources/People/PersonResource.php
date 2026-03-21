@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\People;
 
 use App\Filament\RelationManagers\DocumentsRelationManager;
-use App\Filament\Resources\People\Pages\CreatePerson;
-use App\Filament\Resources\People\Pages\EditPerson;
 use App\Filament\Resources\People\Pages\ListPeople;
 use App\Filament\Resources\People\Pages\ViewPerson;
 use App\Filament\Resources\People\Schemas\PersonForm;
@@ -61,9 +59,7 @@ class PersonResource extends Resource
     {
         return [
             'index' => ListPeople::route('/'),
-            'create' => CreatePerson::route('/create'),
             'view' => ViewPerson::route('/{record}'),
-            'edit' => EditPerson::route('/{record}/edit'),
         ];
     }
 
@@ -73,11 +69,11 @@ class PersonResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return currentUserHasPermission('people.create');
+        return false;
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('people.edit');
+        return false;
     }
     public static function canView(Model $record): bool
     {
@@ -85,7 +81,7 @@ class PersonResource extends Resource
     }
     public static function canDelete(Model $record): bool
     {
-        return currentUserHasPermission('people.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

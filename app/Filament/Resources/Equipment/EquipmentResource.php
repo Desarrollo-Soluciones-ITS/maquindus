@@ -2,15 +2,18 @@
 
 namespace App\Filament\Resources\Equipment;
 
-use App\Filament\RelationManagers\DocumentsRelationManager;
-use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
+use App\Filament\RelationManagers\BlueprintsRelationManager;
+use App\Filament\RelationManagers\CatalogsRelationManager;
+use App\Filament\RelationManagers\DataSheetsRelationManager;
+use App\Filament\RelationManagers\EquipmentSparePartsRelationManager;
+use App\Filament\RelationManagers\FieldQueriesRelationManager;
+use App\Filament\RelationManagers\ReportsRelationManager;
+use App\Filament\RelationManagers\StandardsRelationManager;
+use App\Filament\RelationManagers\TechnicalSpecificationsRelationManager;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
 use App\Filament\Resources\Equipment\Pages\ViewEquipment;
-use App\Filament\RelationManagers\PartsRelationManager;
-use App\Filament\RelationManagers\ProjectsRelationManager;
-use App\Filament\RelationManagers\SuppliersRelationManager;
 use App\Filament\Resources\Equipment\Pages\EquipmentGallery;
 use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
 use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
@@ -18,6 +21,7 @@ use App\Filament\Resources\Equipment\Tables\EquipmentTable;
 use App\Models\Equipment;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -55,11 +59,16 @@ class EquipmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            'documents' => DocumentsRelationManager::class,
-            'parts' => PartsRelationManager::class,
-            'projects' => ProjectsRelationManager::class,
-            'suppliers' => SuppliersRelationManager::class,
-            'purchaseOrders' => PurchaseOrdersRelationManager::class,
+            RelationGroup::make('Especificación técnica', [
+                DataSheetsRelationManager::class,
+                BlueprintsRelationManager::class,
+                CatalogsRelationManager::class,
+                TechnicalSpecificationsRelationManager::class,
+                StandardsRelationManager::class,
+            ]),
+            'fieldQueries' => FieldQueriesRelationManager::class,
+            'equipmentSpareParts' => EquipmentSparePartsRelationManager::class,
+            'reports' => ReportsRelationManager::class,
         ];
     }
 

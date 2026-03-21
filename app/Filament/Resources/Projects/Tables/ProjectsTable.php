@@ -3,14 +3,11 @@
 namespace App\Filament\Resources\Projects\Tables;
 
 use App\Enums\Status;
-use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use App\Filament\Actions\EditAction;
-use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
@@ -23,14 +20,15 @@ class ProjectsTable
     {
         return $table
             ->columns([
-                TextColumn::make('code')
-                    ->label('Código')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('equipment.name')
+                    ->label('Equipos relacionados')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(),
                 TextColumn::make('start')
                     ->label('Fecha de inicio')
                     ->sortable()
@@ -45,6 +43,7 @@ class ProjectsTable
                         Status::Finished => 'success',
                         Status::Posible => 'secondary',
                         Status::awarded => 'danger',
+                        default => 'secondary',
                     }),
                 TextColumn::make('customer.name')
                     ->label('Cliente')
@@ -77,9 +76,6 @@ class ProjectsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('projects.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('projects.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('projects.restore')),
                 ]),
             ])
             ->toolbarActions([
@@ -96,15 +92,15 @@ class ProjectsTable
                             public function __construct($projects) { $this->projects = $projects; }
                             public function collection() { return $this->projects->map(function($project) {
                                 return [
-                                    'Código' => $project->code,
                                     'Nombre' => $project->name,
+                                    'Equipos relacionados' => $project->equipment->pluck('name')->join(', '),
                                     'Fecha de inicio' => $project->start,
                                     'Estado' => $project->status?->value,
                                     'Cliente' => optional($project->customer)->name,
                                     'Fecha' => $project->created_at,
                                 ];
                             }); }
-                            public function headings(): array { return ['Código', 'Nombre', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
+                            public function headings(): array { return ['Nombre', 'Equipos relacionados', 'Fecha de inicio', 'Estado', 'Cliente', 'Fecha']; }
                         }, 'proyectos.xlsx');
                     }),
             ]);

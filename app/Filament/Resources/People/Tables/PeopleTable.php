@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\People\Tables;
 
-use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
@@ -10,8 +9,6 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use App\Filament\Actions\EditAction;
-use App\Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +38,11 @@ class PeopleTable
                     ->label('Cargo')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('projects.name')
+                    ->label('Proyectos relacionados')
+                    ->badge()
+                    ->separator(', ')
+                    ->toggleable(),
                 TextColumn::make('personable.name')
                     ->label('Empresa')
                     ->searchable()
@@ -107,9 +109,6 @@ class PeopleTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
-                    EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.edit')),
-                    ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('people.delete')),
-                    RestoreAction::make()->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('people.restore')),
                 ])
             ])
             ->toolbarActions([

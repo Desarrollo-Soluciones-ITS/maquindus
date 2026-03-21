@@ -13,15 +13,15 @@ class PurchaseOrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'purchaseOrders';
 
-    protected static ?string $title = 'Órdenes de compra';
+    protected static ?string $title = 'Órdenes de compra cliente';
 
-    protected static ?string $modelLabel = 'orden de compra';
+    protected static ?string $modelLabel = 'orden de compra cliente';
 
     public function table(Tables\Table $table): Tables\Table
     {
         return $table
             ->columns([
-                TextColumn::make('order_no')->label('N° de Orden'),
+                TextColumn::make('order_no')->label('Código de orden'),
                 TextColumn::make('description')->label('Descripción'),
                 TextColumn::make('created_at')->label('Creado el')->dateTime(),
             ])
@@ -40,11 +40,11 @@ class PurchaseOrdersRelationManager extends RelationManager
                             protected $orders;
                             public function __construct($orders) { $this->orders = $orders; }
                             public function collection() { return $this->orders->map(fn($order) => [
-                                'N° de Orden' => $order->order_no,
+                                'Código de orden' => $order->order_no,
                                 'Descripción' => $order->description,
                                 'Creado el' => $order->created_at,
                             ]); }
-                            public function headings(): array { return ['N° de Orden', 'Descripción', 'Creado el']; }
+                            public function headings(): array { return ['Código de orden', 'Descripción', 'Creado el']; }
                         }, $fileName);
                     }),
             ]);

@@ -66,7 +66,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function hasPermission(string $name): bool
     {
-        $permission = $this->role->permissions
+        $permission = $this->role?->permissions
             ->first(fn($perm) => $perm->slug === $name);
 
         return !!$permission;

@@ -15,11 +15,10 @@ class PurchaseOrderForm
         return $schema
             ->components([
                 TextInput::make('order_no')
-                    ->label('N° de Orden')
-                    ->placeholder('Ej. OC-001')
+                    ->label('Código de orden')
+                    ->placeholder('Ej. OC-CLIENTE-001')
                     ->minLength(3)
-                    ->maxLength(8)
-                    ->alphaNum()
+                    ->maxLength(80)
                     ->unique()
                     ->required(),
                 TextInput::make('description')

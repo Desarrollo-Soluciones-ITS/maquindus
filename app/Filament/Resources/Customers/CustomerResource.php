@@ -4,8 +4,6 @@ namespace App\Filament\Resources\Customers;
 
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\ProjectsRelationManager;
-use App\Filament\Resources\Customers\Pages\CreateCustomer;
-use App\Filament\Resources\Customers\Pages\EditCustomer;
 use App\Filament\Resources\Customers\Pages\ListCustomers;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Customers\Schemas\CustomerForm;
@@ -60,9 +58,7 @@ class CustomerResource extends Resource
     {
         return [
             'index' => ListCustomers::route('/'),
-            'create' => CreateCustomer::route('/create'),
             'view' => ViewCustomer::route('/{record}'),
-            'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
 
@@ -72,11 +68,11 @@ class CustomerResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return currentUserHasPermission('customers.create');
+        return false;
     }
     public static function canUpdate(): bool
     {
-        return currentUserHasPermission('customers.edit');
+        return false;
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
@@ -84,7 +80,7 @@ class CustomerResource extends Resource
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('customers.delete');
+        return false;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
