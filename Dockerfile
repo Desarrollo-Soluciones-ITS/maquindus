@@ -52,8 +52,7 @@ RUN apk add --no-cache \
     git \
     bash
 
-# Install PHP extensions + Redis en un solo RUN para evitar que
-# docker-php-ext-install purgue autoconf antes de que pecl lo necesite
+# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install \
         pdo_mysql \
@@ -84,10 +83,14 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php.ini $PHP_INI_DIR/conf.d/app.ini
 
+# Copy & prepare entrypoint
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/entrypoint.sh"]
