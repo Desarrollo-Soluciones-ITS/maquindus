@@ -5,6 +5,7 @@ cd /var/www/html
 
 echo "▶ Preparando assets..."
 php artisan filament:assets
+php artisan vendor:publish --tag=livewire:config
 php artisan vendor:publish --tag=livewire:assets --force
 
 echo "▶ Optimizando configuración..."
