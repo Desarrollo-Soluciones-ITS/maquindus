@@ -1,19 +1,5 @@
 # ============================================================
-# Stage 1: Build assets (Node + Vite)
-# ============================================================
-FROM node:20-alpine AS assets
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci --no-audit
-
-COPY vite.config.js ./
-COPY resources/ ./resources/
-RUN npm run build
-
-# ============================================================
-# Stage 2: PHP dependencies
+# Stage 1: PHP dependencies
 # ============================================================
 FROM composer:2 AS vendor
 
@@ -27,6 +13,23 @@ RUN composer install \
     --optimize-autoloader \
     --prefer-dist \
     --ignore-platform-reqs
+
+# ============================================================
+# Stage 2: Build assets (Node + Vite)
+# Necesita vendor/ porque app.css importa el CSS de Filament
+# ============================================================
+FROM node:20-alpine AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit
+
+COPY vite.config.js ./
+COPY resources/ ./resources/
+# Filament publica CSS desde vendor — debe estar antes del build
+COPY --from=vendor /app/vendor ./vendor
+RUN npm run build
 
 # ============================================================
 # Stage 3: Final image
@@ -70,10 +73,10 @@ WORKDIR /var/www/html
 # Copy app files
 COPY --chown=www-data:www-data . .
 
-# Copy compiled assets from Stage 1
+# Copy compiled assets from Stage 2
 COPY --from=assets --chown=www-data:www-data /app/public/build ./public/build
 
-# Copy vendor from Stage 2
+# Copy vendor from Stage 1
 COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
 
 # Copy config files
