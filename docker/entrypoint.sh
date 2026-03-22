@@ -3,6 +3,10 @@ set -e
 
 cd /var/www/html
 
+echo "▶ Preparando assets..."
+php artisan filament:assets
+php artisan vendor:publish --tag=livewire:assets --force
+
 echo "▶ Optimizando configuración..."
 php artisan config:cache
 php artisan route:cache
