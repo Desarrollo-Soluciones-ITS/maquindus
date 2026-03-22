@@ -14,8 +14,24 @@ class EquipmentSeeder extends Seeder
     public function run(): void
     {
         $equipment = [
-            ['name' => 'Compresor Atlas', 'code' => Code::full('CAT', Prefix::Equipment), 'about' => 'Compresor centrífugo', 'details' => ['Potencia' => '50HP', 'Capacidad' => '100T'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Generador Perkins', 'code' => Code::full('GPK', Prefix::Equipment), 'about' => 'Generador diésel', 'details' => ['Potencia' => '200kW', 'Capacidad' => '200T'], 'created_at' => now(), 'updated_at' => now()],
+            [
+                'name' => 'Compresor Atlas',
+                'model' => 'CAT-50HP',
+                'serial' => 'SN123456',
+                'type' => 'Compresor',
+                'about' => 'Compresor centrífugo',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Generador Perkins',
+                'model' => 'GPK-200kW',
+                'serial' => 'SN789012',
+                'type' => 'Generador',
+                'about' => 'Generador diésel',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         foreach ($equipment as $e) {

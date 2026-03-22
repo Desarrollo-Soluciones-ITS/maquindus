@@ -19,8 +19,21 @@ class ProjectSeeder extends Seeder
         $customer = Customer::first();
 
         $projects = [
-            ['name' => 'Planta de ensayo', 'code' => Code::full('PTE', Prefix::Project), 'about' => 'Proyecto piloto para nueva línea', 'start' => '2025-01-01', 'end' => '2025-06-30', 'status' => Status::Finished->value, 'customer_id' => $customer->id],
-            ['name' => 'Mantenimiento anual', 'code' => Code::full('MAN', Prefix::Project), 'about' => 'Mantenimiento mayor de equipos críticos', 'start' => '2025-07-01', 'status' => Status::Ongoing->value, 'customer_id' => $customer->id],
+            [
+                'name' => 'Planta de ensayo',
+                'about' => 'Proyecto piloto para nueva línea',
+                'start' => '2025-01-01',
+                'end' => '2025-06-30',
+                'status' => Status::Finished->value,
+                'customer_id' => $customer->id
+            ],
+            [
+                'name' => 'Mantenimiento anual',
+                'about' => 'Mantenimiento mayor de equipos críticos',
+                'start' => '2025-07-01',
+                'status' => Status::Ongoing->value,
+                'customer_id' => $customer->id
+            ],
         ];
 
         foreach ($projects as $pr) {
