@@ -12,7 +12,8 @@ RUN composer install \
     --no-progress \
     --optimize-autoloader \
     --prefer-dist \
-    --ignore-platform-reqs
+    --ignore-platform-reqs \
+    --no-scripts
 
 # ============================================================
 # Stage 2: Build assets (Node + Vite)
