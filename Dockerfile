@@ -65,6 +65,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         opcache \
         pcntl
 
+# Create supervisor log directory
+RUN mkdir -p /var/log/supervisor
+
 WORKDIR /var/www/html
 
 # Copy app files
