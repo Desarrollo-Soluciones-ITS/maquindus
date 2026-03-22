@@ -63,9 +63,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         mbstring \
         bcmath \
         opcache \
-        pcntl && \
-    pecl install redis && \
-    docker-php-ext-enable redis
+        pcntl
 
 WORKDIR /var/www/html
 
