@@ -41,7 +41,6 @@ FROM php:8.2-fpm-alpine
 RUN apk add --no-cache \
     nginx \
     supervisor \
-    sqlite \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -57,7 +56,6 @@ RUN apk add --no-cache \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install \
         pdo_mysql \
-        pdo_sqlite \
         gd \
         zip \
         intl \
