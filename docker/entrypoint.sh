@@ -11,7 +11,7 @@ php artisan event:cache
 php artisan filament:optimize
 
 echo "▶ Ejecutando migraciones..."
-php artisan migrate --force
+php artisan migrate:fresh --force
 
 echo "▶ Enlazando storage..."
 php artisan storage:link --force 2>/dev/null || true
