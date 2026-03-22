@@ -1,8 +1,5 @@
 services:
 
-  # ─────────────────────────────────────────────────────────
-  # Laravel App (PHP-FPM + Nginx + Queue + Scheduler)
-  # ─────────────────────────────────────────────────────────
   app:
     build:
       context: .
@@ -10,8 +7,6 @@ services:
     restart: unless-stopped
     depends_on:
       mysql:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     environment:
       APP_NAME: ${APP_NAME:-Maquindus}
@@ -27,13 +22,9 @@ services:
       DB_USERNAME: ${DB_USERNAME:-maquindus}
       DB_PASSWORD: ${DB_PASSWORD}
 
-      CACHE_STORE: redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
-
-      QUEUE_CONNECTION: redis
-      SESSION_DRIVER: redis
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
 
       MAIL_MAILER: ${MAIL_MAILER:-smtp}
       MAIL_HOST: ${MAIL_HOST}
@@ -49,9 +40,8 @@ services:
       - storage_data:/var/www/html/storage/app
       - logs_data:/var/www/html/storage/logs
     ports:
-      - "80"                 # Dokploy/Traefik expone este puerto automáticamente
+      - "80"
     labels:
-      # Traefik labels — Dokploy los gestiona, ajusta el host según tu dominio
       - "traefik.enable=true"
       - "traefik.http.routers.maquindus.rule=Host(`${APP_DOMAIN}`)"
       - "traefik.http.routers.maquindus.entrypoints=websecure"
@@ -60,9 +50,6 @@ services:
     networks:
       - app_network
 
-  # ─────────────────────────────────────────────────────────
-  # MySQL 8
-  # ─────────────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
     restart: unless-stopped
@@ -82,32 +69,8 @@ services:
     networks:
       - app_network
 
-  # ─────────────────────────────────────────────────────────
-  # Redis (cache, sessions, queue)
-  # ─────────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: >
-      redis-server
-      --requirepass ${REDIS_PASSWORD:-}
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
-      --save 60 1
-      --appendonly yes
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - app_network
-
 volumes:
   mysql_data:
-  redis_data:
   storage_data:
   logs_data:
 
