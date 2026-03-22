@@ -52,7 +52,8 @@ RUN apk add --no-cache \
     git \
     bash
 
-# Install PHP extensions
+# Install PHP extensions + Redis en un solo RUN para evitar que
+# docker-php-ext-install purgue autoconf antes de que pecl lo necesite
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install \
         pdo_mysql \
@@ -62,10 +63,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         mbstring \
         bcmath \
         opcache \
-        pcntl
-
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+        pcntl && \
+    pecl install redis && \
+    docker-php-ext-enable redis
 
 WORKDIR /var/www/html
 
