@@ -17,7 +17,7 @@ class ManageSearchIndex extends Command
     protected $signature = 'search:index 
                             {--rebuild : Reconstruir la base de datos y volver a indexar los datos}
                             {--search= : Término de búsqueda para consultar el índice}
-                            {--type= : Filtrar resultados por tipo de modelo (ej. User, Customer)}';
+                            {--type= : Filtrar resultados por tipo de modelo (ej. User, Supplier)}';
 
     protected $description = 'Gestionar el índice de búsqueda: crear, reconstruir o buscar.';
 

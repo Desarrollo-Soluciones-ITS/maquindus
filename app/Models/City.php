@@ -19,11 +19,6 @@ class City extends Model
         return $this->belongsTo(State::class);
     }
 
-    public function customers(): HasMany
-    {
-        return $this->hasMany(Customer::class);
-    }
-
     public function suppliers(): HasMany
     {
         return $this->hasMany(Supplier::class);

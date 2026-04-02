@@ -11,9 +11,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('equipment', 'year')) {
+        if (!Schema::hasColumn('equipment', 'manufacturing_date')) {
             Schema::table('equipment', function (Blueprint $table) {
-                $table->unsignedSmallInteger('year')->nullable()->after('type');
+                $table->date('manufacturing_date')->nullable()->after('type');
             });
         }
 
@@ -22,8 +22,13 @@ return new class extends Migration {
                 $table->uuid('id')->primary();
                 $table->string('order_no', 80)->unique();
                 $table->string('description')->nullable();
+                $table->foreignUuid('supplier_id')->nullable()->constrained('suppliers');
                 $table->timestamps();
                 $table->softDeletes();
+            });
+        } elseif (!Schema::hasColumn('supplier_purchase_orders', 'supplier_id')) {
+            Schema::table('supplier_purchase_orders', function (Blueprint $table) {
+                $table->foreignUuid('supplier_id')->nullable()->after('description')->constrained('suppliers');
             });
         }
 
@@ -72,11 +77,18 @@ return new class extends Migration {
         }
 
         Schema::dropIfExists('equipment_supplier_purchase_order');
+
+        if (Schema::hasTable('supplier_purchase_orders') && Schema::hasColumn('supplier_purchase_orders', 'supplier_id')) {
+            Schema::table('supplier_purchase_orders', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('supplier_id');
+            });
+        }
+
         Schema::dropIfExists('supplier_purchase_orders');
 
-        if (Schema::hasColumn('equipment', 'year')) {
+        if (Schema::hasColumn('equipment', 'manufacturing_date')) {
             Schema::table('equipment', function (Blueprint $table) {
-                $table->dropColumn('year');
+                $table->dropColumn('manufacturing_date');
             });
         }
     }

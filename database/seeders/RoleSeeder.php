@@ -14,21 +14,21 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = Role::create(['name' => 'Administrador']);
+        $admin = Role::firstOrCreate(['name' => 'Administrador']);
 
-        User::where('email', 'admin@example.com')->first()->update([
+        User::where('email', 'admin@example.com')->update([
             'role_id' => $admin->id,
         ]);
 
-        $operator = Role::create(['name' => 'Operador']);
+        $operator = Role::firstOrCreate(['name' => 'Operador']);
 
-        User::where('email', 'operator@example.com')->first()->update([
+        User::where('email', 'operator@example.com')->update([
             'role_id' => $operator->id,
         ]);
 
-        $user = Role::create(['name' => 'Usuario']);
+        $user = Role::firstOrCreate(['name' => 'Usuario']);
 
-        User::where('email', 'test@example.com')->first()->update([
+        User::where('email', 'test@example.com')->update([
             'role_id' => $user->id,
         ]);
     }

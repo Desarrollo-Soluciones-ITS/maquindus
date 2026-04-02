@@ -2,35 +2,35 @@
 
 namespace Database\Seeders;
 
-use App\Enums\Prefix;
 use Illuminate\Database\Seeder;
 use App\Models\Equipment;
 use App\Models\Part;
 use App\Models\Supplier;
-use App\Services\Code;
 
 class EquipmentSeeder extends Seeder
 {
     public function run(): void
     {
         $equipment = [
-            ['name' => 'Compresor Atlas', 'code' => Code::full('CAT', Prefix::Equipment), 'about' => 'Compresor centrífugo', 'details' => ['Potencia' => '50HP', 'Capacidad' => '100T'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Generador Perkins', 'code' => Code::full('GPK', Prefix::Equipment), 'about' => 'Generador diésel', 'details' => ['Potencia' => '200kW', 'Capacidad' => '200T'], 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Compresor Atlas GA-75', 'model' => 'ATLASGA7501', 'serial' => 'ATLGA7500001', 'type' => 'COMPRESOR75', 'manufacturing_date' => '2019-06-15', 'about' => 'Compresor centrífugo para línea principal de aire industrial.'],
+            ['name' => 'Generador Perkins 400', 'model' => 'PERK400GEN2', 'serial' => 'PRK400GEN002', 'type' => 'GENERADOR40', 'manufacturing_date' => '2020-03-20', 'about' => 'Generador diésel de respaldo para operación de planta.'],
+            ['name' => 'Bomba Sulzer APT', 'model' => 'SULZERAPT03', 'serial' => 'SLZAPT000003', 'type' => 'BOMBAAPT300', 'manufacturing_date' => '2021-11-08', 'about' => 'Bomba industrial para recirculación y transferencia de fluidos.'],
         ];
 
         foreach ($equipment as $e) {
-            $equipment = Equipment::create($e);
+            $equipment = Equipment::updateOrCreate(
+                ['name' => $e['name']],
+                $e,
+            );
 
-            // Asociar una parte si existe
-            $part = Part::first();
-            if ($part) {
-                $equipment->parts()->syncWithoutDetaching([$part->id]);
+            $partIds = Part::query()->limit(2)->pluck('id')->all();
+            if ($partIds !== []) {
+                $equipment->parts()->syncWithoutDetaching($partIds);
             }
 
-            // Asociar un supplier si existe
-            $supplier = Supplier::first();
-            if ($supplier) {
-                $equipment->suppliers()->syncWithoutDetaching([$supplier->id]);
+            $supplierIds = Supplier::query()->limit(2)->pluck('id')->all();
+            if ($supplierIds !== []) {
+                $equipment->suppliers()->syncWithoutDetaching($supplierIds);
             }
         }
     }

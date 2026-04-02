@@ -113,7 +113,7 @@ class RolesTable
                                 ->send();
                         })
                         ->successNotificationTitle('Se asignó el rol a todos los usuarios seleccionados')
-                        ->hidden(fn($record) => $record->name === 'Administrador'),
+                        ->hidden(fn($record) => $record->name === 'Administrador' || !currentUserHasPermission('roles')),
 
                     Action::make('permissions')
                         ->label('Editar permisos')
@@ -461,9 +461,9 @@ class RolesTable
                                 ->success()
                                 ->send();
                         })
-                        ->hidden(fn(Role $role) => $role->name === 'Administrador'),
+                        ->hidden(fn(Role $role) => $role->name === 'Administrador' || !currentUserHasPermission('roles')),
 
-                    EditAction::make()->hidden(fn(Role $record) => $record->name === 'Administrador'),
+                    EditAction::make()->hidden(fn(Role $record) => $record->name === 'Administrador' || !currentUserHasPermission('roles')),
                 ]),
             ])
             ->toolbarActions([

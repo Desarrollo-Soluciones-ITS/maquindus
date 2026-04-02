@@ -1,17 +1,13 @@
 <?php
 
 use App\Enums\Prefix;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Equipment\Pages\ViewEquipment;
 use App\Filament\Resources\Parts\Pages\ViewPart;
 use App\Filament\Resources\People\Pages\ViewPerson;
-use App\Filament\Resources\Projects\Pages\ViewProject;
-use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Activity;
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Customer;
 use App\Models\Document;
 use App\Models\Equipment;
 use App\Models\EquipmentBlueprint;
@@ -26,11 +22,10 @@ use App\Models\File;
 use App\Models\Part;
 use App\Models\Permission;
 use App\Models\Person;
-use App\Models\Project;
-use App\Models\PurchaseOrder;
 use App\Models\Role;
 use App\Models\State;
 use App\Models\Supplier;
+use App\Models\SupplierPurchaseOrder;
 use App\Models\User;
 use App\Services\Code;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -103,7 +98,6 @@ if (!function_exists('model_to_spanish')) {
             Activity::class => 'Actividad',
             City::class => 'Ciudad',
             Country::class => 'País',
-            Customer::class => 'Cliente',
             Document::class => 'Documento',
             Equipment::class => 'Equipo',
             EquipmentBlueprint::class => 'Plano',
@@ -118,8 +112,7 @@ if (!function_exists('model_to_spanish')) {
             Part::class => 'Repuesto',
             Permission::class => 'Permiso',
             Person::class => 'Contacto',
-            Project::class => 'Proyecto',
-            PurchaseOrder::class => 'Orden de compra cliente',
+            SupplierPurchaseOrder::class => 'Orden de compra proveedor',
             Role::class => 'Rol',
             State::class => 'Estado',
             Supplier::class => 'Proveedor',
@@ -130,7 +123,6 @@ if (!function_exists('model_to_spanish')) {
             Activity::class => 'Actividades',
             City::class => 'Ciudades',
             Country::class => 'Países',
-            Customer::class => 'Clientes',
             Document::class => 'Documentos',
             Equipment::class => 'Equipos',
             EquipmentBlueprint::class => 'Planos',
@@ -145,8 +137,7 @@ if (!function_exists('model_to_spanish')) {
             Part::class => 'Repuestos',
             Permission::class => 'Permisos',
             Person::class => 'Contactos',
-            Project::class => 'Proyectos',
-            PurchaseOrder::class => 'Órdenes de compra cliente',
+            SupplierPurchaseOrder::class => 'Órdenes de compra proveedor',
             Role::class => 'Roles',
             State::class => 'Estados',
             Supplier::class => 'Proveedores',
@@ -308,17 +299,6 @@ if (!function_exists('code_to_full')) {
     }
 }
 
-if (!function_exists('is_view_customer')) {
-    function is_view_customer()
-    {
-        return function (RelationManager|ListProjects $livewire) {
-            if ($livewire instanceof ListProjects)
-                return false;
-            return $livewire->getPageClass() === ViewCustomer::class;
-        };
-    }
-}
-
 if (!function_exists('relation_manager_owner_is_equipment')) {
     function relation_manager_owner_is_equipment(RelationManager $livewire): bool
     {
@@ -339,10 +319,8 @@ if (!function_exists('documentables')) {
     function documentables()
     {
         return collect([
-            Project::class,
             Equipment::class,
             Person::class,
-            Customer::class,
             Part::class,
             Supplier::class,
             EquipmentDataSheet::class,
@@ -367,9 +345,7 @@ if (!function_exists('documentable_view_url')) {
         return match ($documentable::class) {
             Part::class => ViewPart::getUrl(['record' => $documentable->id]),
             Person::class => ViewPerson::getUrl(['record' => $documentable->id]),
-            Project::class => ViewProject::getUrl(['record' => $documentable->id]),
             Supplier::class => ViewSupplier::getUrl(['record' => $documentable->id]),
-            Customer::class => ViewCustomer::getUrl(['record' => $documentable->id]),
             Equipment::class => ViewEquipment::getUrl(['record' => $documentable->id]),
             EquipmentDataSheet::class,
             EquipmentBlueprint::class,

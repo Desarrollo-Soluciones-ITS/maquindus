@@ -7,7 +7,6 @@ use App\Filament\Widgets\LatestActivityLogs;
 use App\Filament\Widgets\LatestDocuments;
 use App\Filament\Widgets\LatestEquipments;
 use App\Filament\Widgets\LatestParts;
-use App\Filament\Widgets\LatestProjects;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\Welcome;
 use Filament\Pages\Page;
@@ -50,7 +49,7 @@ class Dashboard extends Page
     {
         $widgets = [];
 
-        if (currentUserHasPermission('dashboard.view')) {
+        if (currentUserHasPermission('dashboard')) {
             $widgets[] = LatestActivityLogs::class;
         }
 
@@ -60,10 +59,6 @@ class Dashboard extends Page
 
         if (currentUserHasPermission('parts.view')) {
             $widgets[] = LatestParts::class;
-        }
-
-        if (currentUserHasPermission('projects.view')) {
-            $widgets[] = LatestProjects::class;
         }
 
         if (currentUserHasPermission('documents.view')) {

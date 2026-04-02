@@ -5,10 +5,11 @@ namespace App\Filament\Resources\Equipment;
 use App\Filament\RelationManagers\BlueprintsRelationManager;
 use App\Filament\RelationManagers\CatalogsRelationManager;
 use App\Filament\RelationManagers\DataSheetsRelationManager;
-use App\Filament\RelationManagers\EquipmentSparePartsRelationManager;
 use App\Filament\RelationManagers\FieldQueriesRelationManager;
+use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\RelationManagers\ReportsRelationManager;
 use App\Filament\RelationManagers\StandardsRelationManager;
+use App\Filament\RelationManagers\SupplierPurchaseOrdersRelationManager;
 use App\Filament\RelationManagers\TechnicalSpecificationsRelationManager;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
@@ -66,8 +67,9 @@ class EquipmentResource extends Resource
                 TechnicalSpecificationsRelationManager::class,
                 StandardsRelationManager::class,
             ]),
+            'supplierPurchaseOrders' => SupplierPurchaseOrdersRelationManager::class,
+            'parts' => PartsRelationManager::class,
             'fieldQueries' => FieldQueriesRelationManager::class,
-            'equipmentSpareParts' => EquipmentSparePartsRelationManager::class,
             'reports' => ReportsRelationManager::class,
         ];
     }

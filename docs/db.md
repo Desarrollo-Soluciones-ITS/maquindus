@@ -34,20 +34,6 @@ Almacena las ciudades de Venezuela (data precargada).
 - **name**: Nombre de la ciudad
 - **state_id**: Estado al que pertenece la ciudad
 
-## Clientes (customers)
-
-Almacena las empresas que son clientes de proyectos de Maquindus
-
-- **rif**: RIF del cliente
-- **name**: Nombre de la empresa
-- **email**: Correo electrónico
-- **phone**: Teléfono de contacto
-- **about**: Breve descripción de la empresa
-- **address**: Dirección de la empresa
-- **country_id**: País donde se encuentra.
-- **state_id**: Estado en que se encuentra (vacío si no es Venezuela).
-- **city_id**: Ciudad en que se encuentra (vacío si no es Venezuela).
-
 ## Proveedores (suppliers)
 
 Almacena las empresas que son proveedores de equipos y repuestos para Maquindus
@@ -64,7 +50,7 @@ Almacena las empresas que son proveedores de equipos y repuestos para Maquindus
 
 ## Contactos (people)
 
-Almacena las personas que están relacionadas con los clientes, proveedores o proyectos de Maquindus
+Almacena las personas que están relacionadas con los proveedores de Maquindus
 
 - **name**: Nombre de la persona
 - **surname**: Apellido de la persona
@@ -75,7 +61,7 @@ Almacena las personas que están relacionadas con los clientes, proveedores o pr
 - **country_id**: País donde se encuentra.
 - **state_id**: Estado en que se encuentra (vacío si no es Venezuela).
 - **city_id**: Ciudad en que se encuentra (vacío si no es Venezuela).
-- **personable**: Cliente o Proveedor al que pertenece el contacto (opcional)
+- **personable**: Proveedor al que pertenece el contacto (opcional)
 
 ## Equipos (equipment)
 
@@ -85,7 +71,7 @@ Almacena cada equipo gestionado por Maquindus y funciona como entidad principal 
 - **model**: Modelo del equipo
 - **serial**: Serial del equipo
 - **type**: Tipo de equipo
-- **year**: Año del equipo
+- **manufacturing_date**: Fecha de fabricación del equipo
 - **about**: Descripción corta del equipo
 
 ## Repuesto (parts)
@@ -97,32 +83,20 @@ Almacena cada modelo de repuesto con el cual trabaja Maquindus. Cabe destacar qu
 - **about**: Descripción corta del repuesto
 - **details**: Ficha técnica del repuesto (número ilimitado de características con su nombre y valor)
 
-## Proyectos (projects)
-
-Almacena los proyectos realizados por Maquindus a clientes
-
-- **name**: Nombre del proyecto
-- **about**: Descripción del proyecto (opcional)
-- **start**: Fecha de inicio
-- **end**: Fecha de finalización (opcional)
-- **status**: Etapa del proyecto (Planificación, En curso, Finalizado)
-- **customer_id**: Empresa cliente relacionada al proyecto
-
 ## Actividades (activities)
 
-Almacena un historial de las actividades realizadas dentro de un proyecto
+Almacena un historial de las actividades realizadas en el sistema
 
 - **title**: Título de la actividad
 - **comment**: Comentario acerca de la actividad
-- **project_id**: Proyecto al que pertenece
 
 ## Documentos (documents)
 
-Almacena los documentos relacionados a Proyectos, Equipos o Repuestos que se subieron al sistema
+Almacena los documentos relacionados a Equipos o Repuestos que se subieron al sistema
 
 - **name**: Nombre del documento
 - **type**: Tipo de documento (Planos, Manuales, Fichas Técnicas, Reportes). Es utilizado para generar la subcarpeta en que se guarda el documento.
-- **documentable**: Equipo, Repuesto o Proyecto al que pertenece el documento
+- **documentable**: Equipo o Repuesto al que pertenece el documento
 
 ## Versiones (files)
 

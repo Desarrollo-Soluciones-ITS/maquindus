@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
+
+    protected function authorizeAccess(): void
+    {
+        abort_unless(currentUserHasPermission('roles'), 403);
+    }
 }

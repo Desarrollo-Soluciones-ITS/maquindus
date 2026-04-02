@@ -37,7 +37,7 @@ class StateSeeder extends Seeder
         ];
 
         foreach ($states as $state) {
-            State::create($state);
+            State::firstOrCreate($state);
         }
     }
 }

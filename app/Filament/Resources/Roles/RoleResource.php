@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Roles;
 
 use App\Filament\Resources\Roles\Pages\ListRoles;
+use App\Filament\Resources\Roles\Pages\CreateRole;
+use App\Filament\Resources\Roles\Pages\EditRole;
 use App\Filament\Resources\Roles\Schemas\RoleForm;
 use App\Filament\Resources\Roles\Tables\RolesTable;
 use App\Models\Role;
@@ -50,11 +52,28 @@ class RoleResource extends Resource
     {
         return [
             'index' => ListRoles::route('/'),
+            'create' => CreateRole::route('/create'),
+            'edit' => EditRole::route('/{record}/edit'),
         ];
     }
 
     public static function canAccess(): bool
     {
         return currentUserHasPermission('roles');
+    }
+
+    public static function canCreate(): bool
+    {
+        return currentUserHasPermission('roles');
+    }
+
+    public static function canUpdate(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('roles');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return currentUserHasPermission('roles') && $record->name !== 'Administrador';
     }
 }

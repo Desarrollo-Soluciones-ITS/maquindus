@@ -15,71 +15,52 @@ class FileSeeder extends Seeder
     public function run(): void
     {
         $documents = Document::query()
-            ->latest()
+            ->with('documentable')
             ->whereHas('documentable')
             ->get();
 
-        $files = [
-            [
-                'path' => 'docs/sample1.pdf',
-                'mime' => 'PDF',
-                'version' => 1,
-                'document_id' => $documents[0]->id
-            ],
-            [
-                'path' => 'docs/sample2.pdf',
-                'mime' => 'PDF',
-                'version' => 1,
-                'document_id' => $documents[1]->id
-            ],
-            [
-                'path' => 'docs/sample3.pdf',
-                'mime' => 'PDF',
-                'version' => 1,
-                'document_id' => $documents[2]->id
-            ],
-        ];
-
-        foreach ($files as $file) {
-            File::create($file);
-        }
-
-        if (Storage::missing('sample.pdf'))
-            return;
-
-        $files = File::query()
-            ->latest()
-            ->limit(3)
-            ->get();
-
-        foreach ($files as $file) {
-            $document = $file->document;
+        foreach ($documents as $document) {
             $documentable = $document->documentable;
+
+            if (!$documentable) {
+                continue;
+            }
 
             $folder = model_to_spanish(
                 model: $documentable::class,
-                plural: true
-            );
+                plural: true,
+            ) ?? class_basename($documentable::class);
 
-            $segments = collect([$folder, $documentable->name]);
-            $category = $document->category;
+            $documentToken = (string) str($document->id)->afterLast('-');
+            $baseName = $documentable->name ?? class_basename($documentable::class);
+            $segments = collect([$folder, $documentToken, $baseName]);
 
-            if ($category) {
-                $segments->push($category->value);
+            if ($document->category?->value) {
+                $segments->push($document->category->value);
             }
 
-            $name = str($document->name)
-                ->append(" - V1.pdf");
-
-            $segments->push($name);
-
+            $segments->push('documento-v1.pdf');
             $path = $segments->join('/');
 
-            Storage::copy('sample.pdf', $path);
+            if (Storage::exists('sample.pdf')) {
+                if (!Storage::exists($path)) {
+                    Storage::copy('sample.pdf', $path);
+                }
+            } elseif (!Storage::exists($path)) {
+                Storage::put($path, 'Documento de prueba generado por seeder.');
+            }
 
-            $file->update([
-                'path' => $path,
-            ]);
+            File::withTrashed()->updateOrCreate(
+                [
+                    'document_id' => $document->id,
+                    'version' => 1,
+                ],
+                [
+                    'path' => $path,
+                    'mime' => 'PDF',
+                    'deleted_at' => null,
+                ],
+            );
         }
     }
 }

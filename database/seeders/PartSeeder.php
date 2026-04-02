@@ -14,23 +14,25 @@ class PartSeeder extends Seeder
     public function run(): void
     {
         $parts = [
-            ['name' => 'Filtro principal', 'code' => Code::full('FTP', Prefix::Part), 'about' => 'Filtro de aceite', 'details' => ['Material' => 'Acero', 'Diámetro' => '50mm'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Bomba hidráulica', 'code' => Code::full('BHD', Prefix::Part), 'about' => 'Bomba de transferencia', 'details' => ['Capacidad' => '120L/min', 'Potencia' => '200kw'], 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Filtro principal de aceite', 'code' => Code::full('FTP', Prefix::Part), 'about' => 'Filtro metálico para sistemas de lubricación industrial.', 'details' => ['Material' => 'Acero inoxidable', 'Diámetro' => '50 mm', 'Aplicación' => 'Compresores'], 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Bomba hidráulica de transferencia', 'code' => Code::full('BHD', Prefix::Part), 'about' => 'Bomba de transferencia para sistemas hidráulicos de potencia.', 'details' => ['Capacidad' => '120 L/min', 'Potencia' => '20 kW', 'Presión' => '250 bar'], 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Tarjeta de control AVR', 'code' => Code::full('AVR', Prefix::Part), 'about' => 'Tarjeta electrónica para regulación automática de voltaje.', 'details' => ['Voltaje' => '24 VDC', 'Compatibilidad' => 'Generadores Perkins', 'Protección' => 'IP20'], 'created_at' => now(), 'updated_at' => now()],
         ];
 
         foreach ($parts as $p) {
-            $part = Part::create($p);
+            $part = Part::updateOrCreate(
+                ['code' => $p['code']],
+                $p,
+            );
 
-            // Asociar a equipment si existe
-            $equipment = Equipment::first();
-            if ($equipment) {
-                $part->equipment()->syncWithoutDetaching([$equipment->id]);
+            $equipmentIds = Equipment::query()->limit(2)->pluck('id')->all();
+            if ($equipmentIds !== []) {
+                $part->equipment()->syncWithoutDetaching($equipmentIds);
             }
 
-            // Asociar a supplier si existe
-            $supplier = Supplier::first();
-            if ($supplier) {
-                $supplier->parts()->syncWithoutDetaching([$part->id]);
+            $supplierIds = Supplier::query()->limit(2)->pluck('id')->all();
+            if ($supplierIds !== []) {
+                $part->suppliers()->syncWithoutDetaching($supplierIds);
             }
         }
     }

@@ -7,7 +7,7 @@ use App\Filament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderInfolist;
 use App\Filament\Resources\PurchaseOrders\Tables\PurchaseOrdersTable;
-use App\Models\PurchaseOrder;
+use App\Models\SupplierPurchaseOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,14 +18,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PurchaseOrderResource extends Resource
 {
-    protected static ?string $model = PurchaseOrder::class;
+    protected static ?string $model = SupplierPurchaseOrder::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
 
     protected static ?string $recordTitleAttribute = 'order_no';
 
-    protected static ?string $modelLabel = 'orden de compra cliente';
-    protected static ?string $pluralModelLabel = 'órdenes de compra cliente';
+    protected static ?string $modelLabel = 'orden de compra proveedor';
+    protected static ?string $pluralModelLabel = 'órdenes de compra proveedor';
     protected static ?int $navigationSort = 7;
 
     public static function form(Schema $schema): Schema
@@ -52,7 +52,9 @@ class PurchaseOrderResource extends Resource
     {
         return [
             'index' => ListPurchaseOrders::route('/'),
+            'create' => Pages\CreatePurchaseOrder::route('/create'),
             'view' => ViewPurchaseOrder::route('/{record}'),
+            'edit' => Pages\EditPurchaseOrder::route('/{record}/edit'),
         ];
     }
 
@@ -62,15 +64,15 @@ class PurchaseOrderResource extends Resource
     }
     public static function canCreate(): bool
     {
-        return false;
+        return currentUserHasPermission('purchase_orders.create');
     }
     public static function canUpdate(): bool
     {
-        return false;
+        return currentUserHasPermission('purchase_orders.edit');
     }
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return currentUserHasPermission('purchase_orders.show');
+        return currentUserHasPermission('purchase_orders.read');
     }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {

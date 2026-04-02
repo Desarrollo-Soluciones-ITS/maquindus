@@ -234,8 +234,6 @@ class GlobalSearchPage extends Page implements HasForms
     protected function modelToSpanish(string $modelType): string
     {
         $map = [
-            'App\\Models\\Customer' => 'Cliente',
-            'App\\Models\\Project' => 'Proyecto',
             'App\\Models\\Equipment' => 'Equipo',
             'App\\Models\\Part' => 'Parte',
             'App\\Models\\Supplier' => 'Proveedor',
@@ -251,8 +249,6 @@ class GlobalSearchPage extends Page implements HasForms
     protected function modelToResource(string $modelType): string
     {
         $map = [
-            'App\\Models\\Customer' => 'customers',
-            'App\\Models\\Project' => 'projects',
             'App\\Models\\Equipment' => 'equipment',
             'App\\Models\\Part' => 'parts',
             'App\\Models\\Supplier' => 'suppliers',

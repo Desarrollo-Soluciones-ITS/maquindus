@@ -345,7 +345,7 @@ class CitySeeder extends Seeder
             $nested = $cities[$state->name];
 
             foreach ($nested as $city) {
-                City::create([
+                City::firstOrCreate([
                     'name' => $city,
                     'state_id' => $state->id,
                 ]);

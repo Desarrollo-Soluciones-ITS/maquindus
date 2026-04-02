@@ -59,11 +59,6 @@ class Person extends Model
         return $this->belongsToMany(Activity::class);
     }
 
-    public function projects(): BelongsToMany
-    {
-        return $this->belongsToMany(Project::class);
-    }
-
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Equipment\Schemas;
 
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -20,25 +21,33 @@ class EquipmentInfolist
                     ->label('Serial'),
                 TextEntry::make('type')
                     ->label('Tipo'),
-                TextEntry::make('year')
-                    ->label('Año'),
+                TextEntry::make('manufacturing_date')
+                    ->label('Fecha de fabricación')
+                    ->date('d/m/Y'),
                 TextEntry::make('about')
                     ->label('Descripción'),
-                TextEntry::make('linked_projects')
-                    ->label('Proyectos')
-                    ->state(fn($record) => $record->projects->pluck('name')->join(', ') ?: 'Sin proyectos vinculados')
-                    ->columnSpanFull(),
                 TextEntry::make('linked_suppliers')
                     ->label('Proveedores')
                     ->state(fn($record) => $record->suppliers->pluck('name')->join(', ') ?: 'Sin proveedores vinculados')
                     ->columnSpanFull(),
-                TextEntry::make('linked_client_orders')
-                    ->label('Órdenes compra cliente')
-                    ->state(fn($record) => $record->purchaseOrders->pluck('order_no')->join(', ') ?: 'Sin órdenes vinculadas')
-                    ->columnSpanFull(),
-                TextEntry::make('linked_supplier_orders')
+                RepeatableEntry::make('supplierPurchaseOrders')
                     ->label('Órdenes compra proveedor')
-                    ->state(fn($record) => $record->supplierPurchaseOrders->pluck('order_no')->join(', ') ?: 'Sin órdenes vinculadas')
+                    ->grid(1)
+                    ->contained()
+                    ->schema([
+                        TextEntry::make('supplier.name')
+                            ->label('Proveedor')
+                            ->badge()
+                            ->color('info'),
+                        TextEntry::make('order_no')
+                            ->label('Código')
+                            ->badge()
+                            ->color('primary'),
+                        TextEntry::make('description')
+                            ->label('Descripción')
+                            ->placeholder('Sin descripción')
+                            ->columnSpanFull(),
+                    ])
                     ->columnSpanFull(),
             
             ]);

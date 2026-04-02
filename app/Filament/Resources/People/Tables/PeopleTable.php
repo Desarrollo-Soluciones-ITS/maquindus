@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\People\Tables;
 
 use App\Filament\Filters\ArchivedFilter;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
-use App\Models\Customer;
 use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -38,11 +36,6 @@ class PeopleTable
                     ->label('Cargo')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('projects.name')
-                    ->label('Proyectos relacionados')
-                    ->badge()
-                    ->separator(', ')
-                    ->toggleable(),
                 TextColumn::make('personable.name')
                     ->label('Empresa')
                     ->searchable()
@@ -54,8 +47,12 @@ class PeopleTable
 
                         $page = match ($class) {
                             Supplier::class => ViewSupplier::class,
-                            Customer::class => ViewCustomer::class,
+                            default => null,
                         };
+
+                        if (!$page) {
+                            return null;
+                        }
 
                         return $page::getUrl([
                             'record' => $record->personable->id
@@ -69,36 +66,17 @@ class PeopleTable
                     ->searchable()
                     ->getSearchResultsUsing(
                         fn(string $search): array =>
-                        Customer::query()
+                        Supplier::query()
+                            ->select('name', 'id')
                             ->where('name', 'like', "%{$search}%")
                             ->limit(10)
-                            ->unionAll(
-                                Supplier::query()
-                                    ->select('name', 'id')
-                                    ->where('name', 'like', "%{$search}%")
-                                    ->limit(10)
-                            )
                             ->pluck('name', 'id')
                             ->all()
                     )
-                    ->getOptionLabelUsing(function ($value) {
-                        $model = Customer::find($value, ['name']);
-
-                        if (!$model) {
-                            $model = Supplier::find($value, ['name']);
-                        }
-
-                        if (!$model) return;
-
-                        return $model->name;
-                    })
+                    ->getOptionLabelUsing(fn($value) => Supplier::find($value, ['name'])?->name)
                     ->indicateUsing(function (array $data) {
                         $value = $data['value'] ?? null;
-                        $model = Customer::find($value, ['name']);
-
-                        if (!$model) {
-                            $model = Supplier::find($value, ['name']);
-                        }
+                        $model = Supplier::find($value, ['name']);
 
                         if (!$model) return;
 
