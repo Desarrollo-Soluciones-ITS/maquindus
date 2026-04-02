@@ -14,7 +14,6 @@ class PartSeeder extends Seeder
     public function run(): void
     {
         $parts = [
-<<<<<<< HEAD
             [
                 'name' => 'Filtro principal',
                 'about' => 'Filtro de aceite',
@@ -29,11 +28,6 @@ class PartSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
-=======
-            ['name' => 'Filtro principal de aceite', 'code' => Code::full('FTP', Prefix::Part), 'about' => 'Filtro metálico para sistemas de lubricación industrial.', 'details' => ['Material' => 'Acero inoxidable', 'Diámetro' => '50 mm', 'Aplicación' => 'Compresores'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Bomba hidráulica de transferencia', 'code' => Code::full('BHD', Prefix::Part), 'about' => 'Bomba de transferencia para sistemas hidráulicos de potencia.', 'details' => ['Capacidad' => '120 L/min', 'Potencia' => '20 kW', 'Presión' => '250 bar'], 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Tarjeta de control AVR', 'code' => Code::full('AVR', Prefix::Part), 'about' => 'Tarjeta electrónica para regulación automática de voltaje.', 'details' => ['Voltaje' => '24 VDC', 'Compatibilidad' => 'Generadores Perkins', 'Protección' => 'IP20'], 'created_at' => now(), 'updated_at' => now()],
->>>>>>> b5a5614b627df5f40db2a82a66cdff3d2b9ed118
         ];
 
         foreach ($parts as $p) {
