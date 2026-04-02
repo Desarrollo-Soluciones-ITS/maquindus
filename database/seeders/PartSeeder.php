@@ -15,6 +15,7 @@ class PartSeeder extends Seeder
     {
         $parts = [
             [
+                'code' => 'FIL',
                 'name' => 'Filtro principal',
                 'about' => 'Filtro de aceite',
                 'details' => ['Material' => 'Acero', 'Diámetro' => '50mm'],
@@ -22,6 +23,7 @@ class PartSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
+                'code' => 'BOM',
                 'name' => 'Bomba hidráulica',
                 'about' => 'Bomba de transferencia',
                 'details' => ['Capacidad' => '120L/min', 'Potencia' => '200kw'],
@@ -31,9 +33,11 @@ class PartSeeder extends Seeder
         ];
 
         foreach ($parts as $p) {
+            $code = Code::full($p['code'], Prefix::Part);
+
             $part = Part::updateOrCreate(
-                ['code' => $p['code']],
-                $p,
+                ['name' => $p['name']],
+                [...$p, 'code' => $code],
             );
 
             $equipmentIds = Equipment::query()->limit(2)->pluck('id')->all();
