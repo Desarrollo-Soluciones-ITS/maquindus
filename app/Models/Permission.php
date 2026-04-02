@@ -13,8 +13,15 @@ class Permission extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog;
 
+    public static array $standaloneLabels = [
+        'dashboard' => 'Acceso al panel principal',
+        'roles' => 'Administrar roles y permisos',
+        'search' => 'Usar buscador global',
+    ];
+
     public static array $actionLabels = [
         'create' => 'Crear',
+        'read' => 'Ver',
         'edit' => 'Editar',
         'show' => 'Ver',
         'delete' => 'Archivar',
@@ -32,17 +39,15 @@ class Permission extends Model
     public static array $resourceLabels = [
         'equipments' => 'equipo',
         'parts' => 'repuesto',
-        'projects' => 'proyecto',
         'documents' => 'documento',
         'suppliers' => 'proveedor',
-        'customers' => 'cliente',
         'people' => 'contacto',
         'users' => 'usuario',
         'activities' => 'actividad',
         'files' => 'versión',
         'activity_logs' => 'bitácora',
         'search' => 'buscador',
-        'purchase_orders' => 'órden de compra',
+        'purchase_orders' => 'órden de compra proveedor',
     ];
 
     public static array $permissions = [
@@ -69,14 +74,6 @@ class Permission extends Model
             'unsync',
             'restore',
         ],
-        'projects' => [
-            'create',
-            'show',
-            'view',
-            'delete',
-            'edit',
-            'restore',
-        ],
         'documents' => [
             'view',
             'delete',
@@ -96,14 +93,6 @@ class Permission extends Model
             'edit',
             'sync',
             'unsync',
-            'restore',
-        ],
-        'customers' => [
-            'create',
-            'show',
-            'view',
-            'delete',
-            'edit',
             'restore',
         ],
         'people' => [
@@ -149,6 +138,41 @@ class Permission extends Model
             'restore',
         ]
     ];
+
+    public static function buildDefinitions(): array
+    {
+        $definitions = [];
+
+        foreach (static::$permissions as $key => $value) {
+            if (is_int($key) && is_string($value)) {
+                $definitions[] = [
+                    'slug' => $value,
+                    'name' => static::$standaloneLabels[$value] ?? ucfirst(str_replace('_', ' ', $value)),
+                ];
+
+                continue;
+            }
+
+            if (!is_string($key) || !is_array($value)) {
+                continue;
+            }
+
+            $resourceLabel = static::$resourceLabels[$key] ?? $key;
+
+            foreach ($value as $action) {
+                if (!is_string($action)) {
+                    continue;
+                }
+
+                $definitions[] = [
+                    'slug' => "{$key}.{$action}",
+                    'name' => trim((static::$actionLabels[$action] ?? ucfirst($action)) . ' ' . $resourceLabel),
+                ];
+            }
+        }
+
+        return $definitions;
+    }
 
     public function roles()
     {

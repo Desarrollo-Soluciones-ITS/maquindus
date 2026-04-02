@@ -60,15 +60,13 @@ trait HasActivityLog
         $page = match ($class) {
             'Part' => \App\Filament\Resources\Parts\Pages\ViewPart::class,
             'Person' => \App\Filament\Resources\People\Pages\ViewPerson::class,
-            'Project' => \App\Filament\Resources\Projects\Pages\ViewProject::class,
             'Supplier' => \App\Filament\Resources\Suppliers\Pages\ViewSupplier::class,
-            'Customer' => \App\Filament\Resources\Customers\Pages\ViewCustomer::class,
             'Equipment' => \App\Filament\Resources\Equipment\Pages\ViewEquipment::class,
             'Activity' => \App\Filament\Resources\ActivityLogs\Pages\ViewActivityLog::class,
             default => null,
         };
 
-        return $page::getUrl(['record' => $this->id]) ?? null;
+        return $page ? $page::getUrl(['record' => $this->id]) : null;
     }
 
     /**

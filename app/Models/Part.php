@@ -16,11 +16,6 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Part extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
-
-    public function purchaseOrders()
-    {
-        return $this->belongsToMany(PurchaseOrder::class, 'part_purchase_order');
-    }
     use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
 
     protected static function booted()
@@ -53,11 +48,6 @@ class Part extends Model
     public function equipment(): BelongsToMany
     {
         return $this->belongsToMany(Equipment::class);
-    }
-
-    public function projects(): BelongsToMany
-    {
-        return $this->belongsToMany(Project::class);
     }
 
     public function suppliers(): BelongsToMany

@@ -2,12 +2,14 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
+use App\Models\Equipment;
+use App\Models\Supplier;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -26,23 +28,22 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            TextInput::make('order_no')
-                ->label('Código de orden')
-                ->minLength(3)
-                ->maxLength(80)
-                ->unique(ignoreRecord: true)
-                ->required(),
-            TextInput::make('description')
-                ->label('Descripción')
-                ->maxLength(255),
-        ]);
+        return $schema->columns(2)->components(
+            PurchaseOrderForm::getComponents(
+                hideSupplier: $this->ownerIsSupplier(),
+                defaultSupplierId: $this->ownerIsSupplier() ? $this->getOwnerRecord()->getKey() : null,
+            )
+        );
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
+                TextColumn::make('supplier.name')
+                    ->label('Proveedor')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('order_no')
                     ->label('Código de orden')
                     ->searchable()
@@ -55,11 +56,19 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
                     ->dateTime('d/m/Y H:i'),
             ])
             ->headerActions([
-                CreateAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
-                AttachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
+                CreateAction::make()
+                    ->mutateDataUsing(function (array $data): array {
+                        if ($this->ownerIsSupplier()) {
+                            $data['supplier_id'] = $this->getOwnerRecord()->getKey();
+                        }
+
+                        return $data;
+                    })
+                    ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('purchase_orders.create')),
+                AttachAction::make()->hidden(fn() => !$this->ownerIsEquipment() || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('purchase_orders.edit')),
             ])
             ->recordActions([
-                DetachAction::make()->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
+                DetachAction::make()->hidden(fn() => !$this->ownerIsEquipment() || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('purchase_orders.edit')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([]),
@@ -80,6 +89,7 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
 
                             public function collection() {
                                 return $this->orders->map(fn($order) => [
+                                    'Proveedor' => $order->supplier?->name,
                                     'Código de orden' => $order->order_no,
                                     'Descripción' => $order->description,
                                     'Creado el' => $order->created_at,
@@ -87,10 +97,20 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
                             }
 
                             public function headings(): array {
-                                return ['Código de orden', 'Descripción', 'Creado el'];
+                                return ['Proveedor', 'Código de orden', 'Descripción', 'Creado el'];
                             }
                         }, $fileName);
                     }),
             ]);
+    }
+
+    protected function ownerIsSupplier(): bool
+    {
+        return $this->getOwnerRecord() instanceof Supplier;
+    }
+
+    protected function ownerIsEquipment(): bool
+    {
+        return $this->getOwnerRecord() instanceof Equipment;
     }
 }

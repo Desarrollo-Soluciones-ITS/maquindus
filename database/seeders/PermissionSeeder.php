@@ -10,14 +10,13 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissionsTree = Permission::$permissions;
-        $permissionDefinitions = $this->buildPermissionDefinitions($permissionsTree);
+        $permissionDefinitions = Permission::buildDefinitions();
 
-        $admin = Role::first();
+        $admin = Role::firstOrCreate(['name' => 'Administrador']);
         $permissions = [];
 
         foreach ($permissionDefinitions as $def) {
-            $permission = Permission::firstOrCreate([
+            $permission = Permission::updateOrCreate([
                 'slug' => $def['slug'],
             ], [
                 'name' => $def['name'],
@@ -26,30 +25,8 @@ class PermissionSeeder extends Seeder
             array_push($permissions, $permission);
         }
 
-        $admin->permissions()->sync($permissions);
-    }
-
-    protected function buildPermissionDefinitions(array $tree, string $slugPrefix = '', string $namePrefix = ''): array
-    {
-        $definitions = [];
-
-        foreach ($tree as $key => $value) {
-            if (is_numeric($key) && is_string($value)) {
-                $action = $value;
-                $slug = $slugPrefix ? "{$slugPrefix}.{$action}" : $action;
-                $actionLabel = Permission::$actionLabels[$action] ?? ucfirst($action);
-                $resourceLabel = Permission::$resourceLabels[$slugPrefix] ?? $slugPrefix;
-                $name = "{$actionLabel} {$resourceLabel}";
-
-                $definitions[] = compact('slug', 'name');
-            } elseif (is_string($key) && is_array($value)) {
-                $definitions = array_merge(
-                    $definitions,
-                    $this->buildPermissionDefinitions($value, $key, $this->resourceLabels[$key] ?? $key)
-                );
-            }
+        if ($admin) {
+            $admin->permissions()->sync(collect($permissions)->pluck('id')->all());
         }
-
-        return $definitions;
     }
 }

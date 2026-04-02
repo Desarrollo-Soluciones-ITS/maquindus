@@ -36,16 +36,15 @@ trait PreventsEditingTrashed
 
             $map = [
                 \App\Models\Document::class => route('filament.dashboard.resources.documents.view', ['record' => $record]),
-                \App\Models\Project::class => route('filament.dashboard.resources.projects.view', ['record' => $record]),
-                \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
                 \App\Models\Equipment::class => route('filament.dashboard.resources.equipment.view', ['record' => $record]),
                 \App\Models\Part::class => route('filament.dashboard.resources.parts.view', ['record' => $record]),
                 \App\Models\Supplier::class => route('filament.dashboard.resources.suppliers.view', ['record' => $record]),
-                \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
                 \App\Models\Person::class => route('filament.dashboard.resources.people.view', ['record' => $record]),
             ];
 
-            redirect($map[$modelClass]);
+            if (isset($map[$modelClass])) {
+                redirect($map[$modelClass]);
+            }
         }
     }
 

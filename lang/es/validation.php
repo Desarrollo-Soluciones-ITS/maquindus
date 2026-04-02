@@ -280,6 +280,6 @@ return [
         'value'                    => 'valor',
         'winner'                   => 'ganador',
         'work'                     => 'trabajo',
-        'year'                     => 'año',
+        'manufacturing_date'       => 'fecha de fabricación',
     ],
 ];

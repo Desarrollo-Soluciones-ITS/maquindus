@@ -4,7 +4,6 @@ namespace App\Filament\Resources\People\Schemas;
 
 use App\Filament\Inputs\PhoneInput;
 use App\Models\Country;
-use App\Models\Customer;
 use App\Models\Supplier;
 use App\Rules\PreventIllegalCharacters;
 use Filament\Forms\Components\MorphToSelect;
@@ -76,9 +75,6 @@ class PersonForm
                     ->types([
                         MorphToSelect\Type::make(Supplier::class)
                             ->label('Proveedor')
-                            ->titleAttribute('name'),
-                        MorphToSelect\Type::make(Customer::class)
-                            ->label('Cliente')
                             ->titleAttribute('name'),
                     ])
                     ->modifyTypeSelectUsing(

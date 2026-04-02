@@ -19,11 +19,6 @@ class EquipmentTable
     {
         return $table
             ->columns([
-                TextColumn::make('projects.name')
-                    ->label('Nombre proyecto')
-                    ->badge()
-                    ->separator(', ')
-                    ->toggleable(),
                 TextColumn::make('name')
                     ->label('Nombre equipo')
                     ->searchable()
@@ -74,8 +69,8 @@ class EquipmentTable
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($equipments) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $equipments;
                             public function __construct($equipments) { $this->equipments = $equipments; }
-                            public function collection() { return $this->equipments->map(fn($equipment) => ['Nombre proyecto' => $equipment->projects->pluck('name')->join(', '), 'Nombre equipo' => $equipment->name, 'Modelo' => $equipment->model, 'Serial' => $equipment->serial, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
-                            public function headings(): array { return ['Nombre proyecto', 'Nombre equipo', 'Modelo', 'Serial', 'Descripción', 'Fecha']; }
+                            public function collection() { return $this->equipments->map(fn($equipment) => ['Nombre equipo' => $equipment->name, 'Modelo' => $equipment->model, 'Serial' => $equipment->serial, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
+                            public function headings(): array { return ['Nombre equipo', 'Modelo', 'Serial', 'Descripción', 'Fecha']; }
                         }, $fileName);
                     }),
             ]);

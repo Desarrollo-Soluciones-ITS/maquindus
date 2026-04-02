@@ -239,28 +239,14 @@ class FilesScan extends Command
     {
         [$folders, $ext, $name, $mime] = $this->pathing($line, $path);
 
-        $model = '';
-        $project = null;
-        if ($folders->isNotEmpty()) {
-            // eliminar para onlydocs
-            $model = $folders->shift();
-
-            $project = $equipment->projects()->firstOrCreate([
-                'name' => $model,
-            ]);
-
-            $model = '/' . $model;
-        }
-
         $prefix = '';
         if ($folders->isNotEmpty()) {
-            // maybe limitar esto a una cierta profunidad usando ->pop($depth) before ->join
             $prefix = $folders->join(' - ') . ' - ';
         }
 
-        $dest = "Proyectos{$model}/{$prefix}{$name} - V1.{$ext}";
+        $dest = "Equipos/{$equipment->name}/Documentos asociados/{$prefix}{$name} - V1.{$ext}";
 
-        $this->move($path, $dest, $name, $mime, documentable: $project);
+        $this->move($path, $dest, $name, $mime, documentable: $equipment);
     }
 
     public function planos(string $line, string $path, Equipment $equipment)

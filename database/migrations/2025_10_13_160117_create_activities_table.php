@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('comment');
-            $table->foreignUuid('project_id')->constrained();
             $table->timestamps();
         });
     }

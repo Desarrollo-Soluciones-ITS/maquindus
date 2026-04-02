@@ -8,5 +8,4 @@ enum Prefix: string
 
     case Equipment = 'EQ';
     case Part = 'RE';
-    case Project = 'PR';
 }

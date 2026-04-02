@@ -12,11 +12,6 @@ class Country extends Model
 {
     use HasFactory, HasUuids;
 
-    public function customers(): HasMany
-    {
-        return $this->hasMany(Customer::class);
-    }
-
     public function suppliers(): HasMany
     {
         return $this->hasMany(Supplier::class);

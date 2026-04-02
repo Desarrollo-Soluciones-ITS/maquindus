@@ -17,11 +17,6 @@ class Equipment extends Model
 {
     use HasFactory, HasUuids, LogsActivity, HasActivityLog, SoftDeletes, Searchable, Lockable;
 
-    public function purchaseOrders()
-    {
-        return $this->belongsToMany(PurchaseOrder::class, 'equipment_purchase_order');
-    }
-
     public function supplierPurchaseOrders()
     {
         return $this->belongsToMany(SupplierPurchaseOrder::class, 'equipment_supplier_purchase_order');
@@ -85,11 +80,6 @@ class Equipment extends Model
     public function parts(): BelongsToMany
     {
         return $this->belongsToMany(Part::class);
-    }
-
-    public function projects(): BelongsToMany
-    {
-        return $this->belongsToMany(Project::class);
     }
 
     public function suppliers(): BelongsToMany

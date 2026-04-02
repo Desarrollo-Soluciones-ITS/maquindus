@@ -4,27 +4,28 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Activity;
-use App\Models\Project;
 use App\Models\Person;
 
 class ActivitySeeder extends Seeder
 {
     public function run(): void
     {
-        $project = Project::first();
-
         $activities = [
-            ['title' => 'Instalación de equipo principal', 'comment' => 'Se inició la instalación del equipo principal del proyecto en el área designada.', 'project_id' => $project->id],
-            ['title' => 'Pruebas de carga y calibración', 'comment' => 'Se realizaron las diferentes pruebas de carga y calibración con los procedimientos necesarios.', 'project_id' => $project->id],
+            ['title' => 'Instalación de equipo principal', 'comment' => 'Se inició la instalación del equipo principal en el área designada.'],
+            ['title' => 'Pruebas de carga y calibración', 'comment' => 'Se realizaron las pruebas de carga y calibración con los procedimientos necesarios.'],
+            ['title' => 'Inspección de repuestos críticos', 'comment' => 'Se verificó el inventario de repuestos estratégicos asociados a los equipos operativos.'],
         ];
 
-        foreach ($activities as $a) {
-            $activity = Activity::create($a);
+        $peopleIds = Person::query()->limit(3)->pluck('id')->all();
 
-            // Asociar personas si existen
-            $person = Person::first();
-            if ($person) {
-                $activity->people()->syncWithoutDetaching([$person->id]);
+        foreach ($activities as $a) {
+            $activity = Activity::updateOrCreate(
+                ['title' => $a['title']],
+                $a,
+            );
+
+            if ($peopleIds !== []) {
+                $activity->people()->syncWithoutDetaching($peopleIds);
             }
         }
     }

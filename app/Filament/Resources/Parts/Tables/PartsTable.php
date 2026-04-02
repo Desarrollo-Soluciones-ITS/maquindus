@@ -29,11 +29,6 @@ class PartsTable
                     ->badge()
                     ->separator(', ')
                     ->toggleable(),
-                TextColumn::make('projects.name')
-                    ->label('Proyectos relacionados')
-                    ->badge()
-                    ->separator(', ')
-                    ->toggleable(),
                 TextColumn::make('about')
                     ->label('Descripción')
                     ->limit(75),
@@ -69,8 +64,8 @@ class PartsTable
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($parts) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $parts;
                             public function __construct($parts) { $this->parts = $parts; }
-                            public function collection() { return $this->parts->map(fn($part) => ['Código' => $part->code, 'Nombre' => $part->name, 'Equipos relacionados' => $part->equipment->pluck('name')->join(', '), 'Proyectos relacionados' => $part->projects->pluck('name')->join(', '), 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
-                            public function headings(): array { return ['Código', 'Nombre', 'Equipos relacionados', 'Proyectos relacionados', 'Descripción', 'Fecha']; }
+                            public function collection() { return $this->parts->map(fn($part) => ['Código' => $part->code, 'Nombre' => $part->name, 'Equipos relacionados' => $part->equipment->pluck('name')->join(', '), 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
+                            public function headings(): array { return ['Código', 'Nombre', 'Equipos relacionados', 'Descripción', 'Fecha']; }
                         }, $fileName);
                     }),
             ]);

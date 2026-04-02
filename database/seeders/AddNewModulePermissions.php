@@ -13,38 +13,17 @@ class AddNewModulePermissions extends Seeder
      */
     public function run(): void
     {
-        Permission::create(([
-            'name' => 'Actualizar contraseña',
-            'slug' => 'users.update_password'
-        ]));
-
-        Permission::create(([
-            'name' => 'Ver órden de compra',
-            'slug' => 'purchase_orders.read'
-        ]));
-        Permission::create(([
-            'name' => 'Crear órden de compra',
-            'slug' => 'purchase_orders.create'
-        ]));
-        Permission::create(([
-            'name' => 'Actualizar órden de compra',
-            'slug' => 'purchase_orders.delete'
-        ]));
-        Permission::create(([
-            'name' => 'Archivar órden de compra',
-            'slug' => 'purchase_orders.edit'
-        ]));
-        Permission::create(([
-            'name' => 'Listar ordenes de compra',
-            'slug' => 'purchase_orders.view'
-        ]));
-        Permission::create(([
-            'name' => 'Restaurar órdenes de compra',
-            'slug' => 'purchase_orders.restore'
-        ]));
+        foreach (Permission::buildDefinitions() as $definition) {
+            Permission::updateOrCreate(
+                ['slug' => $definition['slug']],
+                ['name' => $definition['name']],
+            );
+        }
 
         $adminRole = Role::where('name', 'Administrador')->first();
-        $purchaseOrderPermissions = Permission::where('slug', 'like', 'purchase_orders.%')->pluck('id')->toArray();
-        $adminRole->permissions()->syncWithoutDetaching($purchaseOrderPermissions);
+
+        if ($adminRole) {
+            $adminRole->permissions()->syncWithoutDetaching(Permission::pluck('id')->all());
+        }
     }
 }

@@ -22,7 +22,6 @@ class ArchiveAction
             ->modalSubmitActionLabel('Archivar')
             ->modalCancelActionLabel('Cancelar')
             ->label('Archivar')
-            ->beforeFormFilled(fn($record) => dd($record))
             ->modalHeading(function (?Model $record) {
                 if (!$record) {
                     return 'Archivar registro';
@@ -44,16 +43,13 @@ class ArchiveAction
 
                 $map = [
                     Document::class => route('filament.dashboard.resources.documents.view', ['record' => $record]),
-                    \App\Models\Project::class => route('filament.dashboard.resources.projects.view', ['record' => $record]),
-                    \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
                     \App\Models\Equipment::class => route('filament.dashboard.resources.equipment.view', ['record' => $record]),
                     \App\Models\Part::class => route('filament.dashboard.resources.parts.view', ['record' => $record]),
                     \App\Models\Supplier::class => route('filament.dashboard.resources.suppliers.view', ['record' => $record]),
-                    \App\Models\Customer::class => route('filament.dashboard.resources.customers.view', ['record' => $record]),
                     \App\Models\Person::class => route('filament.dashboard.resources.people.view', ['record' => $record]),
                 ];
 
-                if ($livewire instanceof \Filament\Resources\Pages\EditRecord) {
+                if ($livewire instanceof \Filament\Resources\Pages\EditRecord && isset($map[$modelClass])) {
                     return redirect($map[$modelClass]);
                 }
 

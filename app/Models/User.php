@@ -66,10 +66,13 @@ class User extends Authenticatable implements FilamentUser
 
     public function hasPermission(string $name): bool
     {
-        $permission = $this->role?->permissions
-            ->first(fn($perm) => $perm->slug === $name);
+        $permissions = $this->role?->permissions;
 
-        return !!$permission;
+        if (!$permissions) {
+            return false;
+        }
+
+        return $permissions->contains(fn($permission) => $permission->slug === $name);
     }
 
     public function canAccessPanel(Panel $panel): bool
