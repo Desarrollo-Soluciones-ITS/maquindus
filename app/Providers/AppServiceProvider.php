@@ -24,6 +24,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Model::unguard();
 
         Table::configureUsing(function (Table $table) {
@@ -104,7 +109,7 @@ class AppServiceProvider extends ServiceProvider
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::TOPBAR_LOGO_AFTER,
-            fn (): View => view('brand'),
+            fn(): View => view('brand'),
         );
 
         Password::defaults(function () {
