@@ -8,7 +8,6 @@ use App\Filament\Actions\Documents\PreviewAction;
 use App\Models\Person;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -37,7 +36,7 @@ class FilesRelationManager extends RelationManager
             ->components([
                 FileUpload::make('path')
                     ->label('Archivo de nueva versión')
-                    ->disk('local')
+                    ->disk('filemanager')
                     ->directory(
                         function (RelationManager $livewire) {
                             $document = $livewire->getOwnerRecord();
@@ -156,10 +155,6 @@ class FilesRelationManager extends RelationManager
                         OpenFolderAction::make()->hidden(!currentUserHasPermission('files.open_in_folder')),
                         DownloadAction::make()->hidden(!currentUserHasPermission('files.download')),
                     ])->dropdown(false),
-                    ViewAction::make()
-                        ->color(Color::Blue)
-                        ->modalHeading('Datos de la versión')
-                        ->hidden(!currentUserHasPermission('files.show')),
                 ]),
             ]);
     }

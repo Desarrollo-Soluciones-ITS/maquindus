@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             UserSeeder::class,
             RoleSeeder::class,
-            PermissionSeeder::class,
+            FileManagerPermissionsSeeder::class,
             AddNewModulePermissions::class,
             SupplierSeeder::class,
             EquipmentSeeder::class,
@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             EquipmentMetadataSeeder::class,
             DocumentSeeder::class,
             FileSeeder::class,
+            FileManagerPermissionsSeeder::class,
         ]);
     }
 }

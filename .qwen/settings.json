@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir *)",
+      "Bash(findstr *)",
+      "Bash(echo *)",
+      "WebFetch(raw.githubusercontent.com)",
+      "WebFetch(github.com)"
+    ]
+  },
+  "$version": 3
+}

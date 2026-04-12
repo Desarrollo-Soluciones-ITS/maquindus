@@ -34,6 +34,7 @@ class Permission extends Model
         'unsync' => 'Desvincular',
         'restore' => 'Restaurar',
         'update_password' => 'Actualizar contraseña',
+        'preview' => 'Previsualizar',
     ];
 
     public static array $resourceLabels = [
@@ -48,12 +49,19 @@ class Permission extends Model
         'activity_logs' => 'bitácora',
         'search' => 'buscador',
         'purchase_orders' => 'órden de compra proveedor',
+        'filemanager' => 'gestor de archivos',
     ];
 
     public static array $permissions = [
         'dashboard',
         'roles',
         'search',
+        'filemanager' => [
+            'view',
+            'upload',
+            'delete',
+            'download',
+        ],
         'equipments' => [
             'create',
             'edit',

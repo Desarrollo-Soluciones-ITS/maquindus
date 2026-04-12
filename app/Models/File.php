@@ -36,6 +36,16 @@ class File extends Model
         return $this->belongsTo(Document::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(\LivewireFilemanager\Filemanager\Models\Media::class);
+    }
+
     public function getFormattedFileSizeAttribute(): string
     {
         if (!$this->file_size) {

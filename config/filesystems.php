@@ -73,6 +73,17 @@ return [
             'throw' => false,
         ],
 
+        'filemanager' => [
+            'driver' => 'local',
+            'root' => env('STORAGE_ROOT', storage_path('app/filemanager')),
+            'url' => env('APP_URL') . '/filemanager-files',
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+            'visibility' => 'public',
+            'directory_visibility' => 'public',
+        ],
+
     ],
 
     /*

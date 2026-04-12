@@ -49,6 +49,7 @@ class DocumentForm
                 FileUpload::make('path')
                     ->label('Archivo')
                     ->disk('local')
+                    // ->disk('filemanager')
                     ->hiddenOn(Operation::Edit)
                     ->directory(
                         function (Get $get, RelationManager $livewire) {

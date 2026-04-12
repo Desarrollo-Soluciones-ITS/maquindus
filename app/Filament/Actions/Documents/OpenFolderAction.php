@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Documents;
 
+use App\Filament\Pages\FileManagerPage;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -13,18 +14,24 @@ class OpenFolderAction
         return Action::make('folder')
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
-            ->action(function ($record, $livewire) {
+            ->url(function ($record) {
                 $file = $record->current ?? $record;
-                try {
-                    $url = exec_url($file->path, endpoint: 'folder');
-                    $livewire->js("fetch('$url')");
-                } catch (\Throwable $th) {
-                    dd($th);
+
+                if (!$file) {
                     Notification::make()
-                        ->title('No se encontró el documento.')
+                        ->title('Archivo no encontrado')
+                        ->body('No se encontró el archivo actual del documento.')
                         ->danger()
                         ->send();
+                    return null;
                 }
-            });
+
+                // Pass the file ID as a parameter to FileManagerPage
+                return FileManagerPage::getUrl([
+                    'fileId' => $file->id,
+                ]);
+            })
+            ->openUrlInNewTab()
+            ->hidden(fn() => !currentUserHasPermission('files.open_in_folder'));
     }
 }

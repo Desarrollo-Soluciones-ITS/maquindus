@@ -8,7 +8,6 @@ use App\Filament\Actions\Documents\DownloadAction;
 use App\Filament\Actions\Documents\EditAction;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Actions\Documents\PreviewAction;
-use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
 use App\Filament\RelationManagers\DocumentsRelationManager;
@@ -194,7 +193,6 @@ class DocumentsTable
                                     $action->halt();
                                 }
                             }),
-                        ViewAction::make()->hidden(!currentUserHasPermission('documents.show')),
                     ])->dropdown(false),
                     EditAction::make()->hidden(fn($livewire, $record) => !managed_from_equipment($livewire) || $record->trashed() || !currentUserHasPermission('documents.edit')),
                     ArchiveAction::make()

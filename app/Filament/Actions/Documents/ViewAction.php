@@ -2,23 +2,31 @@
 
 namespace App\Filament\Actions\Documents;
 
-use App\Filament\Resources\Documents\DocumentResource;
+use App\Filament\Pages\FileManagerPage;
 use Filament\Actions\Action;
-use Filament\Actions\ViewAction as FilamentViewAction;
 use Filament\Support\Icons\Heroicon;
 
 class ViewAction
 {
     public static function make(): Action
     {
-        return FilamentViewAction::make('view')
-            ->label('Versiones')
-            ->icon(Heroicon::ListBullet)
+        return Action::make('view')
+            ->label('Ver en Gestor')
+            ->icon(Heroicon::FolderOpen)
             ->url(function ($record) {
-                return DocumentResource::getUrl('view', [
-                    'record' => $record->id
+                // Get the current file
+                $file = $record->current;
+
+                if (!$file) {
+                    return null;
+                }
+
+                // Pass the file ID as a parameter
+                return FileManagerPage::getUrl([
+                    'fileId' => $file->id,
                 ]);
-            });
+            })
+            ->openUrlInNewTab();
     }
 }
 

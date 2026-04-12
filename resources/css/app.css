@@ -3,6 +3,7 @@
 @source '../../app/Filament/**/*';
 @source '../../resources/views/**/*';
 @source '../../vendor/malzariey/filament-daterangepicker-filter/resources/views/**/*.blade.php';
+@source '../../vendor/livewire-filemanager/filemanager/resources/views/**/*.blade.php';
 
 .fi-sidebar {
   background-color: var(--gray-900);
@@ -13,21 +14,17 @@
     color: var(--gray-200);
   }
 
-  &.fi-active>.fi-sidebar-item-btn {
-    background-color: color-mix(in oklab,
-        var(--color-white) 5%,
-        transparent);
+  &.fi-active > .fi-sidebar-item-btn {
+    background-color: color-mix(in oklab, var(--color-white) 5%, transparent);
 
     .fi-icon {
       color: var(--primary-400);
     }
   }
 
-  &.fi-sidebar-item-has-url>.fi-sidebar-item-btn:hover {
+  &.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover {
     @media (hover: hover) {
-      background-color: color-mix(in oklab,
-          var(--color-white) 5%,
-          transparent);
+      background-color: color-mix(in oklab, var(--color-white) 5%, transparent);
     }
   }
 }
@@ -72,7 +69,7 @@ table.fi-in-key-value tbody td {
   font-family: "Inter Variable";
 }
 
-.fi-fo-key-value .fi-fo-key-value-table>tbody>tr>td .fi-input {
+.fi-fo-key-value .fi-fo-key-value-table > tbody > tr > td .fi-input {
   font-family: "Inter Variable";
 }
 
