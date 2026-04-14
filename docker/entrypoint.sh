@@ -10,6 +10,9 @@ php artisan view:cache
 php artisan event:cache
 php artisan filament:optimize
 
+echo "▶ Publicando assets de Livewire..."
+php artisan livewire:publish --assets --force
+
 echo "▶ Ejecutando migraciones pendientes..."
 php artisan migrate --force
 
