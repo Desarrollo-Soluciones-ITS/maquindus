@@ -23,7 +23,7 @@ class ManageSearchIndex extends Command
 
     public function handle()
     {
-        $databasePath = database_path('search-index.sqlite');
+        $databasePath = storage_path('app/maquindus/search-index.sqlite');
 
         // 1. Manejar creación / reconstrucción de la base de datos
         if ($this->option('rebuild') || !File::exists($databasePath)) {

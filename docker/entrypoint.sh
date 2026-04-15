@@ -23,9 +23,10 @@ echo "▶ Enlazando storage..."
 php artisan storage:link --force 2>/dev/null || true
 
 echo "▶ Preparando base de datos SQLite para búsqueda..."
-if [ ! -f "database/search-index.sqlite" ]; then
-    touch database/search-index.sqlite
-    chown www-data:www-data database/search-index.sqlite
+if [ ! -f "storage/app/maquindus/search-index.sqlite" ]; then
+    mkdir -p storage/app/maquindus
+    touch storage/app/maquindus/search-index.sqlite
+    chown www-data:www-data storage/app/maquindus/search-index.sqlite
     php artisan search:index
 fi
 
