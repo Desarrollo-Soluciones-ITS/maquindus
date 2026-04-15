@@ -22,6 +22,11 @@ php artisan migrate --force
 echo "▶ Enlazando storage..."
 php artisan storage:link --force 2>/dev/null || true
 
+echo "▶ Corrigiendo permisos de storage..."
+chown -R www-data:www-data storage/app/maquindus
+find storage/app/maquindus -type d -exec chmod 755 {} \;
+find storage/app/maquindus -type f -exec chmod 644 {} \;
+
 echo "▶ Preparando base de datos SQLite para búsqueda..."
 if [ ! -f "storage/app/maquindus/search-index.sqlite" ]; then
     mkdir -p storage/app/maquindus
