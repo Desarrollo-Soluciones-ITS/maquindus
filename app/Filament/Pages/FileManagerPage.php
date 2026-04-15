@@ -182,6 +182,9 @@ class FileManagerPage extends Page
         $this->folders = [];
         $this->fileList = [];
 
+        // Files to hide from the UI
+        $hiddenFiles = ['search-index.sqlite'];
+
         try {
             $iterator = new \FilesystemIterator($this->currentPath, \FilesystemIterator::SKIP_DOTS);
 
@@ -193,6 +196,11 @@ class FileManagerPage extends Page
                         'modified' => date('Y-m-d H:i', $item->getMTime()),
                     ];
                 } else {
+                    // Skip hidden files
+                    if (in_array($item->getFilename(), $hiddenFiles)) {
+                        continue;
+                    }
+
                     $this->fileList[] = [
                         'name' => $item->getFilename(),
                         'path' => $item->getPathname(),
