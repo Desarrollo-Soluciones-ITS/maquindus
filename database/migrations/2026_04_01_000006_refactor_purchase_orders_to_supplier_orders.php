@@ -15,10 +15,6 @@ return new class extends Migration {
         }
 
         $this->backfillSupplierIds();
-
-        Schema::dropIfExists('equipment_purchase_order');
-        Schema::dropIfExists('part_purchase_order');
-        Schema::dropIfExists('purchase_orders');
     }
 
     public function down(): void

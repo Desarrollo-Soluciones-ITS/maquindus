@@ -11,14 +11,17 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
-            $table->string('model')->nullable()->after('name');
-            $table->string('serial')->nullable()->after('model');
-            $table->string('type')->nullable()->after('serial');
-        });
+            if (! Schema::hasColumn('equipment', 'model')) {
+                $table->string('model')->nullable()->after('name');
+            }
 
-        Schema::table('equipment', function (Blueprint $table) {
-            $table->dropUnique('equipment_code_unique');
-            $table->dropColumn(['code', 'details']);
+            if (! Schema::hasColumn('equipment', 'serial')) {
+                $table->string('serial')->nullable()->after('model');
+            }
+
+            if (! Schema::hasColumn('equipment', 'type')) {
+                $table->string('type')->nullable()->after('serial');
+            }
         });
     }
 
@@ -28,9 +31,13 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
-            $table->string('code')->nullable()->unique()->after('name');
-            $table->json('details')->nullable()->after('about');
-            $table->dropColumn(['model', 'serial', 'type']);
+            $columnsToDrop = collect(['model', 'serial', 'type'])
+                ->filter(fn (string $column): bool => Schema::hasColumn('equipment', $column))
+                ->all();
+
+            if ($columnsToDrop !== []) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

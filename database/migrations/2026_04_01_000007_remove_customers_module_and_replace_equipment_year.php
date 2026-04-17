@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        $this->removeCustomerData();
         $this->deleteCustomerPermissions();
         $this->deleteCustomerSearchIndexEntries();
         $this->replaceEquipmentYearWithManufacturingDate();
@@ -68,42 +67,6 @@ return new class extends Migration {
         }
     }
 
-    private function removeCustomerData(): void
-    {
-        if (Schema::hasTable('documents')) {
-            $customerDocumentIds = DB::table('documents')
-                ->where('documentable_type', 'App\\Models\\Customer')
-                ->pluck('id');
-
-            if ($customerDocumentIds->isNotEmpty() && Schema::hasTable('files')) {
-                DB::table('files')->whereIn('document_id', $customerDocumentIds)->delete();
-            }
-
-            DB::table('documents')
-                ->where('documentable_type', 'App\\Models\\Customer')
-                ->delete();
-        }
-
-        if (Schema::hasTable('people')) {
-            DB::table('people')
-                ->where('personable_type', 'App\\Models\\Customer')
-                ->update([
-                    'personable_type' => null,
-                    'personable_id' => null,
-                ]);
-        }
-
-        $activityLogTable = config('activitylog.table_name', 'activity_log');
-        if (Schema::hasTable($activityLogTable)) {
-            DB::table($activityLogTable)
-                ->where('subject_type', 'App\\Models\\Customer')
-                ->orWhere('log_name', 'Clientes')
-                ->delete();
-        }
-
-        Schema::dropIfExists('customers');
-    }
-
     private function deleteCustomerPermissions(): void
     {
         if (!Schema::hasTable('permissions')) {
@@ -152,10 +115,6 @@ return new class extends Migration {
 
         if (Schema::hasColumn('equipment', 'year')) {
             DB::statement("UPDATE equipment SET manufacturing_date = COALESCE(manufacturing_date, STR_TO_DATE(CONCAT(year, '-01-01'), '%Y-%m-%d')) WHERE year IS NOT NULL");
-
-            Schema::table('equipment', function (Blueprint $table) {
-                $table->dropColumn('year');
-            });
         }
     }
 };

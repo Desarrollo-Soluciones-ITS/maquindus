@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        $this->deleteLegacyProjectData();
-        $this->dropActivityProjectColumn();
-        $this->dropProjectTables();
         $this->deleteProjectPermissions();
         $this->deleteProjectSearchIndexEntries();
     }
@@ -70,57 +67,6 @@ return new class extends Migration {
                 $table->foreignUuid('project_id')->nullable()->after('comment')->constrained('projects');
             });
         }
-    }
-
-    private function deleteLegacyProjectData(): void
-    {
-        if (Schema::hasTable('documents')) {
-            $projectDocumentIds = DB::table('documents')
-                ->where('documentable_type', 'App\\Models\\Project')
-                ->pluck('id');
-
-            if ($projectDocumentIds->isNotEmpty() && Schema::hasTable('files')) {
-                DB::table('files')->whereIn('document_id', $projectDocumentIds)->delete();
-            }
-
-            DB::table('documents')->where('documentable_type', 'App\\Models\\Project')->delete();
-        }
-
-        if (Schema::hasTable('activities')) {
-            if (Schema::hasTable('activity_person')) {
-                DB::table('activity_person')->delete();
-            }
-
-            DB::table('activities')->delete();
-        }
-
-        $activityLogTable = config('activitylog.table_name', 'activity_log');
-        if (Schema::hasTable($activityLogTable)) {
-            DB::table($activityLogTable)
-                ->where('subject_type', 'App\\Models\\Project')
-                ->orWhere('log_name', 'Proyectos')
-                ->delete();
-        }
-    }
-
-    private function dropActivityProjectColumn(): void
-    {
-        if (!Schema::hasTable('activities') || !Schema::hasColumn('activities', 'project_id')) {
-            return;
-        }
-
-        Schema::table('activities', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('project_id');
-        });
-    }
-
-    private function dropProjectTables(): void
-    {
-        Schema::dropIfExists('project_purchase_order');
-        Schema::dropIfExists('equipment_project');
-        Schema::dropIfExists('part_project');
-        Schema::dropIfExists('person_project');
-        Schema::dropIfExists('projects');
     }
 
     private function deleteProjectPermissions(): void
