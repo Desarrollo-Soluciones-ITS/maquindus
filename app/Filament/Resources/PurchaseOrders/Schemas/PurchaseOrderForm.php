@@ -28,6 +28,7 @@ class PurchaseOrderForm
             Select::make('supplier_id')
                 ->label('Proveedor')
                 ->options(fn(): array => Supplier::query()->orderBy('name')->pluck('name', 'id')->all())
+                ->actionSchemaModel(Supplier::class)
                 ->searchable()
                 ->preload()
                 ->native(false)

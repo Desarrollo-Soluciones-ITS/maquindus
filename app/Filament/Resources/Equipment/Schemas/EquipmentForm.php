@@ -5,14 +5,15 @@ namespace App\Filament\Resources\Equipment\Schemas;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Models\Supplier;
+use App\Models\SupplierPurchaseOrder;
 use App\Rules\PreventIllegalCharacters;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Alignment;
 
 class EquipmentForm
 {
@@ -44,9 +45,7 @@ class EquipmentForm
                     ->required(),
                 TextInput::make('type')
                     ->label('Tipo')
-                    ->placeholder('Ej. INDUSTRIAL1')
-                    ->alphaNum()
-                    ->minLength(10)
+                    ->placeholder('Ej. Bomba centrífuga vertical')
                     ->maxLength(80)
                     ->required(),
                 DatePicker::make('manufacturing_date')
@@ -70,18 +69,50 @@ class EquipmentForm
                     ->placeholder('Selecciona uno o varios proveedores')
                     ->createOptionForm(SupplierForm::getComponents())
                     ->createOptionUsing(fn(array $data): string => Supplier::create($data)->getKey()),
-                Repeater::make('supplier_purchase_orders_data')
-                    ->label('Órdenes de compra proveedor')
-                    ->schema(PurchaseOrderForm::getComponents(shouldValidateUniqueness: false))
-                    ->columns(2)
-                    ->defaultItems(0)
-                    ->cloneable()
-                    ->reorderable(false)
-                    ->addActionLabel('Agregar orden')
-                    ->addActionAlignment(Alignment::End)
-                    ->addAction(fn (Action $action) => $action
-                        ->icon('heroicon-m-plus')
-                        ->color('primary'))
+                Section::make('Órdenes de compra proveedor')
+                    ->description('Selecciona las órdenes existentes vinculadas al equipo o crea una nueva.')
+                    ->headerActions([
+                        Action::make('createSupplierPurchaseOrder')
+                            ->label('Nueva orden')
+                            ->icon('heroicon-m-plus')
+                            ->color('primary')
+                            ->hidden(!currentUserHasPermission('purchase_orders.create'))
+                            ->schema(PurchaseOrderForm::getComponents())
+                            ->modalHeading('Crear orden de compra proveedor')
+                            ->modalSubmitActionLabel('Crear orden')
+                            ->successNotificationTitle('Orden creada correctamente')
+                            ->action(function (array $data): void {
+                                SupplierPurchaseOrder::updateOrCreate(
+                                    ['order_no' => $data['order_no']],
+                                    [
+                                        'supplier_id' => $data['supplier_id'],
+                                        'description' => $data['description'] ?? null,
+                                    ],
+                                );
+                            }),
+                    ])
+                    ->schema([
+                        Select::make('supplierPurchaseOrders')
+                            ->label('Órdenes registradas')
+                            ->relationship(
+                                name: 'supplierPurchaseOrders',
+                                titleAttribute: 'order_no',
+                                modifyQueryUsing: fn(Builder $query) => $query
+                                    ->with('supplier')
+                                    ->orderByDesc('created_at')
+                                    ->orderBy('order_no'),
+                            )
+                            ->getOptionLabelFromRecordUsing(fn(SupplierPurchaseOrder $record): string => collect([
+                                $record->order_no,
+                                $record->supplier?->name,
+                            ])->filter()->join(' · '))
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->placeholder('Selecciona una o varias órdenes registradas')
+                            ->columnSpanFull(),
+                    ])
                     ->columnSpanFull(),
             ]);
     }
