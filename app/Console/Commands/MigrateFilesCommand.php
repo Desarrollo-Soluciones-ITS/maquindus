@@ -38,6 +38,7 @@ class MigrateFilesCommand extends Command
         $disk = $this->option('disk');
         $storage = Storage::disk($disk);
         $dryRun = $this->option('dry-run');
+        $skippedWithError = [];
 
         if (!is_dir($source)) {
             $this->error("El directorio origen no existe: $source");
@@ -59,92 +60,103 @@ class MigrateFilesCommand extends Command
             foreach ($finder as $file) {
                 $relative = str_replace('\\', '/', $file->getRelativePathname());
 
-                if ($this->shouldSkipFile($file->getFilename())) {
-                    $bar->advance();
-                    continue;
+                try {
+                    if ($this->shouldSkipFile($file->getFilename())) {
+                        $bar->advance();
+                        continue;
+                    }
+
+                    $directorySegments = $this->splitPathSegments($file->getRelativePath());
+
+                    // Determinar tipo de entidad raíz
+                    $rootFolder = $directorySegments[0] ?? null;
+                    if (!in_array($rootFolder, self::ROOT_FOLDERS, true)) {
+                        $bar->advance();
+                        continue;
+                    }
+
+                    // Obtener el modelo padre base (equipment, project, supplier o person)
+                    $entityType = null;
+                    $entityName = $directorySegments[1] ?? ($rootFolder === 'Equipos' ? 'Equipos_Varios' :
+                        ($rootFolder === 'Proyectos' ? 'Proyectos_Varios' :
+                            ($rootFolder === 'Proveedores' ? 'Proveedores_Varios' : 'Contactos_Varios')));
+
+                    $baseModel = null;
+                    if ($rootFolder === 'Equipos') {
+                        $entityType = 'equipment';
+                        $baseModel = $this->getOrCreateEntity($entityType, $entityName);
+                    } elseif ($rootFolder === 'Proyectos') {
+                        $entityType = 'project';
+                        $baseModel = $this->getOrCreateEntity($entityType, $entityName);
+                    } elseif ($rootFolder === 'Proveedores') {
+                        $entityType = 'supplier';
+                        $baseModel = $this->getOrCreateEntity($entityType, $entityName);
+                    } elseif ($rootFolder === 'Contactos') {
+                        $entityType = 'person';
+                        $baseModel = $this->getOrCreateEntity($entityType, $entityName);
+                    }
+
+                    $contextSegments = array_slice($directorySegments, 2);
+                    [$category, $contextSegments] = $this->resolveCategoryAndContext($contextSegments);
+
+                    // Procesar nombre de archivo, versión y nombre del documento
+                    $filename = $file->getFilename();
+                    $extension = $this->sanitizeExtension($file->getExtension());
+                    $baseName = pathinfo($filename, PATHINFO_FILENAME);
+                    $version = 1;
+
+                    if (preg_match('/- V(\d+)$/', $baseName, $matches)) {
+                        $version = (int) $matches[1];
+                        $baseName = preg_replace('/- V\d+$/', '', $baseName);
+                    }
+
+                    $docName = trim($baseName);
+                    if (empty($docName)) {
+                        $docName = 'Sin título';
+                    }
+
+                    $docName = $this->buildDocumentName($docName, $contextSegments);
+
+                    // Crear o recuperar el documento asociado al modelo padre base.
+                    $document = $this->getOrCreateDocument($docName, $baseModel, $category);
+
+                    $destPath = $this->buildDestPath($baseModel, $entityType, $entityName, $category, $docName, $version, $extension);
+
+                    if ($destPath === '') {
+                        throw new \RuntimeException('La ruta destino quedó vacía después de normalizarse.');
+                    }
+
+                    if ($dryRun) {
+                        $this->line("Simulación: Copiar '{$file->getRealPath()}' a '{$destPath}' (doc: {$docName}, v{$version})");
+                        $bar->advance();
+                        continue;
+                    }
+
+                    // Asegurar ruta única en el destino
+                    $destPath = $this->makeUniquePath($storage, $destPath);
+
+                    // Copiar archivo
+                    $storage->put($destPath, file_get_contents($file->getRealPath()));
+
+                    $sizeBytes = $file->getSize();
+                    $mime = check_solidworks(
+                        mime: File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
+                        path: $file->getRealPath(),
+                    );
+
+                    // Registrar el archivo
+                    $document->files()->create([
+                        'path' => $destPath,
+                        'mime' => mime_type($mime),
+                        'version' => $version,
+                        'file_size' => $sizeBytes,
+                    ]);
+                } catch (\Throwable $fileException) {
+                    $skippedWithError[] = [
+                        'file' => $relative,
+                        'error' => $fileException->getMessage(),
+                    ];
                 }
-
-                $directorySegments = $this->splitPathSegments($file->getRelativePath());
-
-                // Determinar tipo de entidad raíz
-                $rootFolder = $directorySegments[0] ?? null;
-                if (!in_array($rootFolder, self::ROOT_FOLDERS, true)) {
-                    $bar->advance();
-                    continue;
-                }
-
-                // Obtener el modelo padre base (equipment, project, supplier o person)
-                $entityType = null;
-                $entityName = $directorySegments[1] ?? ($rootFolder === 'Equipos' ? 'Equipos_Varios' :
-                    ($rootFolder === 'Proyectos' ? 'Proyectos_Varios' :
-                        ($rootFolder === 'Proveedores' ? 'Proveedores_Varios' : 'Contactos_Varios')));
-
-                $baseModel = null;
-                if ($rootFolder === 'Equipos') {
-                    $entityType = 'equipment';
-                    $baseModel = $this->getOrCreateEntity($entityType, $entityName);
-                } elseif ($rootFolder === 'Proyectos') {
-                    $entityType = 'project';
-                    $baseModel = $this->getOrCreateEntity($entityType, $entityName);
-                } elseif ($rootFolder === 'Proveedores') {
-                    $entityType = 'supplier';
-                    $baseModel = $this->getOrCreateEntity($entityType, $entityName);
-                } elseif ($rootFolder === 'Contactos') {
-                    $entityType = 'person';
-                    $baseModel = $this->getOrCreateEntity($entityType, $entityName);
-                }
-
-                $contextSegments = array_slice($directorySegments, 2);
-                [$category, $contextSegments] = $this->resolveCategoryAndContext($contextSegments);
-
-                // Procesar nombre de archivo, versión y nombre del documento
-                $filename = $file->getFilename();
-                $extension = $file->getExtension();
-                $baseName = pathinfo($filename, PATHINFO_FILENAME);
-                $version = 1;
-
-                if (preg_match('/- V(\d+)$/', $baseName, $matches)) {
-                    $version = (int) $matches[1];
-                    $baseName = preg_replace('/- V\d+$/', '', $baseName);
-                }
-
-                $docName = trim($baseName);
-                if (empty($docName)) {
-                    $docName = 'Sin título';
-                }
-
-                $docName = $this->buildDocumentName($docName, $contextSegments);
-
-                // Crear o recuperar el documento asociado al modelo padre base.
-                $document = $this->getOrCreateDocument($docName, $baseModel, $category);
-
-                $destPath = $this->buildDestPath($baseModel, $entityType, $entityName, $category, $docName, $version, $extension);
-
-                if ($dryRun) {
-                    $this->line("Simulación: Copiar '{$file->getRealPath()}' a '{$destPath}' (doc: {$docName}, v{$version})");
-                    $bar->advance();
-                    continue;
-                }
-
-                // Asegurar ruta única en el destino
-                $destPath = $this->makeUniquePath($storage, $destPath);
-
-                // Copiar archivo
-                $storage->put($destPath, file_get_contents($file->getRealPath()));
-
-                $sizeBytes = $file->getSize();
-                $mime = check_solidworks(
-                    mime: File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
-                    path: $file->getRealPath(),
-                );
-
-                // Registrar el archivo
-                $document->files()->create([
-                    'path' => $destPath,
-                    'mime' => mime_type($mime),
-                    'version' => $version,
-                    'file_size' => $sizeBytes,
-                ]);
 
                 $bar->advance();
             }
@@ -154,11 +166,13 @@ class MigrateFilesCommand extends Command
                 $bar->finish();
                 $this->newLine();
                 $this->info('¡Migración completada con éxito!');
+                $this->reportSkippedFiles($skippedWithError);
             } else {
                 DB::rollBack();
                 $bar->finish();
                 $this->newLine();
                 $this->info('Simulación completada. No se realizaron cambios.');
+                $this->reportSkippedFiles($skippedWithError);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -225,14 +239,14 @@ class MigrateFilesCommand extends Command
     private function buildDocumentName(string $baseName, array $contextSegments): string
     {
         $segments = collect($contextSegments)
-            ->map(fn(string $segment) => trim($segment))
+            ->map(fn(string $segment) => $this->sanitizePathSegment($segment))
             ->filter();
 
-        $segments->push(trim($baseName));
+        $segments->push($this->sanitizePathSegment($baseName));
 
         return $segments
             ->unique()
-            ->implode(' - ');
+            ->implode(' - ') ?: 'Sin título';
     }
 
     private function splitPathSegments(string $path): array
@@ -247,6 +261,20 @@ class MigrateFilesCommand extends Command
     private function shouldSkipFile(string $filename): bool
     {
         return in_array(mb_strtolower($filename), self::SKIPPED_FILENAMES, true);
+    }
+
+    private function sanitizeExtension(string $extension): string
+    {
+        return trim((string) preg_replace('/[^A-Za-z0-9]+/', '', $extension));
+    }
+
+    private function sanitizePathSegment(string $value): string
+    {
+        $value = str_replace(['\\', '/'], ' ', $value);
+        $value = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $value) ?? '';
+        $value = preg_replace('/\s+/u', ' ', $value) ?? '';
+
+        return trim($value, " .\t\n\r\0\x0B");
     }
 
     /**
@@ -335,25 +363,25 @@ class MigrateFilesCommand extends Command
         $segments = [];
 
         if ($parentModel) {
-            $segments[] = model_to_spanish($parentModel::class, plural: true) ?? Str::headline($entityType);
-            $segments[] = $this->resolveEntityFolderName($parentModel);
+            $segments[] = $this->sanitizePathSegment(model_to_spanish($parentModel::class, plural: true) ?? Str::headline($entityType));
+            $segments[] = $this->sanitizePathSegment($this->resolveEntityFolderName($parentModel));
         } else {
-            $segments[] = Str::headline($entityType === 'project' ? 'proyectos' : $entityType);
-            $segments[] = $entityName;
+            $segments[] = $this->sanitizePathSegment(Str::headline($entityType === 'project' ? 'proyectos' : $entityType));
+            $segments[] = $this->sanitizePathSegment($entityName);
         }
 
         if ($category) {
-            $segments[] = $category->value;
+            $segments[] = $this->sanitizePathSegment($category->value);
         }
 
-        $filename = $documentName . " - V{$version}";
+        $filename = $this->sanitizePathSegment($documentName) . " - V{$version}";
         if ($extension !== '') {
             $filename .= '.' . $extension;
         }
 
-        $segments[] = $filename;
+        $segments[] = $this->sanitizePathSegment($filename);
 
-        return implode('/', $segments);
+        return implode('/', array_values(array_filter($segments, static fn(string $segment) => $segment !== '')));
     }
 
     private function resolveEntityFolderName(Model $model): string
@@ -374,6 +402,12 @@ class MigrateFilesCommand extends Command
      */
     private function makeUniquePath(Filesystem $storage, string $path): string
     {
+        $path = trim($path, '/');
+
+        if ($path === '') {
+            throw new \RuntimeException('La ruta destino está vacía y no puede escribirse en el disco.');
+        }
+
         $directory = dirname($path);
         $filename = basename($path);
         $name = pathinfo($filename, PATHINFO_FILENAME);
@@ -387,5 +421,23 @@ class MigrateFilesCommand extends Command
         }
 
         return $path;
+    }
+
+    private function reportSkippedFiles(array $skippedWithError): void
+    {
+        if ($skippedWithError === []) {
+            return;
+        }
+
+        $this->newLine();
+        $this->warn('Se omitieron archivos con error durante la migración: ' . count($skippedWithError));
+
+        foreach (array_slice($skippedWithError, 0, 20) as $item) {
+            $this->line('- ' . $item['file'] . ' -> ' . $item['error']);
+        }
+
+        if (count($skippedWithError) > 20) {
+            $this->line('... y ' . (count($skippedWithError) - 20) . ' archivos más.');
+        }
     }
 }
