@@ -177,7 +177,6 @@ class MigrateFilesCommand extends Command
                     'mime' => File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
                     'version' => $version,
                     'file_size' => $sizeMB,
-                    'user_id' => null,
                 ]);
 
                 $bar->advance();
