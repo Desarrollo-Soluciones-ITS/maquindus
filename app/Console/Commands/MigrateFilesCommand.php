@@ -15,7 +15,9 @@ use App\Models\EquipmentDataSheet;
 use App\Models\EquipmentReport;
 use App\Models\EquipmentFieldQuery;
 use App\Models\EquipmentSparePart;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Finder\Finder;
@@ -172,7 +174,7 @@ class MigrateFilesCommand extends Command
                 // Registrar el archivo
                 $document->files()->create([
                     'path' => $destPath,
-                    'mime' => $file->getMimeType() ?: 'application/octet-stream',
+                    'mime' => File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
                     'version' => $version,
                     'file_size' => $sizeMB,
                     'user_id' => null,
@@ -322,17 +324,17 @@ class MigrateFilesCommand extends Command
     /**
      * Asegura que la ruta de destino no exista, añadiendo sufijo numérico.
      */
-    private function makeUniquePath(Storage $storage, string $path): string
+    private function makeUniquePath(Filesystem $storage, string $path): string
     {
-        $disk = $storage->getDriver();
         $directory = dirname($path);
         $filename = basename($path);
         $name = pathinfo($filename, PATHINFO_FILENAME);
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
         $counter = 1;
 
-        while ($disk->exists($path)) {
-            $path = $directory . '/' . $name . '_' . $counter . '.' . $ext;
+        while ($storage->exists($path)) {
+            $suffix = '_' . $counter;
+            $path = $directory . '/' . $name . $suffix . ($ext !== '' ? '.' . $ext : '');
             $counter++;
         }
 
