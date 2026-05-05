@@ -16,11 +16,12 @@ class CodeInput
             ->label('Código')
             ->prefix("$prefix->value-")
             ->suffix('-' . now()->format('Y-m-d'))
-            ->placeholder('ABC')
-            ->length(3)
-            ->alpha()
+            ->placeholder('ABC123')
+            ->minLength(3)
+            ->maxLength(10)
+            ->alphaNum()
             ->mask(RawJs::make(<<<'JS'
-                $input.toUpperCase()
+                $input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
             JS))
             ->rule(fn(string $model, $record) => function (string $_, mixed $value, Closure $fail) use ($model, $record) {
                 $exists = $model::query()

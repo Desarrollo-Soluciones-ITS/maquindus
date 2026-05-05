@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PurchaseOrders\Schemas;
 
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Models\Supplier;
+use App\Models\SupplierPurchaseOrder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,7 +22,7 @@ class PurchaseOrderForm
             ->required();
 
         if ($shouldValidateUniqueness) {
-            $orderNo->unique(ignoreRecord: true);
+            $orderNo->unique(table: SupplierPurchaseOrder::class, column: 'order_no', ignoreRecord: true);
         }
 
         return [
