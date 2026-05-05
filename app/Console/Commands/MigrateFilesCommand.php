@@ -2,21 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Category;
 use App\Models\Equipment;
-use App\Models\Project;
 use App\Models\Supplier;
 use App\Models\Person;
 use App\Models\Document;
-use App\Models\EquipmentStandard;
-use App\Models\EquipmentTechnicalSpecification;
-use App\Models\EquipmentCatalog;
-use App\Models\EquipmentBlueprint;
-use App\Models\EquipmentDataSheet;
-use App\Models\EquipmentReport;
-use App\Models\EquipmentFieldQuery;
-use App\Models\EquipmentSparePart;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -30,22 +23,13 @@ class MigrateFilesCommand extends Command
                                           {--dry-run : Simula la migración sin copiar archivos ni guardar en BD}';
     protected $description = 'Copia archivos desde una estructura de directorio a la nueva organización de la base de datos.';
 
-    // Mapeo de subcarpetas dentro de Equipos hacia modelos específicos (metadata)
-    protected const EQUIPMENT_METADATA_MAP = [
-        'Plano' => EquipmentBlueprint::class,
-        'Planos' => EquipmentBlueprint::class,
-        'Hoja De Datos' => EquipmentDataSheet::class,
-        'Hoja de Datos' => EquipmentDataSheet::class,
-        'Catálogo' => EquipmentCatalog::class,
-        'Catalogo' => EquipmentCatalog::class,
-        'Especificaciones Tecnicas' => EquipmentTechnicalSpecification::class,
-        'Especificación Técnica' => EquipmentTechnicalSpecification::class,
-        'Norma' => EquipmentStandard::class,
-        'Consulta De Campo' => EquipmentFieldQuery::class,
-        'Consulta de Campo' => EquipmentFieldQuery::class,
-        'Reportes' => EquipmentReport::class,
-        'Reporte' => EquipmentReport::class,
-        'Repuestos' => EquipmentSparePart::class,
+    protected const ROOT_FOLDERS = ['Equipos', 'Proyectos', 'Proveedores', 'Contactos'];
+
+    protected const SKIPPED_FILENAMES = [
+        'thumbs.db',
+        'desktop.ini',
+        '.ds_store',
+        'duplicados.txt',
     ];
 
     public function handle()
@@ -73,12 +57,18 @@ class MigrateFilesCommand extends Command
 
         try {
             foreach ($finder as $file) {
-                $relative = $file->getRelativePathname();
-                $segments = explode(DIRECTORY_SEPARATOR, $relative);
+                $relative = str_replace('\\', '/', $file->getRelativePathname());
+
+                if ($this->shouldSkipFile($file->getFilename())) {
+                    $bar->advance();
+                    continue;
+                }
+
+                $directorySegments = $this->splitPathSegments($file->getRelativePath());
 
                 // Determinar tipo de entidad raíz
-                $rootFolder = $segments[0] ?? null;
-                if (!in_array($rootFolder, ['Equipos', 'Proyectos', 'Proveedores', 'Contactos'])) {
+                $rootFolder = $directorySegments[0] ?? null;
+                if (!in_array($rootFolder, self::ROOT_FOLDERS, true)) {
                     $this->warn("Ignorando archivo sin entidad padre válida: $relative");
                     $bar->advance();
                     continue;
@@ -86,7 +76,7 @@ class MigrateFilesCommand extends Command
 
                 // Obtener el modelo padre base (equipment, project, supplier o person)
                 $entityType = null;
-                $entityName = $segments[1] ?? ($rootFolder === 'Equipos' ? 'Equipos_Varios' :
+                $entityName = $directorySegments[1] ?? ($rootFolder === 'Equipos' ? 'Equipos_Varios' :
                     ($rootFolder === 'Proyectos' ? 'Proyectos_Varios' :
                         ($rootFolder === 'Proveedores' ? 'Proveedores_Varios' : 'Contactos_Varios')));
 
@@ -105,32 +95,8 @@ class MigrateFilesCommand extends Command
                     $baseModel = $this->getOrCreateEntity($entityType, $entityName);
                 }
 
-                // Determinar el modelo al que se asociará el documento (puede ser el base o un metadata)
-                $targetModel = $baseModel;
-                $metadataType = null;
-
-                if ($rootFolder === 'Equipos' && isset($segments[2])) {
-                    $possibleMetadata = $segments[2];
-                    // Normalizar eliminando acentos y mayúsculas para comparación
-                    $normalized = $this->normalizeFolderName($possibleMetadata);
-                    foreach (self::EQUIPMENT_METADATA_MAP as $key => $class) {
-                        if ($this->normalizeFolderName($key) === $normalized) {
-                            $metadataType = $class;
-                            break;
-                        }
-                    }
-
-                    if ($metadataType) {
-                        // Crear o encontrar el modelo de metadatos asociado al equipo
-                        // Usamos un nombre por defecto basado en la subcarpeta (puede personalizarse)
-                        $metadataName = $possibleMetadata;
-                        $metadata = $metadataType::firstOrCreate([
-                            'equipment_id' => $baseModel->id,
-                            $this->getNameFieldForMetadata($metadataType) => $metadataName
-                        ]);
-                        $targetModel = $metadata;
-                    }
-                }
+                $contextSegments = array_slice($directorySegments, 2);
+                [$category, $contextSegments] = $this->resolveCategoryAndContext($contextSegments);
 
                 // Procesar nombre de archivo, versión y nombre del documento
                 $filename = $file->getFilename();
@@ -148,12 +114,12 @@ class MigrateFilesCommand extends Command
                     $docName = 'Sin título';
                 }
 
-                // Crear o recuperar el documento asociado al modelo padre (targetModel)
-                $document = $this->getOrCreateDocument($docName, $targetModel);
+                $docName = $this->buildDocumentName($docName, $contextSegments);
 
-                // Generar nombre limpio para la ruta del archivo (slug)
-                $cleanName = Str::slug($docName, '_');
-                $destPath = $this->buildDestPath($entityType, $targetModel->id, $document->id, $version, $cleanName, $extension);
+                // Crear o recuperar el documento asociado al modelo padre base.
+                $document = $this->getOrCreateDocument($docName, $baseModel, $category);
+
+                $destPath = $this->buildDestPath($baseModel, $entityType, $entityName, $category, $docName, $version, $extension);
 
                 if ($dryRun) {
                     $this->line("Simulación: Copiar '{$file->getRealPath()}' a '{$destPath}' (doc: {$docName}, v{$version})");
@@ -167,16 +133,18 @@ class MigrateFilesCommand extends Command
                 // Copiar archivo
                 $storage->put($destPath, file_get_contents($file->getRealPath()));
 
-                // Calcular tamaño en MB
                 $sizeBytes = $file->getSize();
-                $sizeMB = round($sizeBytes / 1000000, 2);
+                $mime = check_solidworks(
+                    mime: File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
+                    path: $file->getRealPath(),
+                );
 
                 // Registrar el archivo
                 $document->files()->create([
                     'path' => $destPath,
-                    'mime' => File::mimeType($file->getRealPath()) ?: 'application/octet-stream',
+                    'mime' => mime_type($mime),
                     'version' => $version,
-                    'file_size' => $sizeMB,
+                    'file_size' => $sizeBytes,
                 ]);
 
                 $bar->advance();
@@ -215,6 +183,8 @@ class MigrateFilesCommand extends Command
         switch ($type) {
             case 'equipment':
                 return Equipment::firstOrCreate(['name' => $name]);
+            case 'project':
+                return null;
             case 'supplier':
                 return Supplier::firstOrCreate(['name' => $name]);
             case 'person':
@@ -225,21 +195,59 @@ class MigrateFilesCommand extends Command
     }
 
     /**
-     * Obtiene el campo "name" que debe usarse para cada modelo de metadata.
+     * Decide la categoria actual del sistema a partir de carpetas legadas.
      */
-    private function getNameFieldForMetadata(string $modelClass): string
+    private function resolveCategoryAndContext(array $segments): array
     {
-        return match ($modelClass) {
-            EquipmentBlueprint::class => 'name',
-            EquipmentDataSheet::class => 'sheet_number',
-            EquipmentCatalog::class => 'name',
-            EquipmentTechnicalSpecification::class => 'revision_name',
-            EquipmentStandard::class => 'name',
-            EquipmentFieldQuery::class => 'document_name',
-            EquipmentReport::class => 'document_name',
-            EquipmentSparePart::class => 'part_number',
-            default => 'name',
+        foreach ($segments as $index => $segment) {
+            $category = $this->mapFolderToCategory($segment);
+
+            if ($category !== null) {
+                return [$category, array_slice($segments, $index + 1)];
+            }
+        }
+
+        return [null, $segments];
+    }
+
+    private function mapFolderToCategory(string $folderName): ?Category
+    {
+        return match ($this->normalizeFolderName($folderName)) {
+            'plano', 'planos' => Category::Blueprint,
+            'manual', 'manuales' => Category::Manual,
+            'reporte', 'reportes', 'inspecciones' => Category::Report,
+            'especificaciontecnica', 'especificacionestecnicas', 'informaciontecnica', 'hojadedatos', 'consultadecampo', 'consultasencampo' => Category::Specs,
+            'oferta', 'ofertas' => Category::Offer,
+            'foto', 'fotos' => Category::Photo,
+            default => null,
         };
+    }
+
+    private function buildDocumentName(string $baseName, array $contextSegments): string
+    {
+        $segments = collect($contextSegments)
+            ->map(fn(string $segment) => trim($segment))
+            ->filter();
+
+        $segments->push(trim($baseName));
+
+        return $segments
+            ->unique()
+            ->implode(' - ');
+    }
+
+    private function splitPathSegments(string $path): array
+    {
+        if ($path === '' || $path === '.') {
+            return [];
+        }
+
+        return array_values(array_filter(explode('/', str_replace('\\', '/', $path)), fn(string $segment) => $segment !== ''));
+    }
+
+    private function shouldSkipFile(string $filename): bool
+    {
+        return in_array(mb_strtolower($filename), self::SKIPPED_FILENAMES, true);
     }
 
     /**
@@ -261,17 +269,26 @@ class MigrateFilesCommand extends Command
      * Obtiene o crea un documento asociado a un modelo padre.
      * Maneja duplicados por nombre con sufijo "(Duplicado)".
      */
-    private function getOrCreateDocument(string $name, $parentModel): Document
+    private function getOrCreateDocument(string $name, ?Model $parentModel, ?Category $category): Document
     {
         $originalName = $name;
         $counter = 0;
         $uniqueName = $originalName;
 
-        // Buscar documento existente con el mismo nombre y asociado al mismo padre
-        $document = Document::where('name', $uniqueName)
-            ->where('documentable_type', get_class($parentModel))
-            ->where('documentable_id', $parentModel->id)
-            ->first();
+        $documentQuery = Document::where('name', $uniqueName)
+            ->where('category', $category?->value);
+
+        if ($parentModel) {
+            $documentQuery
+                ->where('documentable_type', get_class($parentModel))
+                ->where('documentable_id', $parentModel->id);
+        } else {
+            $documentQuery
+                ->whereNull('documentable_type')
+                ->whereNull('documentable_id');
+        }
+
+        $document = $documentQuery->first();
 
         if ($document) {
             return $document;
@@ -279,45 +296,78 @@ class MigrateFilesCommand extends Command
 
         // Si no existe, crear con posible sufijo duplicado
         while (
-            Document::where('name', $uniqueName)
-                ->where('documentable_type', get_class($parentModel))
-                ->where('documentable_id', $parentModel->id)
-                ->exists()
+            $this->documentExists($uniqueName, $parentModel, $category)
         ) {
             $counter++;
             $uniqueName = $originalName . ' (Duplicado' . ($counter > 1 ? " $counter" : '') . ')';
         }
 
-        return Document::create([
+        return Document::create(array_filter([
             'name' => $uniqueName,
-            'category' => null, // Sin categoría según requerimiento
-            'documentable_type' => get_class($parentModel),
-            'documentable_id' => $parentModel->id,
-        ]);
+            'category' => $category,
+            'documentable_type' => $parentModel ? get_class($parentModel) : null,
+            'documentable_id' => $parentModel?->id,
+        ], static fn($value) => $value !== null));
+    }
+
+    private function documentExists(string $name, ?Model $parentModel, ?Category $category): bool
+    {
+        $query = Document::where('name', $name)
+            ->where('category', $category?->value);
+
+        if ($parentModel) {
+            $query
+                ->where('documentable_type', get_class($parentModel))
+                ->where('documentable_id', $parentModel->id);
+        } else {
+            $query
+                ->whereNull('documentable_type')
+                ->whereNull('documentable_id');
+        }
+
+        return $query->exists();
     }
 
     /**
      * Construye la ruta de destino relativa al disco.
      */
-    private function buildDestPath(string $entityType, string $parentId, string $documentId, int $version, string $cleanName, string $extension): string
+    private function buildDestPath(?Model $parentModel, string $entityType, string $entityName, ?Category $category, string $documentName, int $version, string $extension): string
     {
-        $folder = match ($entityType) {
-            'equipment' => 'equipos',
-            'project' => 'proyectos',
-            'supplier' => 'proveedores',
-            'person' => 'contactos',
-            default => 'otros',
-        };
+        $segments = [];
 
-        return sprintf(
-            '%s/%s/%s/v%d_%s.%s',
-            $folder,
-            $parentId,
-            $documentId,
-            $version,
-            $cleanName,
-            $extension
-        );
+        if ($parentModel) {
+            $segments[] = model_to_spanish($parentModel::class, plural: true) ?? Str::headline($entityType);
+            $segments[] = $this->resolveEntityFolderName($parentModel);
+        } else {
+            $segments[] = Str::headline($entityType === 'project' ? 'proyectos' : $entityType);
+            $segments[] = $entityName;
+        }
+
+        if ($category) {
+            $segments[] = $category->value;
+        }
+
+        $filename = $documentName . " - V{$version}";
+        if ($extension !== '') {
+            $filename .= '.' . $extension;
+        }
+
+        $segments[] = $filename;
+
+        return implode('/', $segments);
+    }
+
+    private function resolveEntityFolderName(Model $model): string
+    {
+        if ($model instanceof Person) {
+            $email = trim((string) ($model->email ?? ''));
+
+            return $email !== ''
+                ? $model->name . ' - ' . $email
+                : $model->name;
+        }
+
+        return $model->name;
     }
 
     /**
