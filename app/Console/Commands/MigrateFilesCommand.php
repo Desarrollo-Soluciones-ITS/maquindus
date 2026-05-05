@@ -69,7 +69,6 @@ class MigrateFilesCommand extends Command
                 // Determinar tipo de entidad raíz
                 $rootFolder = $directorySegments[0] ?? null;
                 if (!in_array($rootFolder, self::ROOT_FOLDERS, true)) {
-                    $this->warn("Ignorando archivo sin entidad padre válida: $relative");
                     $bar->advance();
                     continue;
                 }
