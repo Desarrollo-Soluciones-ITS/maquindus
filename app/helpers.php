@@ -460,3 +460,28 @@ if (!function_exists('exec_url')) {
         return "$base/$endpoint.php?path=$path";
     }
 }
+
+if (!function_exists('record_folder_url')) {
+    function record_folder_url(Model $record): ?string
+    {
+        if ($record instanceof File) {
+            return filled($record->path) ? exec_url($record->path, endpoint: 'folder') : null;
+        }
+
+        if ($record instanceof Document) {
+            return filled($record->current?->path)
+                ? exec_url($record->current->path, endpoint: 'folder')
+                : null;
+        }
+
+        if (method_exists($record, 'documents')) {
+            $document = $record->documents()->with('current')->latest('created_at')->first();
+
+            return filled($document?->current?->path)
+                ? exec_url($document->current->path, endpoint: 'folder')
+                : null;
+        }
+
+        return null;
+    }
+}

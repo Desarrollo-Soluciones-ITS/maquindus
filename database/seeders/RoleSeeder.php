@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
@@ -16,20 +15,44 @@ class RoleSeeder extends Seeder
     {
         $admin = Role::firstOrCreate(['name' => 'Administrador']);
 
-        User::where('email', 'admin@example.com')->update([
+        DB::table('users')->where('email', 'admin@example.com')->update([
             'role_id' => $admin->id,
         ]);
 
         $operator = Role::firstOrCreate(['name' => 'Operador']);
 
-        User::where('email', 'operator@example.com')->update([
+        DB::table('users')->where('email', 'operator@example.com')->update([
             'role_id' => $operator->id,
         ]);
 
         $user = Role::firstOrCreate(['name' => 'Usuario']);
 
-        User::where('email', 'test@example.com')->update([
+        DB::table('users')->where('email', 'test@example.com')->update([
             'role_id' => $user->id,
         ]);
+
+        $this->grantFilePermissions([$admin, $operator, $user]);
+    }
+
+    /**
+     * @param array<int, Role> $roles
+     */
+    private function grantFilePermissions(array $roles): void
+    {
+        $permissionSlugs = [
+            'documents.show_file',
+            'documents.open_in_folder',
+            'files.show_file',
+            'files.open_in_folder',
+        ];
+
+        $permissionIds = DB::table('permissions')
+            ->whereIn('slug', $permissionSlugs)
+            ->pluck('id')
+            ->all();
+
+        foreach ($roles as $role) {
+            $role->permissions()->syncWithoutDetaching($permissionIds);
+        }
     }
 }

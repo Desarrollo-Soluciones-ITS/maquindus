@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Roles\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Models\Permission;
 use App\Models\Role;
@@ -49,6 +50,7 @@ class RolesTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     Action::make('Asignar rol')
                         ->icon('heroicon-o-tag')
                         ->fillForm(fn(Role $record): array => [

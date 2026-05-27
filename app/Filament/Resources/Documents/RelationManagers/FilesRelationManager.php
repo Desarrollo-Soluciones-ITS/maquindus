@@ -152,8 +152,8 @@ class FilesRelationManager extends RelationManager
             ->recordActions([
                 ActionGroup::make([
                     ActionGroup::make([
-                        PreviewAction::make()->hidden(!currentUserHasPermission('files.show_file')),
-                        OpenFolderAction::make()->hidden(!currentUserHasPermission('files.open_in_folder')),
+                        PreviewAction::make(),
+                        OpenFolderAction::make(),
                         DownloadAction::make()->hidden(!currentUserHasPermission('files.download')),
                     ])->dropdown(false),
                     ViewAction::make()

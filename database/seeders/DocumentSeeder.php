@@ -11,6 +11,8 @@ use App\Models\EquipmentCatalog;
 use App\Models\EquipmentDataSheet;
 use App\Models\EquipmentFieldQuery;
 use App\Models\EquipmentReport;
+use App\Models\EquipmentSparePart;
+use App\Models\SupplierPurchaseOrder;
 use App\Models\EquipmentStandard;
 use App\Models\EquipmentTechnicalSpecification;
 use App\Models\Part;
@@ -86,6 +88,18 @@ class DocumentSeeder extends Seeder
                 'name' => $record->document_name,
                 'category' => Category::Report,
                 'documentable_type' => EquipmentReport::class,
+                'documentable_id' => $record->id,
+            ])->all(),
+            ...EquipmentSparePart::query()->get()->map(fn(EquipmentSparePart $record) => [
+                'name' => 'Ficha de repuesto ' . $record->part_number,
+                'category' => Category::Specs,
+                'documentable_type' => EquipmentSparePart::class,
+                'documentable_id' => $record->id,
+            ])->all(),
+            ...SupplierPurchaseOrder::query()->get()->map(fn(SupplierPurchaseOrder $record) => [
+                'name' => 'Orden de compra ' . $record->order_no,
+                'category' => Category::Offer,
+                'documentable_type' => SupplierPurchaseOrder::class,
                 'documentable_id' => $record->id,
             ])->all(),
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Parts\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
@@ -44,6 +45,7 @@ class PartsTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('parts.show')),
                 ])
             ])

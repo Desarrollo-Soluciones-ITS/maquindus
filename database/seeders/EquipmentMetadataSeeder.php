@@ -8,6 +8,7 @@ use App\Models\EquipmentCatalog;
 use App\Models\EquipmentDataSheet;
 use App\Models\EquipmentFieldQuery;
 use App\Models\EquipmentReport;
+use App\Models\EquipmentSparePart;
 use App\Models\EquipmentStandard;
 use App\Models\EquipmentTechnicalSpecification;
 use Illuminate\Database\Seeder;
@@ -94,6 +95,18 @@ class EquipmentMetadataSeeder extends Seeder
                     'document_type' => 'mantenimiento',
                     'document_date' => now()->subMonths(1 + $index)->toDateString(),
                     'issuer' => 'Ingeniería Maquindus',
+                ],
+            );
+
+            EquipmentSparePart::updateOrCreate(
+                [
+                    'equipment_id' => $equipment->id,
+                    'part_number' => 'SP-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
+                ],
+                [
+                    'catalog_number' => 'CAT-SP-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
+                    'client_part_number' => 'CL-SP-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
+                    'description' => 'Repuesto técnico de prueba para ' . $equipment->name,
                 ],
             );
         }

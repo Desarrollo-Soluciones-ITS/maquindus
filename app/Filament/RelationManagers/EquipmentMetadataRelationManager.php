@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
@@ -123,6 +124,7 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     Action::make('openAttachedDocument')
                         ->label('Abrir anexo')
                         ->icon('heroicon-o-eye')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\People\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Supplier;
@@ -86,6 +87,7 @@ class PeopleTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('people.show')),
                 ])
             ])

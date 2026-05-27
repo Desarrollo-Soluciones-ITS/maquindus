@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Equipment\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
@@ -46,6 +47,7 @@ class EquipmentTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('equipments.show')),
                     EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.edit')),
                     ArchiveAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.delete')),

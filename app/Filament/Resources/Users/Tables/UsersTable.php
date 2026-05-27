@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -45,6 +46,7 @@ class UsersTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('users.show')),
                     EditAction::make()->hidden(!currentUserHasPermission('users.edit')),
                     DeleteAction::make()->hidden(function (Model $record) {

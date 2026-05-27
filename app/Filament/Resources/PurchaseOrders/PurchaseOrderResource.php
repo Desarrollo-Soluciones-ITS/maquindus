@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PurchaseOrders;
 
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\PurchaseOrders\Pages\ListPurchaseOrders;
 use App\Filament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
@@ -45,7 +46,9 @@ class PurchaseOrderResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            'documents' => DocumentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SupplierPurchaseOrder extends Model
@@ -28,5 +29,15 @@ class SupplierPurchaseOrder extends Model
     public function equipment(): BelongsToMany
     {
         return $this->belongsToMany(Equipment::class, 'equipment_supplier_purchase_order');
+    }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->order_no;
     }
 }

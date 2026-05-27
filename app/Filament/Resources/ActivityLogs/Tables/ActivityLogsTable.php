@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ActivityLogs\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
@@ -117,6 +118,7 @@ class ActivityLogsTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission(permission: 'activity_logs.show')),
                 ])
             ]);

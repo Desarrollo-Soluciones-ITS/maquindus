@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Suppliers\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use Filament\Actions\ActionGroup;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\BulkActionGroup;
@@ -45,6 +46,7 @@ class SuppliersTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('suppliers.show')),
                 ])
             ])

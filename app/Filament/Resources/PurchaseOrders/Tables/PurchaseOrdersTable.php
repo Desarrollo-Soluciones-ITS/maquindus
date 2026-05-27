@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PurchaseOrders\Tables;
 
+use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -27,6 +28,7 @@ class PurchaseOrdersTable
             ])
             ->recordActions([
                 ActionGroup::make([
+                    OpenFolderAction::make(),
                     ViewAction::make()->hidden(!currentUserHasPermission('purchase_orders.read')),
                     EditAction::make()->hidden(!currentUserHasPermission('purchase_orders.edit')),
                 ]),

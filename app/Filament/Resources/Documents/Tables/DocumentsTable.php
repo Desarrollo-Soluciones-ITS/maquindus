@@ -165,7 +165,7 @@ class DocumentsTable
                                 }
                             }),
                         OpenFolderAction::make()
-                            ->hidden(fn($record) => empty($record->documentable) || !currentUserHasPermission('documents.open_in_folder'))
+                            ->hidden(fn($record) => empty($record->documentable))
                             ->before(function (Action $action, Model $record) {
                                 if ($record->isRecordLocked()) {
                                     $message = $record->getLockStatusMessage();
