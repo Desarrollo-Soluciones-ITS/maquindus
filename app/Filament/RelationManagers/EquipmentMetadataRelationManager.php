@@ -49,7 +49,29 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                     $section = Str::headline((string) (static::$modelLabel ?? 'Documento'));
                     $descriptor = static::resolveDescriptorFromGet($get) ?? 'General';
 
-                    return collect(['Equipos', $equipment->name, $section, $descriptor])
+                    // Las secciones de "Especificación técnica" van anidadas bajo Especificaciones Tecnicas/
+                    $specSections = ['Hoja De Datos', 'Plano', 'Catálogo', 'Manual', 'Especificación Técnica', 'Norma'];
+                    $specSectionMap = [
+                        'Hoja De Datos' => 'Hoja De Datos',
+                        'Plano' => 'Planos',
+                        'Catálogo' => 'Catálogos',
+                        'Manual' => 'Manuales',
+                        'Especificación Técnica' => 'Revisiones',
+                        'Norma' => 'Normas',
+                    ];
+
+                    $parts = ['Equipos', $equipment->name];
+
+                    if (in_array($section, $specSections)) {
+                        $parts[] = 'Especificaciones Tecnicas';
+                        $parts[] = $specSectionMap[$section] ?? $section;
+                    } else {
+                        $parts[] = $section;
+                    }
+
+                    $parts[] = $descriptor;
+
+                    return collect($parts)
                         ->filter(fn($segment) => filled($segment))
                         ->join('/');
                 })

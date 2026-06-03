@@ -57,6 +57,11 @@ class Equipment extends Model
         return $this->hasMany(EquipmentSparePart::class);
     }
 
+    public function manuals()
+    {
+        return $this->hasMany(EquipmentManual::class);
+    }
+
     public function reports()
     {
         return $this->hasMany(EquipmentReport::class);

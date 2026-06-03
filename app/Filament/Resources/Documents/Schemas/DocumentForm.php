@@ -67,7 +67,24 @@ class DocumentForm
                             $category = $get('category');
 
                             if ($category) {
-                                $segments->push($category);
+                                // Para equipos, las categorías de especificación técnica van anidadas bajo Especificaciones Tecnicas/
+                                if ($documentable instanceof Equipment) {
+                                    $specCategories = ['Planos', 'Manuales', 'Especificaciones Tecnicas'];
+                                    $specCategoryMap = [
+                                        'Planos' => 'Planos',
+                                        'Manuales' => 'Manuales',
+                                        'Especificaciones Tecnicas' => 'Revisiones',
+                                    ];
+
+                                    if (in_array($category, $specCategories)) {
+                                        $segments->push('Especificaciones Tecnicas');
+                                        $segments->push($specCategoryMap[$category]);
+                                    } else {
+                                        $segments->push($category);
+                                    }
+                                } else {
+                                    $segments->push($category);
+                                }
                             }
 
                             return $segments->join('/');

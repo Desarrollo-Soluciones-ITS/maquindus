@@ -363,15 +363,38 @@ class MigrateFilesCommand extends Command
         $segments = [];
 
         if ($parentModel) {
+            // Raíz: nombre del modelo en español (ej: "Equipos")
             $segments[] = $this->sanitizePathSegment(model_to_spanish($parentModel::class, plural: true) ?? Str::headline($entityType));
+            // Nombre de la entidad (ej: "Compresor Atlas")
             $segments[] = $this->sanitizePathSegment($this->resolveEntityFolderName($parentModel));
+
+            // Mapear categoría a nombre de sección (igual que en la interfaz web)
+            if ($category) {
+                $sectionName = $this->mapCategoryToSectionName($category, $parentModel);
+                if ($sectionName !== null) {
+                    // Para equipos, las secciones de especificación técnica van anidadas bajo "Especificaciones Tecnicas/"
+                    if ($parentModel instanceof Equipment && $this->isSpecificationSection($category)) {
+                        $segments[] = 'Especificaciones Tecnicas';
+                        $subSection = $this->getSpecSubsectionName($category);
+                        if ($subSection !== null) {
+                            $segments[] = $subSection;
+                        }
+                    } else {
+                        $segments[] = $sectionName;
+                    }
+                }
+            }
+
+            // Descriptor (nombre del documento sin versión)
+            $descriptor = $this->sanitizePathSegment($documentName);
+            $segments[] = $descriptor;
         } else {
             $segments[] = $this->sanitizePathSegment(Str::headline($entityType === 'project' ? 'proyectos' : $entityType));
             $segments[] = $this->sanitizePathSegment($entityName);
-        }
 
-        if ($category) {
-            $segments[] = $this->sanitizePathSegment($category->value);
+            if ($category) {
+                $segments[] = $this->sanitizePathSegment($category->value);
+            }
         }
 
         $filename = $this->sanitizePathSegment($documentName) . " - V{$version}";
@@ -382,6 +405,53 @@ class MigrateFilesCommand extends Command
         $segments[] = $this->sanitizePathSegment($filename);
 
         return implode('/', array_values(array_filter($segments, static fn(string $segment) => $segment !== '')));
+    }
+
+    /**
+     * Mapea una categoría a un nombre de sección de carpeta, igual que en la interfaz web.
+     * Para equipos, las secciones de especificación técnica van anidadas bajo "Especificaciones Tecnicas/".
+     */
+    private function mapCategoryToSectionName(Category $category, Model $parentModel): ?string
+    {
+        // Solo aplica para equipos
+        if (!($parentModel instanceof Equipment)) {
+            return $this->sanitizePathSegment($category->value);
+        }
+
+        return match ($category) {
+            Category::Blueprint => 'Planos',
+            Category::Manual => 'Manuales',
+            Category::Report => 'Reportes',
+            Category::Specs => 'Especificaciones Tecnicas',
+            Category::Offer => 'Ofertas',
+            Category::Photo => 'Fotos',
+            default => $this->sanitizePathSegment($category->value),
+        };
+    }
+
+    /**
+     * Determina si una categoría pertenece a "Especificación técnica" y debe anidarse.
+     */
+    private function isSpecificationSection(?Category $category): bool
+    {
+        return in_array($category, [
+            Category::Blueprint,
+            Category::Manual,
+            Category::Specs,
+        ], true);
+    }
+
+    /**
+     * Obtiene el nombre de la subsección dentro de Especificaciones Tecnicas.
+     */
+    private function getSpecSubsectionName(Category $category): ?string
+    {
+        return match ($category) {
+            Category::Blueprint => 'Planos',
+            Category::Manual => 'Manuales',
+            Category::Specs => 'Revisiones',
+            default => null,
+        };
     }
 
     private function resolveEntityFolderName(Model $model): string

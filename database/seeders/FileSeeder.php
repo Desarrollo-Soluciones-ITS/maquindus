@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Document;
+use App\Models\Equipment;
 use App\Models\File;
 use App\Models\Person;
 use Illuminate\Database\Seeder;
@@ -31,6 +32,11 @@ class FileSeeder extends Seeder
             foreach ([1, 2] as $version) {
                 $path = $this->buildPath($document, $documentable, $version);
 
+                // Si el archivo ya existe en BD (creado por EquipmentSeeder), saltar
+                if (File::withTrashed()->where('path', $path)->exists()) {
+                    continue;
+                }
+
                 if (!Storage::exists($path)) {
                     Storage::put($path, $this->buildFileContents($document, $documentable, $version));
                 }
@@ -43,6 +49,7 @@ class FileSeeder extends Seeder
                     [
                         'path' => $path,
                         'mime' => 'Texto',
+                        'file_size' => strlen($this->buildFileContents($document, $documentable, $version)),
                         'deleted_at' => null,
                     ],
                 );
@@ -52,6 +59,13 @@ class FileSeeder extends Seeder
 
     private function buildPath(Document $document, mixed $documentable, int $version): string
     {
+        // Si el documentable es un equipo o pertenece a un equipo, usar estructura Equipos/{nombre}/
+        $equipment = $this->getEquipment($documentable);
+        if ($equipment) {
+            return $this->buildEquipmentPath($document, $documentable, $equipment, $version);
+        }
+
+        // Para otros tipos (Supplier, Person), mantener estructura anterior
         $segments = array_filter([
             model_to_spanish($documentable::class, plural: true) ?? class_basename($documentable::class),
             $this->entityFolderName($documentable),
@@ -63,6 +77,87 @@ class FileSeeder extends Seeder
             ->map(fn(string $segment) => $this->sanitizePathSegment($segment))
             ->filter()
             ->implode('/');
+    }
+
+    private function getEquipment(mixed $documentable): ?Equipment
+    {
+        if ($documentable instanceof Equipment) {
+            return $documentable;
+        }
+
+        if (method_exists($documentable, 'equipment')) {
+            $relation = $documentable->equipment();
+            if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+                return $documentable->equipment;
+            }
+            if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+                return $documentable->equipment()->first();
+            }
+        }
+
+        return null;
+    }
+
+    private function buildEquipmentPath(Document $document, mixed $documentable, Equipment $equipment, int $version): string
+    {
+        $section = $this->getSectionForDocumentable($documentable);
+        $descriptor = $this->getDescriptorForDocumentable($documentable);
+        $filename = $this->safeFilename($document->name, $version);
+
+        $parts = ['Equipos', $equipment->name];
+
+        // Las secciones de "Especificación técnica" van anidadas bajo Especificaciones Tecnicas/
+        $specSections = ['Hoja De Datos', 'Planos', 'Catálogos', 'Manuales', 'Especificaciones Tecnicas', 'Normas'];
+        if (in_array($section, $specSections)) {
+            $parts[] = 'Especificaciones Tecnicas';
+            // La sección "Especificaciones Tecnicas" pasa a llamarse "Revisiones" cuando está anidada
+            $nestedSection = $section === 'Especificaciones Tecnicas' ? 'Revisiones' : $section;
+            $parts[] = $nestedSection;
+        } else {
+            $parts[] = $section;
+        }
+
+        if ($descriptor) {
+            $parts[] = $descriptor;
+        }
+        $parts[] = $filename;
+
+        return implode('/', $parts);
+    }
+
+    private function getSectionForDocumentable(mixed $documentable): string
+    {
+        $class = class_basename($documentable::class);
+
+        return match ($class) {
+            'EquipmentDataSheet' => 'Hoja De Datos',
+            'EquipmentBlueprint' => 'Planos',
+            'EquipmentCatalog' => 'Catálogos',
+            'EquipmentManual' => 'Manuales',
+            'EquipmentTechnicalSpecification' => 'Especificaciones Tecnicas',
+            'EquipmentStandard' => 'Normas',
+            'EquipmentFieldQuery' => 'Consultas de Campo',
+            'EquipmentReport' => 'Reportes',
+            'EquipmentSparePart' => 'Repuestos',
+            'Equipment' => 'Manuales',
+            default => 'General',
+        };
+    }
+
+    private function getDescriptorForDocumentable(mixed $documentable): ?string
+    {
+        if ($documentable instanceof Equipment) {
+            return null; // Los documentos directos del equipo van sin descriptor
+        }
+
+        foreach (['name', 'document_name', 'sheet_number', 'blueprint_number', 'revision_name', 'part_number', 'catalog_number'] as $key) {
+            $value = $documentable->$key ?? null;
+            if (filled($value)) {
+                return trim((string) $value);
+            }
+        }
+
+        return null;
     }
 
     private function entityFolderName(mixed $documentable): string

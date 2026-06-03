@@ -14,6 +14,7 @@ use App\Models\EquipmentBlueprint;
 use App\Models\EquipmentCatalog;
 use App\Models\EquipmentDataSheet;
 use App\Models\EquipmentFieldQuery;
+use App\Models\EquipmentManual;
 use App\Models\EquipmentReport;
 use App\Models\EquipmentSparePart;
 use App\Models\EquipmentStandard;
@@ -104,6 +105,7 @@ if (!function_exists('model_to_spanish')) {
             EquipmentCatalog::class => 'Catálogo',
             EquipmentDataSheet::class => 'Hoja de datos',
             EquipmentFieldQuery::class => 'Consulta de campo',
+            EquipmentManual::class => 'Manual',
             EquipmentReport::class => 'Reporte',
             EquipmentSparePart::class => 'Repuesto',
             EquipmentStandard::class => 'Norma',
@@ -129,6 +131,7 @@ if (!function_exists('model_to_spanish')) {
             EquipmentCatalog::class => 'Catálogos',
             EquipmentDataSheet::class => 'Hojas de datos',
             EquipmentFieldQuery::class => 'Consultas de campo',
+            EquipmentManual::class => 'Manuales',
             EquipmentReport::class => 'Reportes',
             EquipmentSparePart::class => 'Repuestos',
             EquipmentStandard::class => 'Normas',
@@ -329,6 +332,7 @@ if (!function_exists('documentables')) {
             EquipmentTechnicalSpecification::class,
             EquipmentStandard::class,
             EquipmentFieldQuery::class,
+            EquipmentManual::class,
             EquipmentSparePart::class,
             EquipmentReport::class,
         ]);
@@ -353,6 +357,7 @@ if (!function_exists('documentable_view_url')) {
             EquipmentTechnicalSpecification::class,
             EquipmentStandard::class,
             EquipmentFieldQuery::class,
+            EquipmentManual::class,
             EquipmentSparePart::class,
             EquipmentReport::class => ViewEquipment::getUrl(['record' => $documentable->equipment_id]),
             default => null,
@@ -455,7 +460,14 @@ if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
         $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
-        $replaced = path($filepath, base: false);
+
+        // Verificar que el archivo exista antes de intentar obtener la ruta
+        try {
+            $replaced = path($filepath, base: false);
+        } catch (\Throwable) {
+            return null;
+        }
+
         $path = urlencode($replaced);
         return "$base/$endpoint.php?path=$path";
     }

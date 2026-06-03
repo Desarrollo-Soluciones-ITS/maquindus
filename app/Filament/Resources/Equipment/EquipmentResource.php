@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Equipment;
 use App\Filament\RelationManagers\BlueprintsRelationManager;
 use App\Filament\RelationManagers\CatalogsRelationManager;
 use App\Filament\RelationManagers\DataSheetsRelationManager;
+use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\FieldQueriesRelationManager;
+use App\Filament\RelationManagers\ManualsRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
 use App\Filament\RelationManagers\ReportsRelationManager;
 use App\Filament\RelationManagers\StandardsRelationManager;
@@ -64,9 +66,11 @@ class EquipmentResource extends Resource
                 DataSheetsRelationManager::class,
                 BlueprintsRelationManager::class,
                 CatalogsRelationManager::class,
+                ManualsRelationManager::class,
                 TechnicalSpecificationsRelationManager::class,
                 StandardsRelationManager::class,
             ]),
+            'documents' => DocumentsRelationManager::class,
             'supplierPurchaseOrders' => SupplierPurchaseOrdersRelationManager::class,
             'parts' => PartsRelationManager::class,
             'fieldQueries' => FieldQueriesRelationManager::class,
