@@ -33,7 +33,7 @@ class Permission extends Model
         'sync' => 'Vincular',
         'unsync' => 'Desvincular',
         'restore' => 'Restaurar',
-        'update_password' => 'Actualizar contraseña',
+        'update_password' => 'Actualizar contraseÃ±a',
     ];
 
     public static array $resourceLabels = [
@@ -44,12 +44,10 @@ class Permission extends Model
         'people' => 'contacto',
         'users' => 'usuario',
         'activities' => 'actividad',
-        'files' => 'versión',
-        'activity_logs' => 'bitácora',
+        'files' => 'versiÃ³n',
+        'activity_logs' => 'bitÃ¡cora',
         'search' => 'buscador',
-        'projects' => 'proyecto',
-        'customers' => 'cliente',
-        'purchase_orders' => 'órden de compra proveedor',
+        'purchase_orders' => 'Ã³rden de compra proveedor',
     ];
 
     public static array $permissions = [
@@ -131,22 +129,6 @@ class Permission extends Model
             'open_in_folder',
             'show_file',
         ],
-        'projects' => [
-            'create',
-            'edit',
-            'show',
-            'delete',
-            'view',
-            'restore',
-        ],
-        'customers' => [
-            'create',
-            'show',
-            'view',
-            'delete',
-            'edit',
-            'restore',
-        ],
         'purchase_orders' => [
             'read',
             'create',
@@ -154,7 +136,7 @@ class Permission extends Model
             'delete',
             'view',
             'restore',
-        ],
+        ]
     ];
 
     public static function buildDefinitions(): array
