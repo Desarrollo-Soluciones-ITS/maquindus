@@ -66,7 +66,12 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                         $parts[] = 'Especificaciones Tecnicas';
                         $parts[] = $specSectionMap[$section] ?? $section;
                     } else {
-                        $parts[] = $section;
+                        $otherSectionMap = [
+                            'Repuesto' => 'Repuestos',
+                            'Reporte' => 'Reportes',
+                            'Consulta De Campo' => 'Consultas de Campo',
+                        ];
+                        $parts[] = $otherSectionMap[$section] ?? $section;
                     }
 
                     $parts[] = $descriptor;

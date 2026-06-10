@@ -8,7 +8,7 @@ use App\Filament\RelationManagers\DataSheetsRelationManager;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\FieldQueriesRelationManager;
 use App\Filament\RelationManagers\ManualsRelationManager;
-use App\Filament\RelationManagers\PartsRelationManager;
+use App\Filament\RelationManagers\EquipmentSparePartsRelationManager;
 use App\Filament\RelationManagers\ReportsRelationManager;
 use App\Filament\RelationManagers\StandardsRelationManager;
 use App\Filament\RelationManagers\SupplierPurchaseOrdersRelationManager;
@@ -72,7 +72,7 @@ class EquipmentResource extends Resource
             ]),
             'documents' => DocumentsRelationManager::class,
             'supplierPurchaseOrders' => SupplierPurchaseOrdersRelationManager::class,
-            'parts' => PartsRelationManager::class,
+            'equipmentSpareParts' => EquipmentSparePartsRelationManager::class,
             'fieldQueries' => FieldQueriesRelationManager::class,
             'reports' => ReportsRelationManager::class,
         ];
