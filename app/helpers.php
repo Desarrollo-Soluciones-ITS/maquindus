@@ -14,7 +14,6 @@ use App\Models\EquipmentBlueprint;
 use App\Models\EquipmentCatalog;
 use App\Models\EquipmentDataSheet;
 use App\Models\EquipmentFieldQuery;
-use App\Models\EquipmentManual;
 use App\Models\EquipmentReport;
 use App\Models\EquipmentSparePart;
 use App\Models\EquipmentStandard;
@@ -34,10 +33,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * @param string $mime El tipo MIME completo del archivo (ej: 'image/png').
- * @return string Una etiqueta de texto amigable (ej: 'PNG', 'Word', 'Archivo').
- */
 if (!function_exists('mime_type')) {
     function mime_type(string $mime): string
     {
@@ -79,13 +74,8 @@ if (!function_exists('check_solidworks')) {
     {
         if ($mime !== 'application/vnd.ms-office')
             return $mime;
-
-        $extension = str($path)
-            ->lower()->explode('.')->last();
-
-        $contains = collect(['sldprt', 'sldasm', 'slddrw', 'slddrt'])
-            ->contains($extension);
-
+        $extension = str($path)->lower()->explode('.')->last();
+        $contains = collect(['sldprt', 'sldasm', 'slddrw', 'slddrt'])->contains($extension);
         if (!$contains)
             return $mime;
         return 'application/x-solidworks';
@@ -105,7 +95,6 @@ if (!function_exists('model_to_spanish')) {
             EquipmentCatalog::class => 'Catálogo',
             EquipmentDataSheet::class => 'Hoja de datos',
             EquipmentFieldQuery::class => 'Consulta de campo',
-            EquipmentManual::class => 'Manual',
             EquipmentReport::class => 'Reporte',
             EquipmentSparePart::class => 'Repuesto',
             EquipmentStandard::class => 'Norma',
@@ -120,7 +109,6 @@ if (!function_exists('model_to_spanish')) {
             Supplier::class => 'Proveedor',
             User::class => 'Usuario',
         ];
-
         $pluralMap = [
             Activity::class => 'Actividades',
             City::class => 'Ciudades',
@@ -131,7 +119,6 @@ if (!function_exists('model_to_spanish')) {
             EquipmentCatalog::class => 'Catálogos',
             EquipmentDataSheet::class => 'Hojas de datos',
             EquipmentFieldQuery::class => 'Consultas de campo',
-            EquipmentManual::class => 'Manuales',
             EquipmentReport::class => 'Reportes',
             EquipmentSparePart::class => 'Repuestos',
             EquipmentStandard::class => 'Normas',
@@ -146,13 +133,8 @@ if (!function_exists('model_to_spanish')) {
             Supplier::class => 'Proveedores',
             User::class => 'Usuarios',
         ];
-
         $spanish = $plural ? ($pluralMap[$model] ?? null) : ($singularMap[$model] ?? null);
-
-        if (!$spanish) {
-            return null;
-        }
-
+        if (!$spanish) return null;
         return $spanish;
     }
 }
@@ -177,26 +159,12 @@ if (!function_exists('documentable_name_column')) {
 if (!function_exists('path')) {
     function path(string $path, $asFolder = false, $base = true)
     {
-        $segments = str($path)
-            ->explode('/');
-
-        if ($asFolder) {
-            $segments->pop();
-        }
-
+        $segments = str($path)->explode('/');
+        if ($asFolder) $segments->pop();
         $folder = $segments->join('\\');
-
-        if ($asFolder && Storage::directoryMissing($folder)) {
-            throw new Error('path() helper error: directory is missing');
-        }
-
-        if (!$asFolder && Storage::fileMissing($folder)) {
-            throw new Error('path() helper error: file is missing');
-        }
-
-        return str($base ? Storage::path($folder) : $folder)
-            ->replace('/', DIRECTORY_SEPARATOR)
-            ->replace('\\', DIRECTORY_SEPARATOR);
+        if ($asFolder && Storage::directoryMissing($folder)) throw new Error('path() helper error: directory is missing');
+        if (!$asFolder && Storage::fileMissing($folder)) throw new Error('path() helper error: file is missing');
+        return str($base ? Storage::path($folder) : $folder)->replace('/', DIRECTORY_SEPARATOR)->replace('\\', DIRECTORY_SEPARATOR);
     }
 }
 
@@ -204,17 +172,9 @@ if (!function_exists('translate_activity_verb')) {
     function translate_activity_verb(string $eventName): string
     {
         return match ($eventName) {
-            // Eventos CRUD
-            'created' => 'creado',
-            'updated' => 'actualizado',
-            'deleted' => 'archivado',
-            'restored' => 'desarchivado',
-            // Eventos de Autenticación
-            'authenticated' => 'inició sesión',
-            'logged_out' => 'cerró sesión',
-            'login_failed' => 'falló el inicio de sesión',
-            'code_updated' => 'código actualizado',
-            default => $eventName,
+            'created' => 'creado', 'updated' => 'actualizado', 'deleted' => 'archivado', 'restored' => 'desarchivado',
+            'authenticated' => 'inició sesión', 'logged_out' => 'cerró sesión', 'login_failed' => 'falló el inicio de sesión',
+            'code_updated' => 'código actualizado', default => $eventName,
         };
     }
 }
@@ -223,17 +183,9 @@ if (!function_exists('translate_activity_event')) {
     function translate_activity_event(string $eventName): string
     {
         return match ($eventName) {
-            // Eventos CRUD
-            'created' => 'Creación',
-            'updated' => 'Actualización',
-            'deleted' => 'Archivado',
-            'restored' => 'Desarchivado',
-            // Eventos de Autenticación
-            'authenticated' => 'Inicio de Sesión',
-            'logged_out' => 'Cierre de Sesión',
-            'login_failed' => 'Fallo de Inicio de Sesión',
-            'code_updated' => 'Código Actualizado',
-            default => $eventName,
+            'created' => 'Creación', 'updated' => 'Actualización', 'deleted' => 'Archivado', 'restored' => 'Desarchivado',
+            'authenticated' => 'Inicio de Sesión', 'logged_out' => 'Cierre de Sesión', 'login_failed' => 'Fallo de Inicio de Sesión',
+            'code_updated' => 'Código Actualizado', default => $eventName,
         };
     }
 }
@@ -242,46 +194,27 @@ if (!function_exists('get_activity_color')) {
     function get_activity_color(string $eventName): string
     {
         return match ($eventName) {
-            // Eventos CRUD
-            'created' => 'success',
-            'updated' => 'warning',
-            'deleted' => 'danger',
-            'restored' => 'success',
-            // Eventos de Autenticación
-            'authenticated' => 'success',
-            'logged_out' => 'info',
-            'login_failed' => 'danger',
-            'code_updated' => 'warning',
+            'created' => 'success', 'updated' => 'warning', 'deleted' => 'danger', 'restored' => 'success',
+            'authenticated' => 'success', 'logged_out' => 'info', 'login_failed' => 'danger', 'code_updated' => 'warning',
             default => 'secondary',
         };
     }
 }
 
 if (!function_exists('hasPermission')) {
-    function currentUserHasPermission(string $permission)
-    {
-        return Auth::user()?->hasPermission($permission) ?? false;
-    }
+    function currentUserHasPermission(string $permission) { return Auth::user()?->hasPermission($permission) ?? false; }
 }
 
 if (!function_exists('currentUserHasAnyPermission')) {
     function currentUserHasAnyPermission(array|string $permissions): bool
     {
-        foreach ((array) $permissions as $permission) {
-            if (currentUserHasPermission($permission)) {
-                return true;
-            }
-        }
-
+        foreach ((array) $permissions as $permission) { if (currentUserHasPermission($permission)) return true; }
         return false;
     }
 }
 
 if (!function_exists('is_relation_manager')) {
-    function is_not_relation_manager()
-    {
-        return fn($livewire) => !($livewire instanceof RelationManager);
-    }
+    function is_not_relation_manager() { return fn($livewire) => !($livewire instanceof RelationManager); }
 }
 
 if (!function_exists('code_to_full')) {
@@ -289,13 +222,7 @@ if (!function_exists('code_to_full')) {
     {
         return function ($data) use ($prefix) {
             $value = $data['code'] ?? null;
-
-            if (!filled($value)) {
-                $data['code'] = null;
-
-                return $data;
-            }
-
+            if (!filled($value)) { $data['code'] = null; return $data; }
             $data['code'] = Code::full($value, $prefix);
             return $data;
         };
@@ -305,16 +232,14 @@ if (!function_exists('code_to_full')) {
 if (!function_exists('relation_manager_owner_is_equipment')) {
     function relation_manager_owner_is_equipment(RelationManager $livewire): bool
     {
-        return method_exists($livewire, 'getOwnerRecord')
-            && $livewire->getOwnerRecord() instanceof Equipment;
+        return method_exists($livewire, 'getOwnerRecord') && $livewire->getOwnerRecord() instanceof Equipment;
     }
 }
 
 if (!function_exists('managed_from_equipment')) {
     function managed_from_equipment(mixed $livewire): bool
     {
-        return $livewire instanceof RelationManager
-            && relation_manager_owner_is_equipment($livewire);
+        return $livewire instanceof RelationManager && relation_manager_owner_is_equipment($livewire);
     }
 }
 
@@ -322,19 +247,10 @@ if (!function_exists('documentables')) {
     function documentables()
     {
         return collect([
-            Equipment::class,
-            Person::class,
-            Part::class,
-            Supplier::class,
-            EquipmentDataSheet::class,
-            EquipmentBlueprint::class,
-            EquipmentCatalog::class,
-            EquipmentTechnicalSpecification::class,
-            EquipmentStandard::class,
-            EquipmentFieldQuery::class,
-            EquipmentManual::class,
-            EquipmentSparePart::class,
-            EquipmentReport::class,
+            Equipment::class, Person::class, Part::class, Supplier::class,
+            EquipmentDataSheet::class, EquipmentBlueprint::class, EquipmentCatalog::class,
+            EquipmentTechnicalSpecification::class, EquipmentStandard::class,
+            EquipmentFieldQuery::class, EquipmentSparePart::class, EquipmentReport::class,
         ]);
     }
 }
@@ -342,24 +258,16 @@ if (!function_exists('documentables')) {
 if (!function_exists('documentable_view_url')) {
     function documentable_view_url(?Model $documentable): ?string
     {
-        if (!$documentable) {
-            return null;
-        }
-
+        if (!$documentable) return null;
         return match ($documentable::class) {
             Part::class => ViewPart::getUrl(['record' => $documentable->id]),
             Person::class => ViewPerson::getUrl(['record' => $documentable->id]),
             Supplier::class => ViewSupplier::getUrl(['record' => $documentable->id]),
             Equipment::class => ViewEquipment::getUrl(['record' => $documentable->id]),
-            EquipmentDataSheet::class,
-            EquipmentBlueprint::class,
-            EquipmentCatalog::class,
-            EquipmentTechnicalSpecification::class,
-            EquipmentStandard::class,
-            EquipmentFieldQuery::class,
-            EquipmentManual::class,
-            EquipmentSparePart::class,
-            EquipmentReport::class => ViewEquipment::getUrl(['record' => $documentable->equipment_id]),
+            EquipmentDataSheet::class, EquipmentBlueprint::class, EquipmentCatalog::class,
+            EquipmentTechnicalSpecification::class, EquipmentStandard::class,
+            EquipmentFieldQuery::class, EquipmentSparePart::class, EquipmentReport::class
+                => ViewEquipment::getUrl(['record' => $documentable->equipment_id]),
             default => null,
         };
     }
@@ -369,25 +277,16 @@ if (!function_exists('cleanup_empty_folders')) {
     function cleanup_empty_folders(string $folderPath): void
     {
         $disk = Storage::disk('local');
-
         $deleteIfEmpty = function ($path) use ($disk, &$deleteIfEmpty) {
-            if (!$disk->exists($path)) {
-                return;
-            }
-
+            if (!$disk->exists($path)) return;
             $contents = $disk->files($path);
             $directories = $disk->directories($path);
-
             if (count($contents) === 0 && count($directories) === 0) {
                 $disk->deleteDirectory($path);
-
                 $parentPath = dirname($path);
-                if ($parentPath !== '.' && $parentPath !== '') {
-                    $deleteIfEmpty($parentPath);
-                }
+                if ($parentPath !== '.' && $parentPath !== '') $deleteIfEmpty($parentPath);
             }
         };
-
         $deleteIfEmpty($folderPath);
     }
 }
@@ -397,44 +296,26 @@ if (!function_exists('handle_documentable_name_change')) {
     {
         $disk = Storage::disk('local');
         $parent = model_to_spanish($documentable::class, plural: true);
-
         $oldBaseFolder = $parent . '/' . $oldName;
         $newBaseFolder = $parent . '/' . $newName;
-
         if ($oldBaseFolder !== $newBaseFolder && $disk->exists($oldBaseFolder)) {
-            if (!$disk->exists($newBaseFolder)) {
-                $disk->makeDirectory($newBaseFolder);
-            }
-
+            if (!$disk->exists($newBaseFolder)) $disk->makeDirectory($newBaseFolder);
             $allFiles = $disk->allFiles($oldBaseFolder);
             foreach ($allFiles as $oldPath) {
                 $newPath = str_replace($oldBaseFolder, $newBaseFolder, $oldPath);
-
                 $newDirectory = dirname($newPath);
-                if (!$disk->exists($newDirectory)) {
-                    $disk->makeDirectory($newDirectory);
-                }
-
+                if (!$disk->exists($newDirectory)) $disk->makeDirectory($newDirectory);
                 $disk->move($oldPath, $newPath);
             }
-
             $documentable->documents->each(function ($document) use ($oldBaseFolder, $newBaseFolder) {
                 $document->files->each(function ($file) use ($oldBaseFolder, $newBaseFolder) {
                     $oldPath = $file->path;
                     $newPath = str_replace($oldBaseFolder, $newBaseFolder, $oldPath);
-
-                    if ($oldPath !== $newPath) {
-                        $file->update(['path' => $newPath]);
-                    }
+                    if ($oldPath !== $newPath) $file->update(['path' => $newPath]);
                 });
             });
-
             $allDirectories = $disk->allDirectories($oldBaseFolder);
-
-            foreach (array_reverse($allDirectories) as $directory) {
-                cleanup_empty_folders($directory);
-            }
-
+            foreach (array_reverse($allDirectories) as $directory) cleanup_empty_folders($directory);
             cleanup_empty_folders($oldBaseFolder);
         }
     }
@@ -445,12 +326,10 @@ if (!function_exists('key_value_trimmer')) {
     {
         return function ($state) {
             $trimmed = [];
-
             foreach ($state as $key => $value) {
                 $trim = fn($str) => is_string($str) ? trim($str) : $str;
                 $trimmed[$trim($key)] = $trim($value);
             }
-
             return $trimmed;
         };
     }
@@ -459,14 +338,14 @@ if (!function_exists('key_value_trimmer')) {
 if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
+        $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
         try {
             $replaced = path($filepath, base: false);
         } catch (\Throwable) {
             return null;
         }
-
         $path = urlencode($replaced);
-        return route('folder.open') . '?path=' . $path;
+        return "$base/$endpoint.php?path=$path";
     }
 }
 
@@ -476,21 +355,13 @@ if (!function_exists('record_folder_url')) {
         if ($record instanceof File) {
             return filled($record->path) ? exec_url($record->path, endpoint: 'folder') : null;
         }
-
         if ($record instanceof Document) {
-            return filled($record->current?->path)
-                ? exec_url($record->current->path, endpoint: 'folder')
-                : null;
+            return filled($record->current?->path) ? exec_url($record->current->path, endpoint: 'folder') : null;
         }
-
         if (method_exists($record, 'documents')) {
             $document = $record->documents()->with('current')->latest('created_at')->first();
-
-            return filled($document?->current?->path)
-                ? exec_url($document->current->path, endpoint: 'folder')
-                : null;
+            return filled($document?->current?->path) ? exec_url($document->current->path, endpoint: 'folder') : null;
         }
-
         return null;
     }
 }
