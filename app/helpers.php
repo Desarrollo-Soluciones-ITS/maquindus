@@ -459,9 +459,6 @@ if (!function_exists('key_value_trimmer')) {
 if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
-        $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
-
-        // Verificar que el archivo exista antes de intentar obtener la ruta
         try {
             $replaced = path($filepath, base: false);
         } catch (\Throwable) {
@@ -469,7 +466,7 @@ if (!function_exists('exec_url')) {
         }
 
         $path = urlencode($replaced);
-        return "$base/$endpoint.php?path=$path";
+        return route('folder.open') . '?path=' . $path;
     }
 }
 

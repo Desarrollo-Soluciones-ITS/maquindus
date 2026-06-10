@@ -47,6 +47,8 @@ class Permission extends Model
         'files' => 'versión',
         'activity_logs' => 'bitácora',
         'search' => 'buscador',
+        'projects' => 'proyecto',
+        'customers' => 'cliente',
         'purchase_orders' => 'órden de compra proveedor',
     ];
 
@@ -129,6 +131,22 @@ class Permission extends Model
             'open_in_folder',
             'show_file',
         ],
+        'projects' => [
+            'create',
+            'edit',
+            'show',
+            'delete',
+            'view',
+            'restore',
+        ],
+        'customers' => [
+            'create',
+            'show',
+            'view',
+            'delete',
+            'edit',
+            'restore',
+        ],
         'purchase_orders' => [
             'read',
             'create',
@@ -136,7 +154,7 @@ class Permission extends Model
             'delete',
             'view',
             'restore',
-        ]
+        ],
     ];
 
     public static function buildDefinitions(): array
