@@ -5,6 +5,7 @@ namespace App\Filament\Actions\Documents;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 
 class OpenFolderAction
 {
@@ -14,6 +15,11 @@ class OpenFolderAction
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
             ->hidden(fn(Model $record) => blank(record_folder_url($record)))
-            ->url(fn(Model $record): ?string => record_folder_url($record), shouldOpenInNewTab: true);
+            ->action(function (Model $record) {
+                $url = record_folder_url($record);
+                if ($url) {
+                    Http::timeout(5)->get($url);
+                }
+            });
     }
 }
