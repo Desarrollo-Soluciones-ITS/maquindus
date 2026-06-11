@@ -11,12 +11,38 @@ if (!$input) {
 	exit;
 }
 
-$path = resolve_target_path((string) $input);
-$arg = escapeshellarg($path);
+$input = trim(urldecode($input));
+$input = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $input);
+
+if ($input === '') {
+	http_response_code(400);
+	echo json_encode(['error' => 'Empty path']);
+	exit;
+}
+
+// Si ya viene como ruta absoluta (C:\) o UNC (\\), usarla directamente
+if (!preg_match('/^(?:[A-Za-z]:\\\\|\\\\\\\\)/', $input)) {
+	// Si es relativa, prepender el storage root
+	$root = getenv('SHELL_SHARE_ROOT');
+	if (!$root) {
+		// Fallback: usar la ruta esperada del servidor
+		$root = 'C:\\inetpub\\wwwroot\\gestor-archivos\\storage\\app\\private';
+	}
+	$root = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $root), DIRECTORY_SEPARATOR);
+	$input = $root . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);
+}
+
+if (!file_exists($input)) {
+	http_response_code(404);
+	echo json_encode(['error' => 'File or directory not found', 'path' => $input]);
+	exit;
+}
+
+$arg = escapeshellarg($input);
 $out = [];
 $code = 0;
 
-if (is_file($path)) {
+if (is_file($input)) {
 	$cmd = 'cmd /c explorer /select,' . $arg;
 } else {
 	$cmd = 'cmd /c explorer ' . $arg;
@@ -25,22 +51,3 @@ if (is_file($path)) {
 exec($cmd, $out, $code);
 
 echo json_encode(compact('cmd', 'out', 'code', 'path'));
-
-function resolve_target_path(string $input): string
-{
-	$input = trim(urldecode($input));
-	$input = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $input);
-
-	if ($input === '') {
-		return '';
-	}
-
-	if (preg_match('/^(?:[A-Za-z]:\\\\|\\\\\\\\)/', $input)) {
-		return $input;
-	}
-
-	$root = getenv('SHELL_SHARE_ROOT') ?: '\\\\192.168.56.10\\Proyecto Base de Datos';
-	$root = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $root), DIRECTORY_SEPARATOR);
-
-	return $root . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);
-}

@@ -340,7 +340,8 @@ if (!function_exists('exec_url')) {
     {
         $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
         try {
-            $replaced = path($filepath, base: false);
+            // Enviar la ruta absoluta completa del sistema de archivos
+            $replaced = path($filepath, base: true);
         } catch (\Throwable) {
             return null;
         }
