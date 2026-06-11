@@ -14,6 +14,6 @@ class OpenFolderAction
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
             ->hidden(fn(Model $record) => blank(record_folder_url($record)))
-            ->alpineClickAction(fn(Model $record): string => 'fetch(\'' . record_folder_url($record) . '\')');
+            ->url(fn(Model $record): ?string => record_folder_url($record), shouldOpenInNewTab: true);
     }
 }
