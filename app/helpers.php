@@ -127,16 +127,17 @@ if (!function_exists('path')) {
         }
 
         $folder = $segments->join('\\');
+        $disk = Storage::disk('local');
 
-        if ($asFolder && Storage::directoryMissing($folder)) {
+        if ($asFolder && $disk->directoryMissing($folder)) {
             throw new Error('path() helper error: directory is missing');
         }
 
-        if (!$asFolder && Storage::fileMissing($folder)) {
+        if (!$asFolder && $disk->fileMissing($folder)) {
             throw new Error('path() helper error: file is missing');
         }
 
-        return str($base ? Storage::path($folder) : $folder)
+        return str($base ? $disk->path($folder) : $folder)
             ->replace('/', DIRECTORY_SEPARATOR)
             ->replace('\\', DIRECTORY_SEPARATOR);
     }
@@ -343,6 +344,11 @@ if (!function_exists('exec_url')) {
     function exec_url(string $filepath, string $endpoint)
     {
         $base = env('SHELL_API_URL', 'http://127.0.0.1:8970');
+        $baseHost = parse_url($base, PHP_URL_HOST);
+        if ($baseHost === 'localhost') {
+            $base = str_replace('localhost', '127.0.0.1', $base);
+        }
+
         $replaced = path($filepath, base: false);
         $path = urlencode($replaced);
         return "$base/$endpoint.php?path=$path";

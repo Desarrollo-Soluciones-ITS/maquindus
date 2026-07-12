@@ -32,7 +32,12 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => env('STORAGE_ROOT', storage_path('app/private')),
+            'root' => (function () {
+                $storageRoot = env('STORAGE_ROOT');
+                return $storageRoot && file_exists($storageRoot)
+                    ? $storageRoot
+                    : storage_path('app/private');
+            })(),
             'serve' => true,
             'throw' => false,
             'report' => false,
