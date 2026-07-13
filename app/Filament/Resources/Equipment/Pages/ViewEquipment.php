@@ -16,4 +16,27 @@ class ViewEquipment extends ViewRecord
             EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('equipments.edit')),
         ];
     }
+
+    public function getViewData(): array
+    {
+        return [
+            'folderStructure' => [
+                'root' => 'Equipos/' . $this->record->name,
+                'folders' => [
+                    'Consultas de Campo',
+                    'Especificaciones Tecnicas' => [
+                        'Catálogos',
+                        'Hoja De Datos',
+                        'Manuales',
+                        'Normas',
+                        'Planos',
+                        'Revisiones',
+                    ],
+                    'General',
+                    'Reportes',
+                    'Repuestos',
+                ],
+            ],
+        ];
+    }
 }

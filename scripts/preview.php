@@ -17,26 +17,39 @@ if (!$input) {
     exit;
 }
 
-$relativePath = trim(str_replace('/', DIRECTORY_SEPARATOR, urldecode($input)), DIRECTORY_SEPARATOR);
+$relativePath = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, urldecode($input)), DIRECTORY_SEPARATOR);
 
-// Replace this with the actual UNC share path visible from each LAN client.
-// Example: if the server shares the folder `gestor-archivos` and the private files are under
-// C:\inetpub\wwwroot\gestor-archivos\storage\app\private, use:
-// \\192.168.0.4\gestor-archivos\storage\app\private
-$sharedRoot = '\\\\192.168.0.4\\gestor-archivos\\storage\\app\\private';
-$root = rtrim($sharedRoot, DIRECTORY_SEPARATOR);
-$path = $root . DIRECTORY_SEPARATOR . $relativePath;
+$pathsToTry = [];
+$localRoot = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'private');
+if ($localRoot !== false) {
+    $pathsToTry[] = $localRoot;
+}
+$sharedRoot = getenv('SHELL_SHARE_ROOT');
+if ($sharedRoot) {
+    $pathsToTry[] = rtrim($sharedRoot, DIRECTORY_SEPARATOR);
+}
+$pathsToTry[] = 'C:\\inetpub\\wwwroot\\gestor-archivos\\storage\\app\\private';
+$pathsToTry[] = '\\192.168.0.4\\gestor-archivos\\storage\\app\\private';
 
-if (!file_exists($path)) {
+$path = null;
+foreach ($pathsToTry as $root) {
+    $candidate = $root . DIRECTORY_SEPARATOR . $relativePath;
+    if (file_exists($candidate)) {
+        $path = $candidate;
+        break;
+    }
+}
+
+if ($path === null) {
     http_response_code(404);
-    echo json_encode(['error' => 'File not found', 'path' => $path]);
+    echo json_encode(['error' => 'File not found', 'path' => end($pathsToTry) . DIRECTORY_SEPARATOR . $relativePath]);
     exit;
 }
 
-$arg = escapeshellarg($path);
+$quotedPath = '"' . str_replace('"', '\\"', $path) . '"';
 $out = null;
 $code = null;
-$cmd = "start \"\" $arg";
+$cmd = "start \"\" {$quotedPath}";
 
 exec($cmd, $out, $code);
 

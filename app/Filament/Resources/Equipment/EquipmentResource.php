@@ -3,7 +3,17 @@
 namespace App\Filament\Resources\Equipment;
 
 use App\Filament\RelationManagers\DocumentsRelationManager;
+use App\Filament\RelationManagers\EquipmentCatalogosRelationManager;
+use App\Filament\RelationManagers\EquipmentConsultasRelationManager;
+use App\Filament\RelationManagers\EquipmentGeneralRelationManager;
+use App\Filament\RelationManagers\EquipmentHojaDeDatosRelationManager;
+use App\Filament\RelationManagers\EquipmentManualesRelationManager;
+use App\Filament\RelationManagers\EquipmentNormasRelationManager;
+use App\Filament\RelationManagers\EquipmentPlanosRelationManager;
+use App\Filament\RelationManagers\EquipmentReportesRelationManager;
+use App\Filament\RelationManagers\EquipmentRepuestosRelationManager;
 use App\Filament\RelationManagers\PurchaseOrdersRelationManager;
+use Filament\Resources\RelationManagers\RelationGroup;
 use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
@@ -55,6 +65,17 @@ class EquipmentResource extends Resource
     public static function getRelations(): array
     {
         return [
+            'consultas' => EquipmentConsultasRelationManager::class,
+            RelationGroup::make('Especificaciones Técnicas', [
+                EquipmentCatalogosRelationManager::class,
+                EquipmentHojaDeDatosRelationManager::class,
+                EquipmentManualesRelationManager::class,
+                EquipmentNormasRelationManager::class,
+                EquipmentPlanosRelationManager::class,
+            ]),
+            'general' => EquipmentGeneralRelationManager::class,
+            'reportes' => EquipmentReportesRelationManager::class,
+            'repuestos' => EquipmentRepuestosRelationManager::class,
             'documents' => DocumentsRelationManager::class,
             'parts' => PartsRelationManager::class,
             'projects' => ProjectsRelationManager::class,

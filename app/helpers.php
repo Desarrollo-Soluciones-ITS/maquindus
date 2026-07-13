@@ -349,8 +349,12 @@ if (!function_exists('exec_url')) {
             $base = str_replace('localhost', '127.0.0.1', $base);
         }
 
-        $replaced = path($filepath, base: false);
-        $path = urlencode($replaced);
-        return "$base/$endpoint.php?path=$path";
+        $normalized = str($filepath)
+            ->replace('\\', '/')
+            ->replace('//', '/')
+            ->trim('/');
+
+        $path = urlencode($normalized);
+        return "{$base}/{$endpoint}.php?path={$path}";
     }
 }
