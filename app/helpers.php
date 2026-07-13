@@ -350,6 +350,25 @@ if (!function_exists('exec_url')) {
     }
 }
 
+if (!function_exists('gestor_net_url')) {
+    function gestor_net_url(string $filepath, string $action = 'select'): ?string
+    {
+        $base = env('STORAGE_NETWORK_PATH');
+        if (!$base) return null;
+
+        try {
+            $relativePath = path($filepath, base: false);
+        } catch (\Throwable) {
+            return null;
+        }
+        $relativePath = ltrim($relativePath, '\\/');
+
+        $fullPath = rtrim($base, '\\/') . '\\' . str_replace('/', '\\', $relativePath);
+
+        return "gestor://$action?path=" . urlencode($fullPath);
+    }
+}
+
 if (!function_exists('record_folder_url')) {
     function record_folder_url(Model $record): ?string
     {

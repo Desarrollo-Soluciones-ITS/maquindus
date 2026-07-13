@@ -1,0 +1,29 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================
+; Registro del protocolo personalizado gestor://
+; ============================================================
+; Este archivo registra el protocolo "gestor://" en Windows
+; para que los navegadores web puedan ejecutar un script local
+; que abre el Explorador de Archivos seleccionando el archivo.
+;
+; Instalación:
+;   Hacer doble clic y confirmar, o ejecutar:
+;   regedit /s open_in_explorer.reg
+;
+; Desinstalación:
+;   reg delete HKCR\gestor /f
+; ============================================================
+
+[HKEY_CLASSES_ROOT\gestor]
+@="URL:Gestor de Archivos Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\gestor\shell]
+@="open"
+
+[HKEY_CLASSES_ROOT\gestor\shell\open]
+@="Abrir en el explorador de archivos"
+
+[HKEY_CLASSES_ROOT\gestor\shell\open\command]
+@="powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File \"%USERPROFILE%\\scripts\\gestor_handler.ps1\" -action \"select\" -path \"%1\""
