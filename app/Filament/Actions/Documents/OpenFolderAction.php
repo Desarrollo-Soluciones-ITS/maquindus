@@ -17,8 +17,7 @@ class OpenFolderAction
             ->icon(Heroicon::FolderOpen)
             ->hidden(fn(Model $record) => blank(record_folder_url($record)))
             ->url(function (Model $record): ?string {
-                // Redirigir a la vista network que maneja la apertura en nueva pestaña
-                // la vista se cierra sola y la pestaña original no se pierde
+                // Redirigir a la vista network que lanza el protocolo y vuelve atras
                 $file = $record instanceof File
                     ? $record
                     : ($record->current ?? null);
@@ -36,6 +35,6 @@ class OpenFolderAction
                 }
 
                 return null;
-            }, shouldOpenInNewTab: true); // <-- NUEVA PESTAÑA, no pierde la vista original
+            }, shouldOpenInNewTab: false);
     }
 }

@@ -45,41 +45,33 @@
             word-break: break-all;
             margin: 1rem 0;
         }
-        .fallback-link {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        .fallback-link:hover {
-            background: #2980b9;
-        }
     </style>
 </head>
 <body>
-    <div class="container" id="container">
+    <div class="container">
         <div class="spinner"></div>
         <h2>Abriendo carpeta...</h2>
         <p>Se está intentando abrir el Explorador de Windows</p>
         <div class="file-name">{{ basename($file->path) }}</div>
-        <a href="{{ $url }}" class="fallback-link" id="manualLink">
-            Abrir carpeta manualmente
-        </a>
+        <p style="font-size: 0.8rem; color: #999;">
+            La ventana se cerrará automáticamente
+        </p>
     </div>
 
     <script>
-        // Abrir el protocolo gestor:// en UNA VENTANA AUXILIAR que se cierra sola
-        // La pestaña actual se cierra inmediatamente
+        // 1. Lanzar el protocolo gestor:// (esto abre el explorador en la PC del usuario)
+        window.location.href = '{{ $url }}';
 
-        // 1. Abrir la URL del protocolo en una ventana auxiliar
-        var auxWindow = window.open('{{ $url }}', '_blank');
-
-        // 2. Cerrar esta pestaña inmediatamente (vuelve a la vista del equipo)
-        window.close();
+        // 2. Volver a la pagina anterior inmediatamente
+        //    Si document.referrer tiene la URL de la vista del equipo, vamos alli
+        //    Si no, vamos al dashboard
+        setTimeout(function() {
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.location.replace(document.referrer);
+            } else {
+                window.location.replace('/dashboard');
+            }
+        }, 500);
     </script>
 </body>
 </html>
