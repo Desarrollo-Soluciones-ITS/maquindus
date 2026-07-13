@@ -2,10 +2,8 @@
 
 namespace App\Filament\Resources\Equipment;
 
-use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentCatalogosRelationManager;
 use App\Filament\RelationManagers\EquipmentConsultasRelationManager;
-use App\Filament\RelationManagers\EquipmentGeneralRelationManager;
 use App\Filament\RelationManagers\EquipmentHojaDeDatosRelationManager;
 use App\Filament\RelationManagers\EquipmentManualesRelationManager;
 use App\Filament\RelationManagers\EquipmentNormasRelationManager;
@@ -18,9 +16,6 @@ use App\Filament\Resources\Equipment\Pages\CreateEquipment;
 use App\Filament\Resources\Equipment\Pages\EditEquipment;
 use App\Filament\Resources\Equipment\Pages\ListEquipment;
 use App\Filament\Resources\Equipment\Pages\ViewEquipment;
-use App\Filament\RelationManagers\PartsRelationManager;
-use App\Filament\RelationManagers\ProjectsRelationManager;
-use App\Filament\RelationManagers\SuppliersRelationManager;
 use App\Filament\Resources\Equipment\Pages\EquipmentGallery;
 use App\Filament\Resources\Equipment\Schemas\EquipmentForm;
 use App\Filament\Resources\Equipment\Schemas\EquipmentInfolist;
@@ -73,13 +68,8 @@ class EquipmentResource extends Resource
                 EquipmentNormasRelationManager::class,
                 EquipmentPlanosRelationManager::class,
             ]),
-            'general' => EquipmentGeneralRelationManager::class,
             'reportes' => EquipmentReportesRelationManager::class,
             'repuestos' => EquipmentRepuestosRelationManager::class,
-            'documents' => DocumentsRelationManager::class,
-            'parts' => PartsRelationManager::class,
-            'projects' => ProjectsRelationManager::class,
-            'suppliers' => SuppliersRelationManager::class,
             'purchaseOrders' => PurchaseOrdersRelationManager::class,
         ];
     }
