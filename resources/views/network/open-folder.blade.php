@@ -61,30 +61,25 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <div class="spinner"></div>
         <h2>Abriendo carpeta...</h2>
         <p>Se está intentando abrir el Explorador de Windows</p>
         <div class="file-name">{{ basename($file->path) }}</div>
-
-        <p style="font-size: 0.8rem; color: #999;">
-            Si no se abre automáticamente, haz clic en el botón de abajo
-        </p>
-
-        <a href="{{ $url }}" class="fallback-link">
+        <a href="{{ $url }}" class="fallback-link" id="manualLink">
             Abrir carpeta manualmente
         </a>
     </div>
 
     <script>
-        // Redirigir al protocolo gestor://
-        window.location.href = '{{ $url }}';
+        // Abrir el protocolo gestor:// en UNA VENTANA AUXILIAR que se cierra sola
+        // La pestaña actual se cierra inmediatamente
 
-        // Fallback: si después de 3 segundos no se abrió, mostrar opción manual
-        setTimeout(function() {
-            document.querySelector('.spinner').style.display = 'none';
-            document.querySelector('.fallback-link').style.display = 'block';
-        }, 3000);
+        // 1. Abrir la URL del protocolo en una ventana auxiliar
+        var auxWindow = window.open('{{ $url }}', '_blank');
+
+        // 2. Cerrar esta pestaña inmediatamente (vuelve a la vista del equipo)
+        window.close();
     </script>
 </body>
 </html>

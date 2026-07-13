@@ -17,33 +17,25 @@ class OpenFolderAction
             ->icon(Heroicon::FolderOpen)
             ->hidden(fn(Model $record) => blank(record_folder_url($record)))
             ->url(function (Model $record): ?string {
-                // 1. Intentar con protocolo gestor:// (funciona en cualquier PC con PowerShell)
+                // Redirigir a la vista network que maneja la apertura en nueva pestaña
+                // la vista se cierra sola y la pestaña original no se pierde
                 $file = $record instanceof File
                     ? $record
                     : ($record->current ?? null);
 
                 if ($file instanceof File && filled($file->path)) {
-                    $gestorUrl = gestor_net_url($file->path, 'select');
-                    if ($gestorUrl) {
-                        return $gestorUrl;
-                    }
-                }
-
-                // 2. Fallback 1: redirect a la vista network (usa gestor:// via navegador)
-                if ($record instanceof File) {
-                    return route('network.folder', ['file' => $record->id]);
+                    return route('network.folder', ['file' => $file->id]);
                 }
                 if ($record instanceof Document && $record->current) {
                     return route('network.folder', ['file' => $record->current->id]);
                 }
 
-                // 3. Fallback 2: URL del servidor PHP auxiliar (solo funciona en servidor)
                 $folderUrl = record_folder_url($record);
                 if ($folderUrl) {
                     return $folderUrl;
                 }
 
                 return null;
-            }, shouldOpenInNewTab: false);
+            }, shouldOpenInNewTab: true); // <-- NUEVA PESTAÑA, no pierde la vista original
     }
 }
