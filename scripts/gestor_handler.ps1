@@ -1,139 +1,152 @@
 <#
 .SYNOPSIS
-    Manejador del protocolo personalizado gestor://
-    Abre el Explorador de Windows seleccionando el archivo en la ruta UNC.
+    Manejador del protocolo gestor://
+    Abre el Explorador de Windows en la ruta UNC del archivo.
 .DESCRIPTION
-    Este script es invocado por el protocolo personalizado gestor://
-    registrado en Windows. Recibe la URL completa como argumento %1:
+    Invocado por el navegador via protocolo gestor:// registrado en Windows.
+    Recibe la URL completa como unico argumento:
+        gestor://select?path=\\192.168.0.4\private\...
+        gestor://open?path=\\192.168.0.4\private\...
+.EXAMPLE
+    Desde navegador:
         gestor://select?path=\\192.168.0.4\private\Equipos\...
-        gestor://open?path=\\192.168.0.4\private\Equipos\...
-
-    Método principal: usar cmd /c explorer /select, "ruta" (confiable 100%)
-    Fallback: usar Shell.Application COM
-.PARAMETER action
-    Acción: "select" (seleccionar archivo) o "open" (abrir carpeta)
-.PARAMETER path
-    Ruta UNC completa del archivo o carpeta
+    Desde PowerShell:
+        .\gestor_handler.ps1 "gestor://select?path=\\192.168.0.4\private\..."
 #>
 
-param(
-    [string]$action = "select",
-    [string]$path = ""
-)
-
 Add-Type -AssemblyName System.Windows.Forms
-
-# LOG de depuración
 $logFile = "$env:TEMP\gestor_debug.log"
+
 function Write-Log { param([string]$msg) "$(Get-Date -Format 'HH:mm:ss'): $msg" | Out-File -Append $logFile }
+function Show-Error { param([string]$msg) [System.Windows.Forms.MessageBox]::Show($msg, "Gestor de Archivos - Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
 
 Write-Log "=== INICIO ==="
-Write-Log "action=$action"
-Write-Log "path_original=$path"
-Write-Log "args=$($args -join ' ')"
 
-# ENTRADA: Windows pasa %1 en -path, ejemplo:
-#   -path "gestor://select?path=\\192.168.0.4\private\Equipos\..."
-# El valor de $path es la URL completa del protocolo gestor://
-# Extraer la ruta real desde el query string de esa URL
+# ============================================================
+# 1. OBTENER LA URL COMPLETA DESDE $args[0]
+# Windows pasa la URL como %1 (argumento posicional)
+# La URL tiene formato: gestor://select?path=\\192.168.0.4\private\...
+# ============================================================
 
-if ($path -match 'gestor://(\w+)\?path=(.+)$') {
+$rawUrl = ""
+if ($args.Count -gt 0) {
+    $rawUrl = $args[0]
+}
+
+Write-Log "rawUrl=$rawUrl"
+
+if ([string]::IsNullOrWhiteSpace($rawUrl)) {
+    Show-Error "No se recibio la URL del protocolo gestor://`n`nEjecuta este script desde el navegador web."
+    Write-Log "ERROR: no se recibio URL"
+    exit 1
+}
+
+# ============================================================
+# 2. EXTRAER ACCION Y RUTA DE LA URL
+# ============================================================
+
+$action = "select"
+$path = ""
+
+# Buscar patron: gestor://<accion>?path=<ruta>
+if ($rawUrl -match 'gestor://(\w+)\?path=(.+)$') {
     $action = $matches[1]
     $path = $matches[2]
-    Write-Log "extraido de URL: action=$action path=$path"
-} elseif ($path -match '^gestor://') {
-    Write-Log "ERROR: URL con formato incorrecto: $path"
-    [System.Windows.Forms.MessageBox]::Show(
-        "La URL del protocolo gestor:// no tiene el formato esperado.`n`nURL recibida: $path",
-        "Gestor de Archivos - Error",
-        [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Error
-    ) | Out-Null
-    exit 1
-}
-
-# Decodificar URL (espacios, %20, %28=%29=(), etc.)
-$pathDecoded = [System.Uri]::UnescapeDataString($path)
-Write-Log "path_decoded=$pathDecoded"
-
-# Normalizar separadores de ruta: / -> \
-$pathDecoded = $pathDecoded -replace '[/]', '\'
-Write-Log "path_normalized=$pathDecoded"
-
-# Validar que la ruta no esté vacía
-if ([string]::IsNullOrWhiteSpace($pathDecoded)) {
-    Write-Log "ERROR: ruta vacia"
-    [System.Windows.Forms.MessageBox]::Show(
-        "La ruta del archivo está vacía.`n`nNo se puede abrir el explorador.",
-        "Gestor de Archivos - Error",
-        [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Error
-    ) | Out-Null
+    Write-Log "extraido: action=$action path=$path"
+} else {
+    Show-Error "La URL del protocolo gestor:// no tiene el formato esperado.`n`nURL recibida: $rawUrl"
+    Write-Log "ERROR: formato inesperado: $rawUrl"
     exit 1
 }
 
 # ============================================================
-# USAR LA RUTA DECODIFICADA
+# 3. DECODIFICAR URL (%5C -> \, %20 -> espacio, etc.)
 # ============================================================
-$targetPath = $pathDecoded
-Write-Log "targetPath=$targetPath"
-
-# ============================================================
-# MÉTODO ÚNICO: explorer.exe con la carpeta contenedora
-# Windows Explorer NO puede hacer /select con rutas UNC largas.
-# Lo mejor es abrir la carpeta contenedora.
-# Si el usuario necesita seleccionar el archivo, puede navegar
-# hasta la carpeta que ya está abierta.
-# ============================================================
-
-Write-Log "METODO: explorer carpeta contenedora"
-$explorerOpened = $false
 
 try {
-    if ($action -eq "select") {
-        # Abrir la carpeta PADRE donde está el archivo
-        $folderPath = [System.IO.Path]::GetDirectoryName($targetPath)
-        Write-Log "folderPath=$folderPath"
-        
-        # Intentar 1: Shell.Application (abre la carpeta correctamente con UNC)
-        try {
-            $shell = New-Object -ComObject "Shell.Application"
-            $shell.Open($folderPath)
-            $explorerOpened = $true
-            Write-Log "Shell.Application.Open OK"
-        } catch {
-            Write-Log "Shell.Application fallo: $_"
-        }
-        
-        # Intentar 2: explorer.exe directo si COM falló
-        if (-not $explorerOpened) {
-            Write-Log "FALLBACK: explorer.exe $folderPath"
-            Start-Process -FilePath "explorer.exe" -ArgumentList "`"$folderPath`"" -ErrorAction Stop
-            $explorerOpened = $true
-            Write-Log "explorer.exe directo OK"
-        }
-    } else {
-        # "open": abrir la ruta directamente
-        Write-Log "open: explorer.exe $targetPath"
-        Start-Process -FilePath "explorer.exe" -ArgumentList "`"$targetPath`"" -ErrorAction Stop
-        $explorerOpened = $true
-        Write-Log "explorer.exe open OK"
-    }
+    $path = [System.Uri]::UnescapeDataString($path)
 } catch {
-    Write-Log "ERROR general: $_"
+    Write-Log "UnescapeDataString fallo: $_"
+    # Fallback manual
+    $path = $path -replace '%5C', '\'
+    $path = $path -replace '%20', ' '
+    $path = $path -replace '%28', '('
+    $path = $path -replace '%29', ')'
 }
 
-# Si nada funcionó, mostrar error
-if (-not $explorerOpened) {
-    Write-Log "ERROR: no se pudo abrir el explorador"
-    [System.Windows.Forms.MessageBox]::Show(
-        "No se pudo abrir el Explorador de Windows.`n`nRuta: $targetPath",
-        "Gestor de Archivos - Error",
-        [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Error
-    ) | Out-Null
+# Normalizar separadores
+$path = $path -replace '[/]', '\'
+
+Write-Log "path_decoded=$path"
+
+if ([string]::IsNullOrWhiteSpace($path)) {
+    Show-Error "La ruta del archivo esta vacia.`n`nNo se puede abrir el explorador."
+    Write-Log "ERROR: ruta vacia"
     exit 1
 }
 
-Write-Log "=== FIN ==="
+# ============================================================
+# 4. ABRIR EXPLORADOR WINDOWS
+# explorer /select NO funciona con rutas UNC largas.
+# Usamos Shell.Application.Open() con la carpeta contenedora.
+# ============================================================
+
+$folderPath = ""
+if ($action -eq "select") {
+    $folderPath = [System.IO.Path]::GetDirectoryName($path)
+} else {
+    $folderPath = $path
+}
+
+Write-Log "folderPath=$folderPath"
+
+if ([string]::IsNullOrWhiteSpace($folderPath)) {
+    # Si la ruta es la raiz del share, usarla directamente
+    $folderPath = $path
+}
+
+$opened = $false
+
+# Intento 1: Shell.Application COM
+try {
+    Write-Log "Intentando Shell.Application..."
+    $shell = New-Object -ComObject "Shell.Application"
+    $shell.Open($folderPath)
+    $opened = $true
+    Write-Log "Shell.Application.Open OK: $folderPath"
+} catch {
+    Write-Log "Shell.Application fallo: $_"
+}
+
+# Intento 2: explorer.exe directo
+if (-not $opened) {
+    try {
+        Write-Log "FALLBACK: explorer.exe..."
+        Start-Process -FilePath "explorer.exe" -ArgumentList "`"$folderPath`"" -ErrorAction Stop
+        $opened = $true
+        Write-Log "explorer.exe directo OK"
+    } catch {
+        Write-Log "explorer.exe fallo: $_"
+    }
+}
+
+# Intento 3: cmd /c start
+if (-not $opened) {
+    try {
+        Write-Log "FALLBACK 2: cmd /c start..."
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c start `"`" `"$folderPath`"" -WindowStyle Hidden
+        $opened = $true
+        Write-Log "cmd /c start OK"
+    } catch {
+        Write-Log "cmd /c start fallo: $_"
+    }
+}
+
+if (-not $opened) {
+    Show-Error "No se pudo abrir el Explorador de Windows.`n`nRuta: $folderPath"
+    Write-Log "ERROR: no se pudo abrir el explorador"
+    exit 1
+}
+
+Write-Log "=== FIN OK ==="
 exit 0
