@@ -1,28 +1,41 @@
 <?php
 /**
- * folder.php para PCs cliente
+ * client_folder.php para PCs cliente
  * 
- * Recibe una ruta absoluta del servidor (C:\inetpub\...)
- * y la convierte a ruta UNC para abrir la carpeta en la PC del cliente.
+ * Recibe una URL del protocolo gestor:// via parametro gestor=
+ * y ejecuta explorer en la ruta UNC extraida.
  * 
- * Ejemplo:
- *   Entrada: C:\inetpub\wwwroot\gestor-archivos\storage\app\private\Equipos\...\archivo.pdf
- *   Salida:  \\192.168.0.4\private\Equipos\...\archivo.pdf
- * 
- * Uso desde el navegador:
- *   http://127.0.0.1:8970/folder.php?path=C%3A%5Cinetpub%5C...%5Carchivo.pdf
+ * Uso:
+ *   http://127.0.0.1:8970/client_folder.php?gestor=gestor%3A%2F%2Fselect%3Fpath%3D%5C%5C...
+ *   http://127.0.0.1:8970/client_folder.php?path=\\192.168.0.4\private\...
  */
 
-$input = $_GET['path'] ?? null;
+// Compatibilidad: aceptar tanto ?gestor= como ?path= directo (para folder.php legacy)
+$input = $_GET['gestor'] ?? $_GET['path'] ?? null;
 
 if (!$input) {
     http_response_code(400);
-    echo json_encode(['error' => 'Missing path parameter']);
+    echo json_encode(['error' => 'Missing parameter']);
     exit;
 }
 
 $input = trim(urldecode($input));
+
+// Si viene como URL gestor:// (via gestor=), extraer la ruta UNC
+if (preg_match('/^gestor/', $input)) {
+    $parts = parse_url($input);
+    parse_str($parts['query'] ?? '', $query);
+    $path = $query['path'] ?? null;
+    if (!$path) {
+        http_response_code(400);
+        echo json_encode(['error' => 'No path found in gestor URL']);
+        exit;
+    }
+    $input = urldecode($path);
+}
+
 $input = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $input);
+$input = rtrim($input, DIRECTORY_SEPARATOR);
 
 if ($input === '') {
     http_response_code(400);
@@ -30,36 +43,10 @@ if ($input === '') {
     exit;
 }
 
-// Obtener la raíz UNC desde variable de entorno
-$uncRoot = getenv('SHELL_SHARE_ROOT');
-if (!$uncRoot) {
-    $uncRoot = '\\\\192.168.0.4\\private';
-}
-$uncRoot = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $uncRoot), DIRECTORY_SEPARATOR);
-
-// Si la ruta es absoluta local (C:\), extraer la parte relativa después de "private"
-// y reemplazar la raíz por la UNC
-if (preg_match('/^[A-Za-z]:\\\\/', $input)) {
-    // Buscar la última ocurrencia de "\private\" en la ruta
-    $privatePos = stripos($input, '\private\\');
-    if ($privatePos !== false) {
-        $relative = substr($input, $privatePos + strlen('\private\\'));
-        $input = $uncRoot . '\\' . $relative;
-    } else {
-        // Fallback: buscar la parte relativa completa
-        $pos = stripos($input, '\storage\app\private\\');
-        if ($pos !== false) {
-            $relative = substr($input, $pos + strlen('\storage\app\private\\'));
-            $input = $uncRoot . '\\' . $relative;
-        } else {
-            // Si no se encuentra, asumir que el nombre del archivo es la parte relativa
-            $input = $uncRoot . '\\' . basename($input);
-        }
-    }
-}
-
-// Si la ruta no es UNC, asumir que es relativa y anteponer UNC
+// Asegurar formato UNC si es ruta relativa
 if (!preg_match('/^\\\\/', $input)) {
+    $uncRoot = getenv('SHELL_SHARE_ROOT') ?: '\\\\192.168.0.4\\private';
+    $uncRoot = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $uncRoot), DIRECTORY_SEPARATOR);
     $input = $uncRoot . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);
 }
 
