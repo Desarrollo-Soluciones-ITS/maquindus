@@ -5,6 +5,7 @@ namespace App\Filament\Actions\Documents;
 use App\Models\Document;
 use App\Models\File;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,12 +20,20 @@ class OpenFolderAction
                 $file = static::resolveFile($record);
                 return blank($file?->path);
             })
-            ->url(function (Model $record): ?string {
+            ->action(function (Model $record, $livewire) {
                 $file = static::resolveFile($record);
-                if ($file && filled($file->path)) {
-                    return route('network.folder', ['file' => $file->id]);
+                if (!$file || blank($file->path)) {
+                    Notification::make()
+                        ->title('No se encontró el documento.')
+                        ->danger()
+                        ->send();
+                    return;
                 }
-                return null;
+
+                $gestorUrl = record_folder_gestor_url($record);
+                if ($gestorUrl) {
+                    $livewire->js("window.location.href = '{$gestorUrl}'");
+                }
             });
     }
 
