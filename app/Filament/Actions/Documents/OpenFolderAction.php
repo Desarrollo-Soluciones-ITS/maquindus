@@ -37,29 +37,15 @@ class OpenFolderAction
                 $file = static::resolveFile($record);
                 return blank($file?->path);
             })
-            ->action(function ($record, $livewire) {
+            ->url(function (Model $record): ?string {
                 $file = static::resolveFile($record);
                 if (!$file || blank($file->path)) {
-                    Notification::make()
-                        ->title('No se encontró el archivo.')
-                        ->danger()
-                        ->send();
-                    return;
+                    return null;
                 }
-
-                // Generar URL UNC via protocolo gestor (para PowerShell)
-                $gestorUrl = gestor_net_url($file->path, 'select');
-
-                if ($gestorUrl) {
-                    // Ejecutar fetch desde el navegador del cliente a su
-                    // servidor PHP auxiliar local (puerto 8970)
-                    $fetchUrl = env('SHELL_API_URL', 'http://127.0.0.1:8970')
-                        . '/client_folder.php?gestor='
-                        . urlencode($gestorUrl);
-
-                    $livewire->js("fetch('$fetchUrl')");
-                }
-            });
+                // Generar URL del protocolo gestor://
+                // El navegador la lanza -> PowerShell -> explorer
+                return record_folder_gestor_url($record);
+            }, shouldOpenInNewTab: false);
     }
 
     private static function makeServerAction(): Action
