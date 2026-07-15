@@ -354,6 +354,7 @@ if (!function_exists('gestor_net_url')) {
     /**
      * Genera una URL del protocolo gestor:// para abrir un archivo/carpeta
      * desde un cliente LAN, usando ruta UNC.
+     * La ruta UNC final tiene el formato: \\\\servidor\recurso\carpeta\archivo
      */
     function gestor_net_url(string $filepath, string $action = 'select'): ?string
     {
@@ -365,9 +366,22 @@ if (!function_exists('gestor_net_url')) {
         } catch (\Throwable) {
             return null;
         }
-        $relativePath = ltrim($relativePath, '\\/');
 
-        $fullPath = rtrim($base, '\\/') . '\\' . str_replace('/', '\\', $relativePath);
+        // Normalizar la ruta relativa: reemplazar / por \ y eliminar separadores iniciales
+        $relativePath = str_replace('/', '\\', $relativePath);
+        $relativePath = ltrim($relativePath, '\\');
+
+        // Normalizar la base: colapsar backslashes multiples a uno solo,
+        // luego agregar exactamente \\ al inicio (UNC)
+        // El .env tiene STORAGE_NETWORK_PATH=\\192.168.0.4\private
+        // Pero tras dotenv puede llegar como \\192.168.0.4\private o \\\192.168.0.4\\private
+        $base = str_replace('/', '\\', $base);
+        $base = preg_replace('/\\\\+/', '\\', $base);  // colapsar \\\\... a \
+        $base = ltrim($base, '\\');                     // quitar \ iniciales
+        $base = '\\\\' . $base;                         // agregar exactamente \\
+
+        // Construir ruta completa: base + \ + relativa
+        $fullPath = $base . '\\' . $relativePath;
 
         return "gestor://$action?path=" . urlencode($fullPath);
     }

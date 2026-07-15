@@ -72,13 +72,21 @@
     </div>
 
     <script>
-        // Abrir el protocolo gestor:// en una ventana auxiliar
-        var auxWindow = window.open('{{ $url }}', '_blank');
+        // Redirigir al protocolo gestor:// para abrir el explorador
+        // El navegador preguntara: "Abrir gestor://?" -> Aceptar
+        window.location.href = '{{ $url }}';
 
-        // Cerrar esta pestaña para volver a la vista anterior
+        // Si el protocolo no se abrio (ej: gestor:// no instalado),
+        // mostrar mensaje y permitir volver
         setTimeout(function() {
-            window.close();
-        }, 500);
+            document.querySelector('.spinner').style.display = 'none';
+            document.getElementById('manualLink').style.display = 'inline-block';
+            document.getElementById('backLink').style.display = 'inline-block';
+        }, 3000);
     </script>
+
+    <a href="javascript:window.history.back()" class="back-link" id="backLink" style="display:none;">
+        Volver a la pagina anterior
+    </a>
 </body>
 </html>
