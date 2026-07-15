@@ -351,6 +351,10 @@ if (!function_exists('exec_url')) {
 }
 
 if (!function_exists('gestor_net_url')) {
+    /**
+     * Genera una URL del protocolo gestor:// para abrir un archivo/carpeta
+     * desde un cliente LAN, usando ruta UNC.
+     */
     function gestor_net_url(string $filepath, string $action = 'select'): ?string
     {
         $base = env('STORAGE_NETWORK_PATH');
@@ -383,5 +387,31 @@ if (!function_exists('record_folder_url')) {
             return filled($document?->current?->path) ? exec_url($document->current->path, endpoint: 'folder') : null;
         }
         return null;
+    }
+}
+
+if (!function_exists('record_folder_gestor_url')) {
+    /**
+     * Obtiene la URL del protocolo gestor:// (UNC) para un registro,
+     * para usar desde clientes LAN.
+     */
+    function record_folder_gestor_url(Model $record): ?string
+    {
+        $filePath = null;
+
+        if ($record instanceof File) {
+            $filePath = $record->path ?? null;
+        } elseif ($record instanceof Document) {
+            $filePath = $record->current?->path ?? null;
+        } elseif (method_exists($record, 'documents')) {
+            $document = $record->documents()->with('current')->latest('created_at')->first();
+            $filePath = $document?->current?->path ?? null;
+        }
+
+        if (!$filePath) {
+            return null;
+        }
+
+        return gestor_net_url($filePath, 'select');
     }
 }

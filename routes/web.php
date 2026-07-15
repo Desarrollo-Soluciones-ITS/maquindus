@@ -10,7 +10,7 @@ Route::middleware(['permission.any:documents.show_file,files.show_file'])
         ->get('/files/{file}/preview', PreviewFileController::class)
         ->name('files.preview');
 
-// Rutas para clientes LAN (usan protocolo gestor://)
+// Rutas para clientes LAN (usan protocolo gestor:// registrado en Windows)
 Route::prefix('network')->middleware(['permission.any:documents.show_file,files.show_file'])->group(function () {
     Route::get('/folder/{file}', [NetworkFileController::class, 'openFolder'])
         ->name('network.folder');

@@ -72,14 +72,13 @@
     </div>
 
     <script>
-        // Abrir el protocolo gestor:// en UNA VENTANA AUXILIAR que se cierra sola
-        // La pestaña actual se cierra inmediatamente
-
-        // 1. Abrir la URL del protocolo en una ventana auxiliar
+        // Abrir el protocolo gestor:// en una ventana auxiliar
         var auxWindow = window.open('{{ $url }}', '_blank');
 
-        // 2. Cerrar esta pestaña inmediatamente (vuelve a la vista del equipo)
-        window.close();
+        // Cerrar esta pestaña para volver a la vista anterior
+        setTimeout(function() {
+            window.close();
+        }, 500);
     </script>
 </body>
 </html>
