@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
-use Illuminate\Http\Request;
 
 class NetworkFileController extends Controller
 {
@@ -11,10 +10,8 @@ class NetworkFileController extends Controller
      * Redirige al protocolo gestor:// para abrir carpeta con archivo seleccionado
      * desde un cliente LAN.
      */
-    public function openFolder(Request $request)
+    public function openFolder(File $file)
     {
-        $file = File::findOrFail($request->file);
-
         // Generar URL del protocolo gestor://
         $url = gestor_net_url($file->path, 'select');
 
@@ -29,10 +26,8 @@ class NetworkFileController extends Controller
      * Redirige al protocolo gestor:// para abrir archivo directamente
      * desde un cliente LAN.
      */
-    public function openFile(Request $request)
+    public function openFile(File $file)
     {
-        $file = File::findOrFail($request->file);
-
         // Generar URL del protocolo gestor:// para abrir
         $url = gestor_net_url($file->path, 'open');
 
