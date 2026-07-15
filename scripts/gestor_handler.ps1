@@ -79,48 +79,82 @@ $targetPath = $pathDecoded
 Write-Log "targetPath=$targetPath"
 
 # ============================================================
-# MÉTODO ÚNICO: explorer /select desde cmd.exe
-# Usar cmd /c porque explorer a veces necesita eso con UNC.
-# Si falla la selección, al menos abrir la carpeta contenedora.
+# MÉTODO PRINCIPAL: Shell.Application COM
+# explorer /select NO funciona con rutas UNC largas en Windows.
+# Shell.Application COM maneja correctamente UNC y selecciona
+# archivos con ParseName.
 # ============================================================
 
-$explorerOpened = $false
+Write-Log "METODO: Shell.Application COM"
+$shellOpened = $false
 
 try {
+    $shell = New-Object -ComObject "Shell.Application"
+    
     if ($action -eq "select") {
-        Write-Log "ejecutando: explorer /select, $targetPath"
-        # Intentar 1: explorer /select con el archivo
-        Start-Process -FilePath "cmd.exe" -ArgumentList "/c explorer /select,`"$targetPath`"" -WindowStyle Hidden -Wait -ErrorAction Stop
-        $explorerOpened = $true
-        Write-Log "explorer /select ejecutado OK"
+        $parentDir = [System.IO.Path]::GetDirectoryName($targetPath)
+        $fileName = [System.IO.Path]::GetFileName($targetPath)
+        Write-Log "parentDir=$parentDir"
+        Write-Log "fileName=$fileName"
+        
+        # Abrir la carpeta contenedora
+        $shell.Open($parentDir)
+        Write-Log "shell.Open ejecutado"
+        
+        # Esperar a que la carpeta cargue
+        Start-Sleep -Milliseconds 500
+        
+        # Obtener la carpeta y seleccionar el archivo
+        $folder = $shell.NameSpace($parentDir)
+        if ($folder -ne $null) {
+            Write-Log "folder obtenido"
+            $item = $folder.ParseName($fileName)
+            if ($item -ne $null) {
+                Write-Log "item encontrado, InvokeVerb open"
+                $item.InvokeVerb("open")
+                $shellOpened = $true
+            } else {
+                Write-Log "item NO encontrado en la carpeta"
+            }
+        } else {
+            Write-Log "folder es null"
+        }
     } else {
-        Write-Log "ejecutando: explorer $targetPath"
-        Start-Process -FilePath "cmd.exe" -ArgumentList "/c explorer `"$targetPath`"" -WindowStyle Hidden -Wait -ErrorAction Stop
-        $explorerOpened = $true
-        Write-Log "explorer ejecutado OK"
+        Write-Log "open: abriendo carpeta $targetPath"
+        $shell.Open($targetPath)
+        $shellOpened = $true
     }
 } catch {
-    Write-Log "explorer fallo: $_"
+    Write-Log "Shell.Application fallo: $_"
 }
 
-# Fallback: si explorer /select no funciono, intentar abrir solo la carpeta
-if (-not $explorerOpened) {
-    Write-Log "FALLBACK: abriendo carpeta contenedora"
+# Fallback: intentar explorer directo (puede fallar con UNC largas)
+if (-not $shellOpened) {
+    Write-Log "FALLBACK: Start-Process explorer directo"
     try {
-        $parentDir = [System.IO.Path]::GetDirectoryName($targetPath)
-        Write-Log "parentDir=$parentDir"
-        Start-Process -FilePath "cmd.exe" -ArgumentList "/c explorer `"$parentDir`"" -WindowStyle Hidden -Wait -ErrorAction Stop
-        Write-Log "fallback ejecutado OK"
+        if ($action -eq "select") {
+            $parentDir = [System.IO.Path]::GetDirectoryName($targetPath)
+            Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$targetPath`"" -ErrorAction Stop
+        } else {
+            Start-Process -FilePath "explorer.exe" -ArgumentList "`"$targetPath`"" -ErrorAction Stop
+        }
+        $shellOpened = $true
+        Write-Log "explorer directo ejecutado"
     } catch {
-        Write-Log "fallback fallo: $_"
-        [System.Windows.Forms.MessageBox]::Show(
-            "No se pudo abrir el Explorador de Windows.`n`nRuta: $targetPath",
-            "Gestor de Archivos - Error",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Error
-        ) | Out-Null
-        exit 1
+        Write-Log "explorer directo fallo: $_"
     }
+}
+
+# Si nada funcionó, mostrar error
+if (-not $shellOpened) {
+    Write-Log "ERROR: no se pudo abrir el explorador"
+    [System.Windows.Forms.MessageBox]::Show(
+        "No se pudo abrir el Explorador de Windows.`n`nRuta: $targetPath",
+        "Gestor de Archivos - Error",
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Error
+    ) | Out-Null
+    exit 1
 }
 
 Write-Log "=== FIN ==="
