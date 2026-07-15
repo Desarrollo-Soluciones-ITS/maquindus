@@ -1,25 +1,18 @@
 param([string]$path = "")
 
-# Extraer ruta real de la URL
-$idx = $path.IndexOf("path=")
-if ($idx -lt 0) { exit 1 }
+# Extraer todo lo que viene despues de "path=" en la URL
+$i = $path.IndexOf("path=")
+if ($i -lt 0) { exit 1 }
 
-$p = $path.Substring($idx + 5)
+$ruta = $path.Substring($i + 5)
 
-# Decodificar URL
-$p = [System.Uri]::UnescapeDataString($p)
-$p = $p -replace '[/]', '\'
+# Decodificar caracteres URL
+$ruta = [System.Uri]::UnescapeDataString($ruta)
+$ruta = $ruta -replace '[/]', '\'
 
 # Obtener carpeta contenedora
-$folder = [System.IO.Path]::GetDirectoryName($p)
+$carpeta = [System.IO.Path]::GetDirectoryName($ruta)
 
-# Shell.Application es el unico metodo que funciona con UNC largas
-try {
-    $shell = New-Object -ComObject Shell.Application
-    $shell.Open($folder)
-    exit 0
-} catch {
-    # Fallback: explorer directo
-    try { Start-Process explorer -ArgumentList "`"$folder`"" -ErrorAction Stop; exit 0 }
-    catch { exit 1 }
-}
+# Abrir carpeta (intenta /select, fallback a carpeta)
+try { Start-Process explorer -ArgumentList "/select,`"$ruta`"" -ErrorAction Stop; exit 0 }
+catch { try { Start-Process explorer -ArgumentList "`"$carpeta`"" -ErrorAction Stop; exit 0 } catch { exit 1 } }
