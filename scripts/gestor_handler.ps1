@@ -1,53 +1,65 @@
 <#
 .SYNOPSIS
     Manejador del protocolo personalizado gestor://
-    Abre el Explorador de Windows en la ubicación del archivo o carpeta.
+    Abre el Explorador de Windows seleccionando el archivo en la ruta UNC.
 .DESCRIPTION
     Este script es invocado por el protocolo personalizado gestor://
-    registrado en Windows. Recibe la ruta UNC y ejecuta explorer para
-    abrir la carpeta con el archivo seleccionado.
-
-    Uso desde navegador:
+    registrado en Windows. Recibe la URL completa como argumento %1:
         gestor://select?path=\\192.168.0.4\private\Equipos\...
         gestor://open?path=\\192.168.0.4\private\Equipos\...
 
+    Método principal: usar cmd /c explorer /select, "ruta" (confiable 100%)
+    Fallback: usar Shell.Application COM
 .PARAMETER action
-    Acción a realizar: "select" (seleccionar archivo) o "open" (abrir carpeta)
+    Acción: "select" (seleccionar archivo) o "open" (abrir carpeta)
 .PARAMETER path
     Ruta UNC completa del archivo o carpeta
 #>
 
-param(
-    [string]$action = "select",
-    [string]$path = ""
-)
+param()
 
-# Si no recibió parámetros, intentar parsear de la línea de comandos
-if ($path -eq "" -and $args.Count -gt 0) {
-    $rawArgs = $args -join " "
-    Write-Host "Argumentos recibidos: $rawArgs" | Out-File -Append "$env:TEMP\gestor_debug.log"
+# Cargar ensamblado para MessageBox
+Add-Type -AssemblyName System.Windows.Forms
+
+# Variables de accion y ruta (se extraen de la URL)
+$action = "select"
+$path = ""
+
+# Windows pasa la URL completa como argumento: gestor://select?path=\\...
+# Extraer accion y ruta de la URL
+if ($args.Count -gt 0) {
+    $rawUrl = $args -join " "
     
-    # Intentar extraer action y path de la URL completa
-    if ($rawArgs -match 'gestor://(\w+)\?path=(.+?)$') {
+    if ($rawUrl -match 'gestor://(\w+)\?path=(.+)$') {
         $action = $matches[1]
         $path = $matches[2]
-    } elseif ($rawArgs -match 'path=(.+?)$') {
+    } elseif ($rawUrl -match 'path=(.+)$') {
         $path = $matches[1]
     }
+} else {
+    # Si no hay argumentos (ejecucion manual), mostrar error
+    [System.Windows.Forms.MessageBox]::Show(
+        "No se recibio la URL del protocolo gestor://`n`nEjecuta este script desde el navegador web.",
+        "Gestor de Archivos - Error",
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Error
+    ) | Out-Null
+    exit 1
 }
 
-# Decodificar URL
-$path = [System.Uri]::UnescapeDataString($path)
+# Decodificar URL (espacios, %20, etc.)
+try {
+    $path = [System.Uri]::UnescapeDataString($path)
+} catch {
+    # Si falla la decodificación, intentar con una simple
+    $path = $path -replace '%20', ' '
+}
 
 # Normalizar separadores de ruta
 $path = $path -replace '[/]', '\'
 
-Write-Host "Acción: $action" | Out-File -Append "$env:TEMP\gestor_debug.log"
-Write-Host "Ruta: $path" | Out-File -Append "$env:TEMP\gestor_debug.log"
-
 # Validar que la ruta no esté vacía
 if ([string]::IsNullOrWhiteSpace($path)) {
-    Write-Host "ERROR: Ruta vacía" | Out-File -Append "$env:TEMP\gestor_debug.log"
     [System.Windows.Forms.MessageBox]::Show(
         "La ruta del archivo está vacía.`n`nNo se puede abrir el explorador.",
         "Gestor de Archivos - Error",
@@ -57,73 +69,81 @@ if ([string]::IsNullOrWhiteSpace($path)) {
     exit 1
 }
 
-# Crear objeto COM para Shell
-try {
-    $shell = New-Object -ComObject "Shell.Application"
+# ============================================================
+# MÉTODO PRINCIPAL: explorer /select desde cmd.exe
+# Este método es el más confiable para seleccionar un archivo
+# en el Explorador de Windows, incluso con rutas UNC.
+# ============================================================
+function Open-ExplorerSelect {
+    param([string]$TargetPath)
     
-    switch ($action.ToLower()) {
-        "select" {
-            # Abrir carpeta y seleccionar el archivo
-            if (Test-Path -Path $path) {
-                $shell.Open( [System.IO.Path]::GetDirectoryName($path) )
-                # Enfocar y seleccionar el archivo
-                $folder = $shell.NameSpace( [System.IO.Path]::GetDirectoryName($path) )
-                $item = $folder.ParseName( [System.IO.Path]::GetFileName($path) )
-                if ($item) {
-                    $item.InvokeVerb("properties")
-                }
-            } else {
-                # Si no existe, abrir la carpeta contenedora
-                $parentDir = [System.IO.Path]::GetDirectoryName($path)
-                if (Test-Path -Path $parentDir) {
-                    $shell.Open($parentDir)
-                } else {
-                    # Intentar abrir la raíz del compartido
-                    $uncRoot = $path.Substring(0, $path.IndexOf('\', $path.IndexOf('\\') + 2))
-                    if (Test-Path -Path $uncRoot) {
-                        $shell.Open($uncRoot)
-                    }
-                }
-            }
-            break
-        }
-        "open" {
-            # Abrir carpeta directamente
-            $targetPath = $path
-            if (Test-Path -Path $targetPath) {
-                $shell.Open($targetPath)
-            } else {
-                $parentDir = [System.IO.Path]::GetDirectoryName($targetPath)
-                if (Test-Path -Path $parentDir) {
-                    $shell.Open($parentDir)
-                }
-            }
-            break
-        }
-        default {
-            Write-Host "ERROR: Acción desconocida: $action" | Out-File -Append "$env:TEMP\gestor_debug.log"
-            break
-        }
-    }
-    
-    Write-Host "Explorer abierto correctamente" | Out-File -Append "$env:TEMP\gestor_debug.log"
-} catch {
-    Write-Host "ERROR: $($_.Exception.Message)" | Out-File -Append "$env:TEMP\gestor_debug.log"
-    
-    # Fallback: usar cmd /c explorer directamente
     try {
         if ($action -eq "select") {
-            $folderPath = [System.IO.Path]::GetDirectoryName($path)
-            Start-Process -FilePath "cmd" -ArgumentList "/c explorer /select,`"$path`"" -WindowStyle Normal -Wait
+            # explorer /select, "ruta" abre la carpeta y selecciona el archivo
+            Start-Process -FilePath "cmd.exe" -ArgumentList "/c explorer /select,`"$TargetPath`"" -WindowStyle Hidden
         } else {
-            Start-Process -FilePath "cmd" -ArgumentList "/c explorer `"$path`"" -WindowStyle Normal -Wait
+            # explorer "ruta" abre la carpeta
+            Start-Process -FilePath "cmd.exe" -ArgumentList "/c explorer `"$TargetPath`"" -WindowStyle Hidden
         }
+        return $true
     } catch {
-        [System.Windows.Forms.MessageBox]::Show(
-            "Error al abrir el explorador:`n$($_.Exception.Message)",
-            "Gestor de Archivos - Error",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Error
-        ) | Out-Null
+        return $false
     }
 }
+
+# ============================================================
+# MÉTODO FALLBACK: Shell.Application COM
+# ============================================================
+function Open-ExplorerCOM {
+    param([string]$TargetPath)
+
+    try {
+        $shell = New-Object -ComObject "Shell.Application"
+        
+        if ($action -eq "select" -and (Test-Path -Path $TargetPath)) {
+            $parentDir = [System.IO.Path]::GetDirectoryName($TargetPath)
+            $shell.Open($parentDir)
+            Start-Sleep -Milliseconds 300
+            $folder = $shell.NameSpace($parentDir)
+            if ($folder) {
+                $item = $folder.ParseName([System.IO.Path]::GetFileName($TargetPath))
+                if ($item) {
+                    $item.InvokeVerb("open")
+                }
+            }
+        } else {
+            $target = if (Test-Path -Path $TargetPath) { $TargetPath } else { [System.IO.Path]::GetDirectoryName($TargetPath) }
+            if (Test-Path -Path $target) {
+                $shell.Open($target)
+            }
+        }
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+# ============================================================
+# EJECUCIÓN
+# ============================================================
+
+# 1. Intentar método principal (explorer /select)
+$result = Open-ExplorerSelect -TargetPath $path
+
+# 2. Si falla, intentar fallback COM
+if (-not $result) {
+    $result = Open-ExplorerCOM -TargetPath $path
+}
+
+# 3. Si todo falla, mostrar error
+if (-not $result) {
+    [System.Windows.Forms.MessageBox]::Show(
+        "No se pudo abrir el Explorador de Windows.`n`nRuta: $path",
+        "Gestor de Archivos - Error",
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Error
+    ) | Out-Null
+    exit 1
+}
+
+exit 0
