@@ -37,8 +37,16 @@ class OpenFolderAction
                 $file = static::resolveFile($record);
                 return blank($file?->path);
             })
-            ->url(fn(Model $record): ?string => record_folder_gestor_url($record))
-            ->openUrlInNewTab(true);
+            ->url(function (Model $record): ?string {
+                $file = static::resolveFile($record);
+                if ($file && filled($file->path)) {
+                    // Redirigir a la ruta network.folder (Laravel)
+                    // que renderiza una pagina HTML que lanza el protocolo gestor://
+                    return route('network.folder', ['file' => $file->id]);
+                }
+                return null;
+            })
+            ->openUrlInNewTab(false);
     }
 
     private static function makeServerAction(): Action
