@@ -2,11 +2,10 @@
 
 namespace App\Filament\Actions\Documents;
 
-use App\Models\Document;
-use App\Models\File;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 
 class OpenFolderAction
 {
@@ -16,25 +15,11 @@ class OpenFolderAction
             ->label('Ver en carpeta')
             ->icon(Heroicon::FolderOpen)
             ->hidden(fn(Model $record) => blank(record_folder_url($record)))
-            ->url(function (Model $record): ?string {
-                // Redirigir a la vista network que lanza el protocolo y vuelve atras
-                $file = $record instanceof File
-                    ? $record
-                    : ($record->current ?? null);
-
-                if ($file instanceof File && filled($file->path)) {
-                    return route('network.folder', ['file' => $file->id]);
+            ->action(function (Model $record) {
+                $url = record_folder_url($record);
+                if ($url) {
+                    Http::timeout(5)->get($url);
                 }
-                if ($record instanceof Document && $record->current) {
-                    return route('network.folder', ['file' => $record->current->id]);
-                }
-
-                $folderUrl = record_folder_url($record);
-                if ($folderUrl) {
-                    return $folderUrl;
-                }
-
-                return null;
-            }, shouldOpenInNewTab: false);
+            });
     }
 }
