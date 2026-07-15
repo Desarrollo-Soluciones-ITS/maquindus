@@ -27,21 +27,31 @@ Write-Log "=== INICIO ==="
 Write-Log "path_recibido=$path"
 
 # ============================================================
-# 1. EXTRAER ACCION Y RUTA DESDE LA URL gestor://
-# El registro de Windows pasa: -path "gestor://select?path=\\...\archivo"
-# $path contiene exactamente esa URL completa.
+# 1. EXTRAER ACCION Y RUTA DESDE LA URL
+# Windows pasa: -path "gestor://select/?path=\\...\archivo"
+# $path contiene la URL completa.
+# Extraer la accion y la ruta con Split simple (sin regex).
 # ============================================================
 
 $action = "select"
 $realPath = ""
 
-if ($path -match 'gestor://(\w+)/?\?path=(.+)$') {
-    $action = $matches[1]
-    $realPath = $matches[2]
-    Write-Log "extraido: action=$action realPath=$realPath"
+# Buscar "path=" en la URL y tomar todo lo que sigue
+$pathMarker = "path="
+$pathIndex = $path.IndexOf($pathMarker)
+
+if ($pathIndex -ge 0) {
+    $realPath = $path.Substring($pathIndex + $pathMarker.Length)
+    Write-Log "extraido por Split: realPath=$realPath"
+    
+    # Extraer accion si empieza con gestor://
+    if ($path -match 'gestor://(\w+)[/?]') {
+        $action = $matches[1]
+        Write-Log "accion extraida: $action"
+    }
 } else {
     Show-Error "La URL del protocolo gestor:// no tiene el formato esperado.`n`nRecibido: $path"
-    Write-Log "ERROR: no se pudo extraer path de: $path"
+    Write-Log "ERROR: no se encontro 'path=' en: $path"
     exit 1
 }
 
