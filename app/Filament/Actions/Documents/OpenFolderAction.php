@@ -37,15 +37,23 @@ class OpenFolderAction
                 $file = static::resolveFile($record);
                 return blank($file?->path);
             })
-            ->url(function (Model $record): ?string {
+            ->action(function ($record, $livewire) {
                 $file = static::resolveFile($record);
                 if (!$file || blank($file->path)) {
-                    return null;
+                    Notification::make()
+                        ->title('No se encontró el archivo.')
+                        ->danger()
+                        ->send();
+                    return;
                 }
-                // Generar URL del protocolo gestor://
-                // El navegador la lanza -> PowerShell -> explorer
-                return record_folder_gestor_url($record);
-            }, shouldOpenInNewTab: false);
+                // Generar URL gestor:// y forzar navegación del navegador
+                $gestorUrl = record_folder_gestor_url($record);
+                if ($gestorUrl) {
+                    // Redirigir al protocolo gestor:// directamente desde el navegador
+                    // Esto evita problemas de Livewire/Filament con protocolos personalizados
+                    $livewire->js("window.location.href = '{$gestorUrl}'");
+                }
+            });
     }
 
     private static function makeServerAction(): Action
