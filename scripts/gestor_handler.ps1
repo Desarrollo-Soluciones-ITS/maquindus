@@ -35,7 +35,7 @@ Write-Log "path_recibido=$path"
 $action = "select"
 $realPath = ""
 
-if ($path -match 'gestor://(\w+)\?path=(.+)$') {
+if ($path -match 'gestor://(\w+)/?\?path=(.+)$') {
     $action = $matches[1]
     $realPath = $matches[2]
     Write-Log "extraido: action=$action realPath=$realPath"
