@@ -6,8 +6,13 @@ if ($i -lt 0) { exit 1 }
 
 $ruta = $path.Substring($i + 5)
 
-# Decodificar caracteres URL
-$ruta = [System.Uri]::UnescapeDataString($ruta)
+# Decodificar URL: %5C -> \, %20 -> espacio, + -> espacio
+$ruta = $ruta -replace '%5C', '\'
+$ruta = $ruta -replace '%5c', '\'
+$ruta = $ruta -replace '%20', ' '
+$ruta = $ruta -replace '%28', '('
+$ruta = $ruta -replace '%29', ')'
+$ruta = $ruta -replace '+', ' '
 $ruta = $ruta -replace '[/]', '\'
 
 # Obtener carpeta contenedora

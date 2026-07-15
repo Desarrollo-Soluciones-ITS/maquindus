@@ -383,7 +383,7 @@ if (!function_exists('gestor_net_url')) {
         // Construir ruta completa: base + \ + relativa
         $fullPath = $base . '\\' . $relativePath;
 
-        return "gestor://$action?path=" . urlencode($fullPath);
+        return "gestor://$action?path=" . rawurlencode($fullPath);
     }
 }
 
