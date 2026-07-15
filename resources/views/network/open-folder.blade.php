@@ -61,32 +61,40 @@
     </style>
 </head>
 <body>
-    <div class="container" id="container">
-        <div class="spinner"></div>
-        <h2>Abriendo carpeta...</h2>
-        <p>Se está intentando abrir el Explorador de Windows</p>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h2 id="statusTitle">Abriendo carpeta...</h2>
+        <p id="statusMsg">Se está intentando abrir el Explorador de Windows</p>
         <div class="file-name">{{ basename($file->path) }}</div>
-        <a href="{{ $url }}" class="fallback-link" id="manualLink">
-            Abrir carpeta manualmente
-        </a>
+        <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem; align-items:center;">
+            <a href="{{ $url }}" class="fallback-link" id="manualLink" style="display:none;">
+                Abrir carpeta manualmente
+            </a>
+            <a href="javascript:window.history.back()" class="back-link" id="backLink" style="display:none; background:#95a5a6;">
+                Volver a la pagina anterior
+            </a>
+        </div>
     </div>
 
     <script>
-        // Redirigir al protocolo gestor:// para abrir el explorador
-        // El navegador preguntara: "Abrir gestor://?" -> Aceptar
+        // Redirigir al protocolo gestor://
         window.location.href = '{{ $url }}';
 
-        // Si el protocolo no se abrio (ej: gestor:// no instalado),
-        // mostrar mensaje y permitir volver
+        // Fallback: si el protocolo gestor:// no esta instalado,
+        // mostrar opciones manuales despues de 4 segundos
         setTimeout(function() {
-            document.querySelector('.spinner').style.display = 'none';
-            document.getElementById('manualLink').style.display = 'inline-block';
-            document.getElementById('backLink').style.display = 'inline-block';
-        }, 3000);
-    </script>
+            var spinner = document.getElementById('spinner');
+            var title = document.getElementById('statusTitle');
+            var msg = document.getElementById('statusMsg');
+            var manualLink = document.getElementById('manualLink');
+            var backLink = document.getElementById('backLink');
 
-    <a href="javascript:window.history.back()" class="back-link" id="backLink" style="display:none;">
-        Volver a la pagina anterior
-    </a>
+            if (spinner) spinner.style.display = 'none';
+            if (title) title.textContent = 'No se pudo abrir la carpeta';
+            if (msg) msg.textContent = 'Haz clic en el boton para abrir manualmente';
+            if (manualLink) manualLink.style.display = 'inline-block';
+            if (backLink) backLink.style.display = 'inline-block';
+        }, 4000);
+    </script>
 </body>
 </html>
