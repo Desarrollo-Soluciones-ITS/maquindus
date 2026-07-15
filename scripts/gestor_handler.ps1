@@ -4,15 +4,18 @@
     Abre el Explorador de Windows en la ruta UNC del archivo.
 .DESCRIPTION
     Invocado por el navegador via protocolo gestor:// registrado en Windows.
-    Recibe la URL completa como unico argumento:
-        gestor://select?path=\\192.168.0.4\private\...
-        gestor://open?path=\\192.168.0.4\private\...
+    Recibe la URL completa como parametro -path:
+        powershell ... -path "gestor://select?path=\\192.168.0.4\private\..."
+    Extrae la ruta real desde el query string de la URL y abre la carpeta.
 .EXAMPLE
-    Desde navegador:
-        gestor://select?path=\\192.168.0.4\private\Equipos\...
-    Desde PowerShell:
-        .\gestor_handler.ps1 "gestor://select?path=\\192.168.0.4\private\..."
+    gestor://select?path=\\192.168.0.4\private\Equipos\...
+.PARAMETER path
+    URL completa del protocolo gestor:// (pasada por el registro de Windows como %1)
 #>
+
+param(
+    [string]$path = ""
+)
 
 Add-Type -AssemblyName System.Windows.Forms
 $logFile = "$env:TEMP\gestor_debug.log"
@@ -21,99 +24,78 @@ function Write-Log { param([string]$msg) "$(Get-Date -Format 'HH:mm:ss'): $msg" 
 function Show-Error { param([string]$msg) [System.Windows.Forms.MessageBox]::Show($msg, "Gestor de Archivos - Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
 
 Write-Log "=== INICIO ==="
+Write-Log "path_recibido=$path"
 
 # ============================================================
-# 1. OBTENER LA URL COMPLETA DESDE $args[0]
-# Windows pasa la URL como %1 (argumento posicional)
-# La URL tiene formato: gestor://select?path=\\192.168.0.4\private\...
-# ============================================================
-
-$rawUrl = ""
-if ($args.Count -gt 0) {
-    $rawUrl = $args[0]
-}
-
-Write-Log "rawUrl=$rawUrl"
-
-if ([string]::IsNullOrWhiteSpace($rawUrl)) {
-    Show-Error "No se recibio la URL del protocolo gestor://`n`nEjecuta este script desde el navegador web."
-    Write-Log "ERROR: no se recibio URL"
-    exit 1
-}
-
-# ============================================================
-# 2. EXTRAER ACCION Y RUTA DE LA URL
+# 1. EXTRAER ACCION Y RUTA DESDE LA URL gestor://
+# El registro de Windows pasa: -path "gestor://select?path=\\...\archivo"
+# $path contiene exactamente esa URL completa.
 # ============================================================
 
 $action = "select"
-$path = ""
+$realPath = ""
 
-# Buscar patron: gestor://<accion>?path=<ruta>
-if ($rawUrl -match 'gestor://(\w+)\?path=(.+)$') {
+if ($path -match 'gestor://(\w+)\?path=(.+)$') {
     $action = $matches[1]
-    $path = $matches[2]
-    Write-Log "extraido: action=$action path=$path"
+    $realPath = $matches[2]
+    Write-Log "extraido: action=$action realPath=$realPath"
 } else {
-    Show-Error "La URL del protocolo gestor:// no tiene el formato esperado.`n`nURL recibida: $rawUrl"
-    Write-Log "ERROR: formato inesperado: $rawUrl"
+    Show-Error "La URL del protocolo gestor:// no tiene el formato esperado.`n`nRecibido: $path"
+    Write-Log "ERROR: no se pudo extraer path de: $path"
     exit 1
 }
 
 # ============================================================
-# 3. DECODIFICAR URL (%5C -> \, %20 -> espacio, etc.)
+# 2. DECODIFICAR URL (%5C -> \, %20 -> espacio, etc.)
 # ============================================================
 
 try {
-    $path = [System.Uri]::UnescapeDataString($path)
+    $realPath = [System.Uri]::UnescapeDataString($realPath)
 } catch {
-    Write-Log "UnescapeDataString fallo: $_"
-    # Fallback manual
-    $path = $path -replace '%5C', '\'
-    $path = $path -replace '%20', ' '
-    $path = $path -replace '%28', '('
-    $path = $path -replace '%29', ')'
+    Write-Log "UnescapeDataString fallo, usando reemplazo manual"
+    $realPath = $realPath -replace '%5C', '\'
+    $realPath = $realPath -replace '%20', ' '
+    $realPath = $realPath -replace '%28', '('
+    $realPath = $realPath -replace '%29', ')'
+    $realPath = $realPath -replace '%2C', ','
+    $realPath = $realPath -replace '%27', "'"
 }
 
-# Normalizar separadores
-$path = $path -replace '[/]', '\'
+# Normalizar separadores: / -> \
+$realPath = $realPath -replace '[/]', '\'
 
-Write-Log "path_decoded=$path"
+Write-Log "realPath_decoded=$realPath"
 
-if ([string]::IsNullOrWhiteSpace($path)) {
-    Show-Error "La ruta del archivo esta vacia.`n`nNo se puede abrir el explorador."
+if ([string]::IsNullOrWhiteSpace($realPath)) {
+    Show-Error "La ruta extraida esta vacia.`n`nURL recibida: $path"
     Write-Log "ERROR: ruta vacia"
     exit 1
 }
 
 # ============================================================
-# 4. ABRIR EXPLORADOR WINDOWS
-# explorer /select NO funciona con rutas UNC largas.
+# 3. ABRIR EXPLORADOR WINDOWS
+# explorer /select NO funciona con rutas UNC largas (bug Windows).
 # Usamos Shell.Application.Open() con la carpeta contenedora.
+# 3 intentos: Shell COM -> explorer.exe -> cmd /c start
 # ============================================================
 
-$folderPath = ""
-if ($action -eq "select") {
-    $folderPath = [System.IO.Path]::GetDirectoryName($path)
-} else {
-    $folderPath = $path
-}
+$folderPath = if ($action -eq "select") { [System.IO.Path]::GetDirectoryName($realPath) } else { $realPath }
 
 Write-Log "folderPath=$folderPath"
 
 if ([string]::IsNullOrWhiteSpace($folderPath)) {
-    # Si la ruta es la raiz del share, usarla directamente
-    $folderPath = $path
+    $folderPath = $realPath
 }
 
 $opened = $false
 
-# Intento 1: Shell.Application COM
+# Intento 1: Shell.Application COM (funciona mejor con UNC)
 try {
-    Write-Log "Intentando Shell.Application..."
+    Write-Log "Intento 1: Shell.Application..."
     $shell = New-Object -ComObject "Shell.Application"
     $shell.Open($folderPath)
     $opened = $true
-    Write-Log "Shell.Application.Open OK: $folderPath"
+    Write-Log "Shell.Application OPEN OK"
 } catch {
     Write-Log "Shell.Application fallo: $_"
 }
@@ -121,10 +103,10 @@ try {
 # Intento 2: explorer.exe directo
 if (-not $opened) {
     try {
-        Write-Log "FALLBACK: explorer.exe..."
+        Write-Log "Intento 2: explorer.exe..."
         Start-Process -FilePath "explorer.exe" -ArgumentList "`"$folderPath`"" -ErrorAction Stop
         $opened = $true
-        Write-Log "explorer.exe directo OK"
+        Write-Log "explorer.exe OK"
     } catch {
         Write-Log "explorer.exe fallo: $_"
     }
@@ -133,7 +115,7 @@ if (-not $opened) {
 # Intento 3: cmd /c start
 if (-not $opened) {
     try {
-        Write-Log "FALLBACK 2: cmd /c start..."
+        Write-Log "Intento 3: cmd /c start..."
         Start-Process -FilePath "cmd.exe" -ArgumentList "/c start `"`" `"$folderPath`"" -WindowStyle Hidden
         $opened = $true
         Write-Log "cmd /c start OK"
