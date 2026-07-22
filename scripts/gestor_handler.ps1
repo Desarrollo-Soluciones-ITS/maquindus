@@ -11,13 +11,12 @@ if ($i -lt 0) { "ERROR: no se encontro path=" | Out-File -Append "$env:TEMP\gest
 $ruta = $path.Substring($i + 5)
 "ruta_extraida=$ruta" | Out-File -Append "$env:TEMP\gestor_debug.log"
 
-# Decodificar URL: %5C -> \, %20 -> espacio, + -> espacio
-$ruta = $ruta -replace '%5C', '\'
-$ruta = $ruta -replace '%5c', '\'
-$ruta = $ruta -replace '%20', ' '
-$ruta = $ruta -replace '%28', '('
-$ruta = $ruta -replace '%29', ')'
-$ruta = $ruta -replace '+', ' '
+# Decodificar URL completa (incluye acentos, ñ, %, etc.)
+# 1. Primero + -> espacio (UnescapeDataString no lo hace)
+$ruta = $ruta -replace '\+', ' '
+# 2. Decodificar TODOS los %XX (incluye %5C, %20, %C3%A1, %C3%B1, etc.)
+$ruta = [System.Uri]::UnescapeDataString($ruta)
+# 3. / -> \
 $ruta = $ruta -replace '[/]', '\'
 "ruta_decodificada=$ruta" | Out-File -Append "$env:TEMP\gestor_debug.log"
 
