@@ -13,15 +13,14 @@ class PartInfolist
         return $schema
             ->columns(3)
             ->components([
-                TextEntry::make('name')
-                    ->label('Nombre'),
-                TextEntry::make('code')
-                    ->label('Código'),
+                TextEntry::make('part_number')
+                    ->label('N° de parte'),
+                TextEntry::make('catalog_number')
+                    ->label('N° de catálogo'),
+                TextEntry::make('customer_part_number')
+                    ->label('N° de parte del cliente'),
                 TextEntry::make('about')
-                    ->label('Descripción'),
-                KeyValueEntry::make('details')
-                    ->label('Características')
-                    ->keyLabel('Nombre')
+                    ->label('Descripción')
                     ->columnSpanFull(),
                ]);
     }

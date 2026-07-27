@@ -17,14 +17,16 @@ class PartsTable
     {
         return $table
             ->columns([
-                TextColumn::make('code')
-                    ->label('Código')
+                TextColumn::make('part_number')
+                    ->label('N° de parte')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('name')
-                    ->label('Nombre')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('catalog_number')
+                    ->label('N° de catálogo')
+                    ->searchable(),
+                TextColumn::make('customer_part_number')
+                    ->label('N° de parte del cliente')
+                    ->searchable(),
                 TextColumn::make('equipment.name')
                     ->label('Equipos relacionados')
                     ->badge()
@@ -66,8 +68,8 @@ class PartsTable
                         return \Maatwebsite\Excel\Facades\Excel::download(new class($parts) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
                             protected $parts;
                             public function __construct($parts) { $this->parts = $parts; }
-                            public function collection() { return $this->parts->map(fn($part) => ['Código' => $part->code, 'Nombre' => $part->name, 'Equipos relacionados' => $part->equipment->pluck('name')->join(', '), 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
-                            public function headings(): array { return ['Código', 'Nombre', 'Equipos relacionados', 'Descripción', 'Fecha']; }
+                            public function collection() { return $this->parts->map(fn($part) => ['N° de parte' => $part->part_number, 'N° de catálogo' => $part->catalog_number, 'N° de parte del cliente' => $part->customer_part_number, 'Equipos relacionados' => $part->equipment->pluck('name')->join(', '), 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
+                            public function headings(): array { return ['N° de parte', 'N° de catálogo', 'N° de parte del cliente', 'Equipos relacionados', 'Descripción', 'Fecha']; }
                         }, $fileName);
                     }),
             ]);
