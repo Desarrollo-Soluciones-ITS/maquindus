@@ -31,4 +31,18 @@ class ManualsRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('document_date')->label('Fecha')->date('d/m/Y'),
         ];
     }
+
+    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Nombre' => $record->name,
+            'Revisión' => $record->revision,
+            'Fecha' => $record->document_date?->format('d/m/Y'),
+        ];
+    }
+
+    protected static function getExportHeadings(): array
+    {
+        return ['Nombre', 'Revisión', 'Fecha'];
+    }
 }

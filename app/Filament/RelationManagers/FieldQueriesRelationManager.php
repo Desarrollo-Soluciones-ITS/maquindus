@@ -33,4 +33,19 @@ class FieldQueriesRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('issuer')->label('Emisor')->searchable(),
         ];
     }
+
+    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Fecha de doc' => $record->document_date?->format('d/m/Y'),
+            'Nombre de doc' => $record->document_name,
+            'Tipo de documento' => $record->document_type,
+            'Emisor' => $record->issuer,
+        ];
+    }
+
+    protected static function getExportHeadings(): array
+    {
+        return ['Fecha de doc', 'Nombre de doc', 'Tipo de documento', 'Emisor'];
+    }
 }

@@ -28,4 +28,17 @@ class StandardsRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('revision')->label('Rev'),
         ];
     }
+
+    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Nombre' => $record->name,
+            'Rev' => $record->revision,
+        ];
+    }
+
+    protected static function getExportHeadings(): array
+    {
+        return ['Nombre', 'Rev'];
+    }
 }

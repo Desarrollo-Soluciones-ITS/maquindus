@@ -37,4 +37,17 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('name')->label('Nombre')->searchable(),
         ];
     }
+
+    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Tipo de documento' => $record->document_type,
+            'Nombre' => $record->name,
+        ];
+    }
+
+    protected static function getExportHeadings(): array
+    {
+        return ['Tipo de documento', 'Nombre'];
+    }
 }

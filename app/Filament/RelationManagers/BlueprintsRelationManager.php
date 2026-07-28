@@ -33,4 +33,19 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('document_date')->label('Fecha')->date('d/m/Y'),
         ];
     }
+
+    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'N de planos' => $record->blueprint_number,
+            'Nombre' => $record->name,
+            'Rev' => $record->revision,
+            'Fecha' => $record->document_date?->format('d/m/Y'),
+        ];
+    }
+
+    protected static function getExportHeadings(): array
+    {
+        return ['N de planos', 'Nombre', 'Rev', 'Fecha'];
+    }
 }

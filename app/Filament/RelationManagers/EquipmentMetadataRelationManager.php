@@ -36,6 +36,23 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
 
     abstract protected static function getMetadataTableColumns(): array;
 
+    /**
+     * Devuelve los datos a exportar en formato [columna => valor]
+     * para cada registro. Cada subclase debe implementarlo.
+     */
+    protected static function getExportData(Model $record): array
+    {
+        return [];
+    }
+
+    /**
+     * Devuelve los encabezados del archivo Excel.
+     */
+    protected static function getExportHeadings(): array
+    {
+        return [];
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -49,7 +66,6 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                     $section = Str::headline((string) (static::$modelLabel ?? 'Documento'));
                     $descriptor = static::resolveDescriptorFromGet($get) ?? 'General';
 
-                    // Las secciones de "Especificación técnica" van anidadas bajo Especificaciones Tecnicas/
                     $specSections = ['Hoja De Datos', 'Plano', 'Catálogo', 'Manual', 'Especificación Técnica', 'Norma'];
                     $specSectionMap = [
                         'Hoja De Datos' => 'Hoja De Datos',
@@ -150,51 +166,48 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
             ])
             ->toolbarActions([
-                \Filament\Actions\Action::make('export')
+                Action::make('export')
                     ->label('Exportar')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
-                        $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
-                        $sectionName = \Illuminate\Support\Str::slug((string) (static::$title ?? 'registro'));
-                        $fileName = "{$ownerName}-{$sectionName}.xlsx";
                         $records = $query->get();
+                        $ownerName = Str::slug($this->getOwnerRecord()->name ?? 'registro');
+                        $sectionName = Str::slug((string) (static::$title ?? 'registro'));
+                        $fileName = "{$ownerName}-{$sectionName}.xlsx";
 
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($records, static::class) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $records;
-                            protected $managerClass;
+                        $headings = static::getExportHeadings();
 
-                            public function __construct($records, $managerClass) { $this->records = $records; $this->managerClass = $managerClass; }
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new class($records, $headings, static::class) implements
+                                \Maatwebsite\Excel\Concerns\FromCollection,
+                                \Maatwebsite\Excel\Concerns\WithHeadings
+                            {
+                                protected $records;
+                                protected $headings;
+                                protected $managerClass;
 
-                            public function collection() {
-                                return $this->records->map(function($record) {
-                                    $columns = $this->managerClass::getMetadataTableColumns();
-                                    $row = [];
-                                    foreach ($columns as $col) {
-                                        $name = $col->getName();
-                                        $label = $col->getLabel();
-                                        $value = data_get($record, $name);
-                                        if ($value instanceof \Carbon\Carbon) {
-                                            $value = $value->format('d/m/Y');
-                                        }
-                                        $row[$label] = $value;
-                                    }
-                                    $row['Anexo'] = $record->documents->first()?->current ? 'Sí' : 'No';
-                                    return $row;
-                                });
-                            }
-
-                            public function headings(): array {
-                                $columns = $this->managerClass::getMetadataTableColumns();
-                                $headings = [];
-                                foreach ($columns as $col) {
-                                    $headings[] = $col->getLabel();
+                                public function __construct($records, $headings, $managerClass)
+                                {
+                                    $this->records = $records;
+                                    $this->headings = $headings;
+                                    $this->managerClass = $managerClass;
                                 }
-                                $headings[] = 'Anexo';
-                                return $headings;
-                            }
-                        }, $fileName);
+
+                                public function collection()
+                                {
+                                    return $this->records->map(function ($record) {
+                                        return $this->managerClass::getExportData($record);
+                                    });
+                                }
+
+                                public function headings(): array
+                                {
+                                    return $this->headings;
+                                }
+                            },
+                            $fileName
+                        );
                     }),
             ])
             ->recordActions([
