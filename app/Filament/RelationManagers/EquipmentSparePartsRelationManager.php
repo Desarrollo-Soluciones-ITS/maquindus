@@ -11,6 +11,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
+use App\Models\Part;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -76,7 +77,9 @@ class EquipmentSparePartsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->using(function (array $data): Model {
-                        return $this->getRelationship()->create($data);
+                        $part = Part::create($data);
+                        $this->getOwnerRecord()->parts()->attach($part->id);
+                        return $part;
                     })
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.create')),
             ])
