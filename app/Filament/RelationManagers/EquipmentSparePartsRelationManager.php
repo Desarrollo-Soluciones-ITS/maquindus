@@ -54,7 +54,7 @@ class EquipmentSparePartsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('parts.created_at', 'desc')
             ->columns([
                 TextColumn::make('part_number')
                     ->label('N° de parte')
