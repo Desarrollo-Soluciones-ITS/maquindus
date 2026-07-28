@@ -149,6 +149,54 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                     })
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
             ])
+            ->toolbarActions([
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
+                        $sectionName = \Illuminate\Support\Str::slug((string) (static::$title ?? 'registro'));
+                        $fileName = "{$ownerName}-{$sectionName}.xlsx";
+                        $records = $query->get();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($records, static::class) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $records;
+                            protected $managerClass;
+
+                            public function __construct($records, $managerClass) { $this->records = $records; $this->managerClass = $managerClass; }
+
+                            public function collection() {
+                                return $this->records->map(function($record) {
+                                    $columns = $this->managerClass::getMetadataTableColumns();
+                                    $row = [];
+                                    foreach ($columns as $col) {
+                                        $name = $col->getName();
+                                        $label = $col->getLabel();
+                                        $value = data_get($record, $name);
+                                        if ($value instanceof \Carbon\Carbon) {
+                                            $value = $value->format('d/m/Y');
+                                        }
+                                        $row[$label] = $value;
+                                    }
+                                    $row['Anexo'] = $record->documents->first()?->current ? 'Sí' : 'No';
+                                    return $row;
+                                });
+                            }
+
+                            public function headings(): array {
+                                $columns = $this->managerClass::getMetadataTableColumns();
+                                $headings = [];
+                                foreach ($columns as $col) {
+                                    $headings[] = $col->getLabel();
+                                }
+                                $headings[] = 'Anexo';
+                                return $headings;
+                            }
+                        }, $fileName);
+                    }),
+            ])
             ->recordActions([
                 ActionGroup::make([
                     OpenFolderAction::make(),

@@ -80,6 +80,33 @@ class EquipmentSparePartsRelationManager extends RelationManager
                     })
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.create')),
             ])
+            ->toolbarActions([
+                \Filament\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredTableQuery();
+                        $ownerRecord = $livewire->getOwnerRecord();
+                        $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
+                        $fileName = "{$ownerName}-repuestos.xlsx";
+                        $records = $query->get();
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($records) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+                            protected $records;
+                            public function __construct($records) { $this->records = $records; }
+                            public function collection() {
+                                return $this->records->map(fn($r) => [
+                                    'N° de parte' => $r->part_number,
+                                    'N° de catálogo' => $r->catalog_number,
+                                    'N° parte cliente' => $r->customer_part_number,
+                                    'Descripción' => $r->about,
+                                ]);
+                            }
+                            public function headings(): array {
+                                return ['N° de parte', 'N° de catálogo', 'N° parte cliente', 'Descripción'];
+                            }
+                        }, $fileName);
+                    }),
+            ])
             ->recordActions([
                 ActionGroup::make([
                     OpenFolderAction::make(),
