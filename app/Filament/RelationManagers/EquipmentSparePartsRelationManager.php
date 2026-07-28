@@ -5,9 +5,7 @@ namespace App\Filament\RelationManagers;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,7 +17,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EquipmentSparePartsRelationManager extends RelationManager
 {
@@ -79,25 +76,7 @@ class EquipmentSparePartsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->using(function (array $data): Model {
-                        $record = $this->getRelationship()->create($data);
-
-                        // Sincronizar con la tabla antigua equipment_spare_parts
-                        try {
-                            DB::table('equipment_spare_parts')->insert([
-                                'id' => (string) \Illuminate\Support\Str::uuid(),
-                                'equipment_id' => $this->getOwnerRecord()->id,
-                                'part_number' => $data['part_number'] ?? null,
-                                'catalog_number' => $data['catalog_number'] ?? null,
-                                'client_part_number' => $data['customer_part_number'] ?? null,
-                                'description' => $data['about'] ?? null,
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
-                        } catch (\Throwable) {
-                            // Si falla, no importa, el dato principal ya se guardó
-                        }
-
-                        return $record;
+                        return $this->getRelationship()->create($data);
                     })
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.create')),
             ])
