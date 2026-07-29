@@ -34,7 +34,7 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'N de planos' => $record->blueprint_number,
@@ -44,7 +44,7 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return ['N de planos', 'Nombre', 'Rev', 'Fecha'];
     }

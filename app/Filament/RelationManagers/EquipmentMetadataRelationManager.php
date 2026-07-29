@@ -39,16 +39,18 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
     /**
      * Devuelve los datos a exportar en formato [columna => valor]
      * para cada registro. Cada subclase debe implementarlo.
+     * Debe ser public porque se llama desde una clase anónima.
      */
-    protected static function getExportData(Model $record): array
+    public static function getExportData(Model $record): array
     {
         return [];
     }
 
     /**
      * Devuelve los encabezados del archivo Excel.
+     * Debe ser public porque se llama desde una clase anónima.
      */
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return [];
     }

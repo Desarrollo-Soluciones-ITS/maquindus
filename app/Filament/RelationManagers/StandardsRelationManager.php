@@ -29,7 +29,7 @@ class StandardsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Nombre' => $record->name,
@@ -37,7 +37,7 @@ class StandardsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return ['Nombre', 'Rev'];
     }

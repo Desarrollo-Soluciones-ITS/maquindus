@@ -32,7 +32,7 @@ class TechnicalSpecificationsRelationManager extends EquipmentMetadataRelationMa
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Nombre rev' => $record->revision_name,
@@ -41,7 +41,7 @@ class TechnicalSpecificationsRelationManager extends EquipmentMetadataRelationMa
         ];
     }
 
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return ['Nombre rev', 'Rev', 'Fecha'];
     }

@@ -38,7 +38,7 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Tipo de documento' => $record->document_type,
@@ -46,7 +46,7 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return ['Tipo de documento', 'Nombre'];
     }

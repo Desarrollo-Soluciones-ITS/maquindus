@@ -32,7 +32,7 @@ class DataSheetsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'N hoja datos' => $record->sheet_number,
@@ -41,7 +41,7 @@ class DataSheetsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportHeadings(): array
+    public static function getExportHeadings(): array
     {
         return ['N hoja datos', 'Rev', 'Fecha'];
     }
