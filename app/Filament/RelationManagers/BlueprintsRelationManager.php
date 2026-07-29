@@ -2,12 +2,16 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class BlueprintsRelationManager extends EquipmentMetadataRelationManager
 {
+    use HasExportToExcel;
+
     protected static string $relationship = 'blueprints';
 
     protected static ?string $title = 'Especificación técnica · Planos';
@@ -34,4 +38,19 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
+    public function table(Table $table): Table
+    {
+        return parent::table($table)
+            ->toolbarActions([static::getExportAction()]);
+    }
+
+    protected static function getExportColumns(): array
+    {
+        return ['blueprint_number', 'name', 'revision', 'document_date'];
+    }
+
+    protected static function getExportLabels(): array
+    {
+        return ['N de planos', 'Nombre', 'Rev', 'Fecha'];
+    }
 }

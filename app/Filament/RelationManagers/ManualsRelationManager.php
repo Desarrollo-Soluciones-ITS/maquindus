@@ -2,12 +2,16 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class ManualsRelationManager extends EquipmentMetadataRelationManager
 {
+    use HasExportToExcel;
+
     protected static string $relationship = 'manuals';
 
     protected static ?string $title = 'Especificación técnica · Manuales';
@@ -32,16 +36,18 @@ class ManualsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public function table(Table $table): Table
     {
-        return [
-            'Nombre' => $record->name,
-            'Revisión' => $record->revision,
-            'Fecha' => $record->document_date?->format('d/m/Y'),
-        ];
+        return parent::table($table)
+            ->toolbarActions([static::getExportAction()]);
     }
 
-    public static function getExportHeadings(): array
+    protected static function getExportColumns(): array
+    {
+        return ['name', 'revision', 'document_date'];
+    }
+
+    protected static function getExportLabels(): array
     {
         return ['Nombre', 'Revisión', 'Fecha'];
     }

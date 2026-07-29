@@ -2,12 +2,16 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class CatalogsRelationManager extends EquipmentMetadataRelationManager
 {
+    use HasExportToExcel;
+
     protected static string $relationship = 'catalogs';
 
     protected static ?string $title = 'Especificación técnica · Catálogos, fotos y videos';
@@ -38,15 +42,18 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public function table(Table $table): Table
     {
-        return [
-            'Tipo de documento' => $record->document_type,
-            'Nombre' => $record->name,
-        ];
+        return parent::table($table)
+            ->toolbarActions([static::getExportAction()]);
     }
 
-    public static function getExportHeadings(): array
+    protected static function getExportColumns(): array
+    {
+        return ['document_type', 'name'];
+    }
+
+    protected static function getExportLabels(): array
     {
         return ['Tipo de documento', 'Nombre'];
     }

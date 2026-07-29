@@ -2,12 +2,16 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class FieldQueriesRelationManager extends EquipmentMetadataRelationManager
 {
+    use HasExportToExcel;
+
     protected static string $relationship = 'fieldQueries';
 
     protected static ?string $title = 'Consultas de campo';
@@ -34,17 +38,18 @@ class FieldQueriesRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    protected static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
+    public function table(Table $table): Table
     {
-        return [
-            'Fecha de doc' => $record->document_date?->format('d/m/Y'),
-            'Nombre de doc' => $record->document_name,
-            'Tipo de documento' => $record->document_type,
-            'Emisor' => $record->issuer,
-        ];
+        return parent::table($table)
+            ->toolbarActions([static::getExportAction()]);
     }
 
-    protected static function getExportHeadings(): array
+    protected static function getExportColumns(): array
+    {
+        return ['document_date', 'document_name', 'document_type', 'issuer'];
+    }
+
+    protected static function getExportLabels(): array
     {
         return ['Fecha de doc', 'Nombre de doc', 'Tipo de documento', 'Emisor'];
     }
