@@ -31,18 +31,4 @@ class DataSheetsRelationManager extends EquipmentMetadataRelationManager
             TextColumn::make('document_date')->label('Fecha')->date('d/m/Y'),
         ];
     }
-
-    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
-    {
-        return [
-            'N hoja datos' => $record->sheet_number,
-            'Rev' => $record->revision,
-            'Fecha' => $record->document_date?->format('d/m/Y'),
-        ];
-    }
-
-    public static function getExportHeadings(): array
-    {
-        return ['N hoja datos', 'Rev', 'Fecha'];
-    }
 }

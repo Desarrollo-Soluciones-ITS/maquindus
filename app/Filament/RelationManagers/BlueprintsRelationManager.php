@@ -34,18 +34,4 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
         ];
     }
 
-    public static function getExportData(\Illuminate\Database\Eloquent\Model $record): array
-    {
-        return [
-            'N de planos' => $record->blueprint_number,
-            'Nombre' => $record->name,
-            'Rev' => $record->revision,
-            'Fecha' => $record->document_date?->format('d/m/Y'),
-        ];
-    }
-
-    public static function getExportHeadings(): array
-    {
-        return ['N de planos', 'Nombre', 'Rev', 'Fecha'];
-    }
 }

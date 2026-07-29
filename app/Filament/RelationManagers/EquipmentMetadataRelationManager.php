@@ -36,25 +36,6 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
 
     abstract protected static function getMetadataTableColumns(): array;
 
-    /**
-     * Devuelve los datos a exportar en formato [columna => valor]
-     * para cada registro. Cada subclase debe implementarlo.
-     * Debe ser public porque se llama desde una clase anónima.
-     */
-    public static function getExportData(Model $record): array
-    {
-        return [];
-    }
-
-    /**
-     * Devuelve los encabezados del archivo Excel.
-     * Debe ser public porque se llama desde una clase anónima.
-     */
-    public static function getExportHeadings(): array
-    {
-        return [];
-    }
-
     public function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -166,51 +147,6 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                         return $record;
                     })
                     ->hidden(fn() => $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.edit')),
-            ])
-            ->toolbarActions([
-                Action::make('export')
-                    ->label('Exportar')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->action(function ($livewire) {
-                        $query = $livewire->getFilteredTableQuery();
-                        $records = $query->get();
-                        $ownerName = Str::slug($this->getOwnerRecord()->name ?? 'registro');
-                        $sectionName = Str::slug((string) (static::$title ?? 'registro'));
-                        $fileName = "{$ownerName}-{$sectionName}.xlsx";
-
-                        $headings = static::getExportHeadings();
-
-                        return \Maatwebsite\Excel\Facades\Excel::download(
-                            new class($records, $headings, static::class) implements
-                                \Maatwebsite\Excel\Concerns\FromCollection,
-                                \Maatwebsite\Excel\Concerns\WithHeadings
-                            {
-                                protected $records;
-                                protected $headings;
-                                protected $managerClass;
-
-                                public function __construct($records, $headings, $managerClass)
-                                {
-                                    $this->records = $records;
-                                    $this->headings = $headings;
-                                    $this->managerClass = $managerClass;
-                                }
-
-                                public function collection()
-                                {
-                                    return $this->records->map(function ($record) {
-                                        return $this->managerClass::getExportData($record);
-                                    });
-                                }
-
-                                public function headings(): array
-                                {
-                                    return $this->headings;
-                                }
-                            },
-                            $fileName
-                        );
-                    }),
             ])
             ->recordActions([
                 ActionGroup::make([
