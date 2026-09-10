@@ -13,7 +13,7 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->hidden(fn($record) => $record->trashed() || !currentUserHasPermission('users.edit')),
+            EditAction::make()->hidden(fn() => !currentUserHasPermission('users.edit')),
         ];
     }
 }
