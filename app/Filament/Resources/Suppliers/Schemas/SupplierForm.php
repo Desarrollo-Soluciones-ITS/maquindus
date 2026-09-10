@@ -27,22 +27,19 @@ class SupplierForm
                     'J-99999999-9'
                 JS))
                 ->maxLength(12)
-                ->unique()
-                ->required(),
+                ->unique(),
             TextInput::make('name')
                 ->label('Nombre')
                 ->placeholder('Ej. Suministros Industriales CA')
                 ->rule(PreventIllegalCharacters::apply())
                 ->maxLength(80)
-                ->unique()
-                ->required(),
+                ->unique(),
             TextInput::make('email')
                 ->label('Correo electrónico')
                 ->placeholder('Ej. info@sumindus.com')
                 ->email()
                 ->unique()
-                ->maxLength(255)
-                ->required(),
+                ->maxLength(255),
             PhoneInput::make(),
             Select::make('country_id')
                 ->label('País')
@@ -55,14 +52,12 @@ class SupplierForm
                     modifyQueryUsing: fn(Builder $query) => $query->oldest()
                 )
                 ->live()
-                ->required()
                 ->default($venId),
             Select::make('state_id')
                 ->label('Estado')
                 ->relationship('state', 'name')
                 ->live()
-                ->hidden(fn(Get $get) => $get('country_id') !== $venId)
-                ->required(),
+                ->hidden(fn(Get $get) => $get('country_id') !== $venId),
             Select::make('city_id')
                 ->label('Ciudad')
                 ->relationship(
@@ -71,13 +66,11 @@ class SupplierForm
                     modifyQueryUsing: fn(Builder $query, Get $get) =>
                     $query->where('state_id', '=', $get('state_id'))
                 )
-                ->hidden(fn(Get $get) => $get('country_id') !== $venId)
-                ->required(),
+                ->hidden(fn(Get $get) => $get('country_id') !== $venId),
             TextInput::make('address')
                 ->label('Dirección')
                 ->placeholder('Ej. Calle 10, Avenida MC')
-                ->maxLength(255)
-                ->required(),
+                ->maxLength(255),
             TextInput::make('about')
                 ->label('Descripción')
                 ->placeholder('Ej. Empresa de suministro de equipamiento.')

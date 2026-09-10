@@ -29,8 +29,7 @@ class DocumentForm
                     ->label('Nombre')
                     ->maxLength(80)
                     ->placeholder('Ej. Manual de operación')
-                    ->rule(UniquePath::apply())
-                    ->required(),
+                    ->rule(UniquePath::apply()),
                 Select::make('category')
                     ->label('Categoría')
                     ->options(Category::options())
@@ -98,15 +97,13 @@ class DocumentForm
                             return str($get('name'))
                                 ->append(" - V{$initialVersion}", '.', $extension);
                         }
-                    )
-                    ->required(),
+                    ),
                 DatePicker::make('review_date')
                     ->label('Fecha de revisión')
                     ->placeholder('Selecciona una fecha...')
                     ->format('Y-m-d')
                     ->displayFormat('d/m/Y')
                     ->native(false)
-                    ->required()
                     ->hidden(function (RelationManager|ListDocuments $livewire, Model|null $record) {
                         $documentable = null;
                         if ($livewire instanceof RelationManager) {

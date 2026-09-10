@@ -22,8 +22,8 @@ class ReportsRelationManager extends EquipmentMetadataRelationManager
     {
         return [
             DatePicker::make('document_date')->label('Fecha de doc')->native(false),
-            TextInput::make('document_name')->label('Nombre de doc')->required()->maxLength(120),
-            TextInput::make('document_type')->label('Tipo de documento')->required()->maxLength(80),
+            TextInput::make('document_name')->label('Nombre de doc')->maxLength(120),
+            TextInput::make('document_type')->label('Tipo de documento')->maxLength(80),
             TextInput::make('issuer')->label('Emisor')->maxLength(120),
         ];
     }

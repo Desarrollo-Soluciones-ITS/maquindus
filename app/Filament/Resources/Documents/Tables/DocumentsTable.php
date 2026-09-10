@@ -55,9 +55,37 @@ class DocumentsTable
                     ->searchable()
                     ->hiddenOn(DocumentsRelationManager::class)
                     ->formatStateUsing(function (Model $record, $state) {
-                        $model = $record->documentable_type;
-                        $spanish = model_to_spanish($model) ?? 'Relacionado';
-                        return "($spanish) $state";
+                        $documentable = $record->documentable;
+                        $kind = model_to_spanish($record->documentable_type) ?? 'Relacionado';
+
+                        if (!$documentable instanceof Model) {
+                            return blank($state) ? "({$kind})" : "{$state} ({$kind})";
+                        }
+
+                        $name = data_get($documentable, 'name');
+
+                        if (filled(data_get($documentable, 'part_number'))) {
+                            $name = data_get($documentable, 'part_number');
+                        }
+
+                        // Metadata de equipo (plano, reporte, consulta de campo, etc.)
+                        // -> mostrar el nombre del equipo padre + el tipo del documento.
+                        if (!$documentable instanceof Part && method_exists($documentable, 'equipment')) {
+                            try {
+                                $equipment = $documentable->equipment;
+                                if ($equipment instanceof Model && filled($equipment->name)) {
+                                    $name = $equipment->name;
+                                }
+                            } catch (Throwable) {
+                                // relación no disponible; se mantiene el nombre propio
+                            }
+                        }
+
+                        if (blank($name)) {
+                            return "({$kind})";
+                        }
+
+                        return "{$name} ({$kind})";
                     })
                     ->color(Color::Blue)
                     ->url(fn(Model $record) => documentable_view_url($record->documentable)),

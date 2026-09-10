@@ -38,19 +38,17 @@ class ActivitiesRelationManager extends RelationManager
                 TextInput::make('title')
                     ->label('Título')
                     ->placeholder('Ej. Instalación de equipo principal')
-                    ->maxLength(80)
-                    ->required(),
+                    ->maxLength(80),
                 Textarea::make('comment')
                     ->label('Comentario')
                     ->placeholder('Ej. Se inició la instalación del equipo principal en el proyecto')
-                    ->maxLength(255)
-                    ->required(),
+                    ->maxLength(255),
                 Select::make('people')
                     ->label('Participantes')
                     ->multiple()
                     ->relationship()
                     ->searchable(['name', 'email'])
-                    ->getOptionLabelFromRecordUsing(fn($record) => $record->name . ' - ' . $record->email)
+                    ->getOptionLabelFromRecordUsing(fn($record) => $record->name . ' - ' . $record->email),
             ]);
     }
 

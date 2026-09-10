@@ -75,7 +75,6 @@ class FilesRelationManager extends RelationManager
                                 ->append(" - V{$nextVersion}", '.', $extension);
                         }
                     )
-                    ->required()
                     ->columnSpanFull(),
             ]);
     }

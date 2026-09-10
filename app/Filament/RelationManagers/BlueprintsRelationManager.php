@@ -21,8 +21,8 @@ class BlueprintsRelationManager extends EquipmentMetadataRelationManager
     protected static function getFormComponents(): array
     {
         return [
-            TextInput::make('blueprint_number')->label('N de planos')->required()->maxLength(80),
-            TextInput::make('name')->label('Nombre')->required()->maxLength(120),
+            TextInput::make('blueprint_number')->label('N de planos')->maxLength(80),
+            TextInput::make('name')->label('Nombre')->maxLength(120),
             TextInput::make('revision')->label('Rev')->maxLength(40),
             DatePicker::make('document_date')->label('Fecha')->native(false),
         ];

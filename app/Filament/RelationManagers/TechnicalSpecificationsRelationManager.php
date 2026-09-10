@@ -21,7 +21,7 @@ class TechnicalSpecificationsRelationManager extends EquipmentMetadataRelationMa
     protected static function getFormComponents(): array
     {
         return [
-            TextInput::make('revision_name')->label('Nombre revisión')->required()->maxLength(120),
+            TextInput::make('revision_name')->label('Nombre revisión')->maxLength(120),
             TextInput::make('revision')->label('Rev')->maxLength(40),
             DatePicker::make('document_date')->label('Fecha')->native(false),
         ];

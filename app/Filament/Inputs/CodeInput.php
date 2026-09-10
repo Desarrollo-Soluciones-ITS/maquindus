@@ -35,7 +35,6 @@ class CodeInput
                 }
             })
             ->live()
-            ->formatStateUsing(fn($state) => Code::short($state))
-            ->required();
+            ->formatStateUsing(fn($state) => Code::short($state));
     }
 }

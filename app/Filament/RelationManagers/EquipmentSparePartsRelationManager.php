@@ -36,8 +36,7 @@ class EquipmentSparePartsRelationManager extends RelationManager
             ->components([
                 TextInput::make('part_number')
                     ->label('N° de parte')
-                    ->maxLength(80)
-                    ->required(),
+                    ->maxLength(80),
                 TextInput::make('catalog_number')
                     ->label('N° de catálogo')
                     ->maxLength(80),

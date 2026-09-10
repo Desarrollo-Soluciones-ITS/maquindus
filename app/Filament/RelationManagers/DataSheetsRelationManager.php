@@ -21,7 +21,7 @@ class DataSheetsRelationManager extends EquipmentMetadataRelationManager
     protected static function getFormComponents(): array
     {
         return [
-            TextInput::make('sheet_number')->label('N hoja datos')->required()->maxLength(80),
+            TextInput::make('sheet_number')->label('N hoja datos')->maxLength(80),
             TextInput::make('revision')->label('Rev')->maxLength(40),
             DatePicker::make('document_date')->label('Fecha')->native(false),
         ];

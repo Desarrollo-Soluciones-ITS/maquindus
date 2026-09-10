@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Suppliers;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Filament\RelationManagers\EquipmentRelationManager;
 use App\Filament\RelationManagers\PartsRelationManager;
-use App\Filament\RelationManagers\SupplierPurchaseOrdersRelationManager;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
@@ -56,7 +55,6 @@ class SupplierResource extends Resource
             'documents' => DocumentsRelationManager::class,
             'equipment' => EquipmentRelationManager::class,
             'parts' => PartsRelationManager::class,
-            'supplierPurchaseOrders' => SupplierPurchaseOrdersRelationManager::class,
         ];
     }
 

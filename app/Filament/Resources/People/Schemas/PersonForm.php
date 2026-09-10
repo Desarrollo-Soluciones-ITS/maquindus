@@ -25,15 +25,13 @@ class PersonForm
                     ->label('Nombre completo')
                     ->placeholder('Ej. Mario Gómez')
                     ->maxLength(80)
-                    ->rule(PreventIllegalCharacters::apply())
-                    ->required(),
+                    ->rule(PreventIllegalCharacters::apply()),
                 TextInput::make('email')
                     ->label('Correo electrónico')
                     ->placeholder('Ej. contacto@correo.com')
                     ->email()
                     ->unique()
-                    ->maxLength(255)
-                    ->required(),
+                    ->maxLength(255),
                 PhoneInput::make(),
                 Select::make('country_id')
                     ->label('País')
@@ -46,14 +44,12 @@ class PersonForm
                         modifyQueryUsing: fn(Builder $query) => $query->oldest()
                     )
                     ->live()
-                    ->required()
                     ->default($venId),
                 Select::make('state_id')
                     ->label('Estado')
                     ->relationship('state', 'name')
                     ->live()
-                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
-                    ->required(),
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId),
                 Select::make('city_id')
                     ->label('Ciudad')
                     ->relationship(
@@ -62,13 +58,11 @@ class PersonForm
                         modifyQueryUsing: fn(Builder $query, Get $get) =>
                         $query->where('state_id', '=', $get('state_id'))
                     )
-                    ->hidden(fn(Get $get) => $get('country_id') !== $venId)
-                    ->required(),
+                    ->hidden(fn(Get $get) => $get('country_id') !== $venId),
                 TextInput::make('address')
                     ->label('Dirección')
                     ->placeholder('Ej. Calle 15, Avenida FG')
                     ->maxLength(255)
-                    ->required()
                     ->columnSpanFull(),
                 MorphToSelect::make('personable')
                     ->label('Empresa relacionada')

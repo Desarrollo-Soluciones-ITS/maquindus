@@ -20,7 +20,7 @@ class StandardsRelationManager extends EquipmentMetadataRelationManager
     protected static function getFormComponents(): array
     {
         return [
-            TextInput::make('name')->label('Nombre')->required()->maxLength(120),
+            TextInput::make('name')->label('Nombre')->maxLength(120),
             TextInput::make('revision')->label('Rev')->maxLength(40),
         ];
     }

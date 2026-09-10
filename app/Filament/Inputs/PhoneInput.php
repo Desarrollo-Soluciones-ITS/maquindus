@@ -19,7 +19,6 @@ class PhoneInput
             JS))
             ->maxLength(19)
             ->tel()
-            ->unique()
-            ->required();
+            ->unique();
     }
 }

@@ -28,9 +28,8 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
                     'videos' => 'Videos',
                     'pdf' => 'PDF',
                 ])
-                ->native(false)
-                ->required(),
-            TextInput::make('name')->label('Nombre')->required()->maxLength(120),
+                ->native(false),
+            TextInput::make('name')->label('Nombre')->maxLength(120),
         ];
     }
 

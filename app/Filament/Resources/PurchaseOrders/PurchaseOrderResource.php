@@ -29,6 +29,11 @@ class PurchaseOrderResource extends Resource
     protected static ?string $pluralModelLabel = 'órdenes de compra proveedor';
     protected static ?int $navigationSort = 7;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PurchaseOrderForm::configure($schema);
