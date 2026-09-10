@@ -39,9 +39,18 @@ return new class extends Migration
                 continue;
             }
 
-            Schema::table($table, function (Blueprint $blueprint) use ($columns) {
+            Schema::table($table, function (Blueprint $blueprint) use ($columns, $table) {
                 foreach ($columns as $column) {
-                    if (Schema::hasColumn($blueprint->getTable(), $column)) {
+                    if (! Schema::hasColumn($blueprint->getTable(), $column)) {
+                        continue;
+                    }
+
+                    // Preserva longitudes no estándar para evitar truncar datos existentes.
+                    $length = ($table === 'documents' && $column === 'name') ? 511 : null;
+
+                    if ($length !== null) {
+                        $blueprint->string($column, $length)->nullable()->change();
+                    } else {
                         $blueprint->string($column)->nullable()->change();
                     }
                 }
