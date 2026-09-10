@@ -4,6 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\EditAction;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\People\Schemas\PersonForm;
 use App\Filament\Resources\People\Schemas\PersonInfolist;
 use App\Filament\Resources\People\Tables\PeopleTable;
@@ -43,7 +44,15 @@ class PeopleRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return PeopleTable::configure($table)
-            ->filters([])
+            ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                    'email' => 'Correo',
+                    'phone' => 'Teléfono',
+                    'position' => 'Cargo',
+                    'personable.name' => 'Empresa',
+                ], \App\Models\Person::class),
+            ])
             ->headerActions([
                 CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.create')),
                 AttachAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('people.sync')),

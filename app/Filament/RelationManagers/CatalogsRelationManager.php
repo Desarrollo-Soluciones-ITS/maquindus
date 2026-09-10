@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Filters\TextFilter;
 use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -44,6 +45,12 @@ class CatalogsRelationManager extends EquipmentMetadataRelationManager
     public function table(Table $table): Table
     {
         return parent::table($table)
+            ->filters([
+                ...TextFilter::forColumns([
+                    'document_type' => 'Tipo de documento',
+                    'name' => 'Nombre',
+                ], \App\Models\EquipmentCatalog::class),
+            ])
             ->toolbarActions([static::getExportAction()]);
     }
 

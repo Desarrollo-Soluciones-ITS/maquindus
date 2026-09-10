@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Suppliers\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use App\Filament\Filters\ArchivedFilter;
 use Filament\Actions\BulkActionGroup;
@@ -42,6 +43,14 @@ class SuppliersTable
                     ->searchable(),
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'rif' => 'RIF',
+                    'name' => 'Nombre',
+                    'email' => 'Correo',
+                    'phone' => 'Teléfono',
+                    'equipment.name' => 'Equipo relacionado',
+                    'parts.name' => 'Repuesto relacionado',
+                ], \App\Models\Supplier::class),
                 ArchivedFilter::make(),
             ])
             ->recordActions([

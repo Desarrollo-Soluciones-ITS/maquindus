@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ActivityLogs\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -86,10 +87,15 @@ class ActivityLogsTable
                     ->default('Sistema'),
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'description' => 'Descripción',
+                    'causer.name' => 'Causado por',
+                ], \Spatie\Activitylog\Models\Activity::class),
                 DateFilter::make(),
                 SelectFilter::make('log_name')
                     ->label('Módulo')
                     ->searchable()
+                    ->multiple()
                     ->options([
                         'Actividades' => 'Actividades',
                         'Archivos' => 'Archivos',
@@ -107,6 +113,7 @@ class ActivityLogsTable
                     ]),
                 SelectFilter::make('event')
                     ->label('Evento')
+                    ->multiple()
                     ->options([
                         'created' => 'Creación',
                         'updated' => 'Actualización',

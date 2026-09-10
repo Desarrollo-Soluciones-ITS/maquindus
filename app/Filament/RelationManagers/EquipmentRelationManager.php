@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\EditAction;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Equipment\Tables\EquipmentTable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -41,7 +42,14 @@ class EquipmentRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return EquipmentTable::configure($table)
-            ->filters([])
+            ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre equipo',
+                    'model' => 'Modelo',
+                    'serial' => 'Serial',
+                    'about' => 'Descripción',
+                ], \App\Models\Equipment::class),
+            ])
             ->headerActions([
                 CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.create')),
                 AttachAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('equipments.sync')),

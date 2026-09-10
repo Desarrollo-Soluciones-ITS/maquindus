@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Filters\DateFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
@@ -100,6 +101,10 @@ class ActivitiesRelationManager extends RelationManager
                     ->timezone('America/Caracas'),
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'title' => 'Título',
+                    'comment' => 'Comentario',
+                ], \App\Models\Activity::class),
                 DateFilter::make(),
             ])
             ->headerActions([

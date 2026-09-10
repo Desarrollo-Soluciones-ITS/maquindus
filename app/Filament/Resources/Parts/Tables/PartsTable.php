@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Parts\Tables;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Filters\ArchivedFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
@@ -42,6 +43,13 @@ class PartsTable
                     ->timezone('America/Caracas'),
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'part_number' => 'N° de parte',
+                    'catalog_number' => 'N° de catálogo',
+                    'customer_part_number' => 'N° de parte del cliente',
+                    'about' => 'Descripción',
+                    'equipment.name' => 'Equipo relacionado',
+                ], \App\Models\Part::class),
                 DateFilter::make(),
                 ArchivedFilter::make(),
             ])

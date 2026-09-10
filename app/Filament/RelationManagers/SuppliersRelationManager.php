@@ -4,6 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Actions\EditAction;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
@@ -44,7 +45,12 @@ class SuppliersRelationManager extends RelationManager
     {
         return SuppliersTable::configure($table)
             ->filters([
-                //
+                ...TextFilter::forColumns([
+                    'rif' => 'RIF',
+                    'name' => 'Nombre',
+                    'email' => 'Correo',
+                    'phone' => 'Teléfono',
+                ], \App\Models\Supplier::class),
             ])
             ->headerActions([
                 CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('suppliers.create')),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm;
 use App\Models\Equipment;
 use App\Models\Supplier;
@@ -54,6 +55,13 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
                 TextColumn::make('created_at')
                     ->label('Creado el')
                     ->dateTime('d/m/Y H:i'),
+            ])
+            ->filters([
+                ...TextFilter::forColumns([
+                    'supplier.name' => 'Proveedor',
+                    'order_no' => 'Código de orden',
+                    'description' => 'Descripción',
+                ], \App\Models\SupplierPurchaseOrder::class),
             ])
             ->headerActions([
                 CreateAction::make()

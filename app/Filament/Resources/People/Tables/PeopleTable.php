@@ -4,6 +4,7 @@ namespace App\Filament\Resources\People\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
@@ -61,28 +62,13 @@ class PeopleTable
                     }),
             ])
             ->filters([
-                // TODO -> se hace multiples veces la misma query (getSearchResultsUsing, getOptionLabelUsing y indicateUsing)
-                SelectFilter::make('personable_id')
-                    ->label('Empresa')
-                    ->searchable()
-                    ->getSearchResultsUsing(
-                        fn(string $search): array =>
-                        Supplier::query()
-                            ->select('name', 'id')
-                            ->where('name', 'like', "%{$search}%")
-                            ->limit(10)
-                            ->pluck('name', 'id')
-                            ->all()
-                    )
-                    ->getOptionLabelUsing(fn($value) => Supplier::find($value, ['name'])?->name)
-                    ->indicateUsing(function (array $data) {
-                        $value = $data['value'] ?? null;
-                        $model = Supplier::find($value, ['name']);
-
-                        if (!$model) return;
-
-                        return "Empresa: {$model->name}";
-                    }),
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                    'email' => 'Correo',
+                    'phone' => 'Teléfono',
+                    'position' => 'Cargo',
+                    'personable.name' => 'Empresa',
+                ], \App\Models\Person::class),
                 ArchivedFilter::make(),
             ])
             ->recordActions([

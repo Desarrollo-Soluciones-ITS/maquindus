@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PurchaseOrders\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -24,6 +25,11 @@ class PurchaseOrdersTable
 
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'supplier.name' => 'Proveedor',
+                    'order_no' => 'Código de orden',
+                    'description' => 'Descripción',
+                ], \App\Models\SupplierPurchaseOrder::class),
                 ArchivedFilter::make(),
             ])
             ->recordActions([

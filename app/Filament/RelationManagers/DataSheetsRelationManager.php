@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Filters\TextFilter;
 use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -39,6 +40,12 @@ class DataSheetsRelationManager extends EquipmentMetadataRelationManager
     public function table(Table $table): Table
     {
         return parent::table($table)
+            ->filters([
+                ...TextFilter::forColumns([
+                    'sheet_number' => 'N hoja datos',
+                    'revision' => 'Rev',
+                ], \App\Models\EquipmentDataSheet::class),
+            ])
             ->toolbarActions([static::getExportAction()]);
     }
 

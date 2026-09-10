@@ -6,6 +6,7 @@ use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Actions\ArchiveAction;
 use App\Filament\Filters\ArchivedFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use App\Filament\Actions\EditAction;
@@ -42,6 +43,12 @@ class EquipmentTable
                     ->timezone('America/Caracas'),
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre equipo',
+                    'model' => 'Modelo',
+                    'serial' => 'Serial',
+                    'about' => 'Descripción',
+                ], \App\Models\Equipment::class),
                 DateFilter::make(),
                 ArchivedFilter::make(),
             ])

@@ -11,6 +11,7 @@ use App\Filament\Actions\Documents\PreviewAction;
 use App\Filament\Actions\Documents\ViewAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\DateFilter;
+use App\Filament\Filters\TextFilter;
 use App\Filament\RelationManagers\DocumentsRelationManager;
 use App\Models\Equipment;
 use App\Models\Part;
@@ -118,6 +119,9 @@ class DocumentsTable
                     })
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                ], \App\Models\Document::class),
                 DateFilter::make('current.created_at')
                     ->query(function (Builder $query, ?Carbon $startDate, ?Carbon $endDate) {
                         $when = $startDate && $endDate;
@@ -136,14 +140,16 @@ class DocumentsTable
                     }),
                 SelectFilter::make('current.mime')
                     ->label('Tipo de archivo')
+                    ->multiple()
                     ->query(
                         fn(Builder $query, array $data) =>
-                        !$data['value'] ? $query
-                        : $query->whereHas(
-                            'current',
-                            fn(Builder $inner) =>
-                            $inner->where('mime', '=', $data['value'])
-                        )
+                        empty($data['values'])
+                            ? $query
+                            : $query->whereHas(
+                                'current',
+                                fn(Builder $inner) =>
+                                $inner->whereIn('mime', $data['values'])
+                            )
                     )
                     ->options([
                         'PDF' => 'PDF',
@@ -156,18 +162,27 @@ class DocumentsTable
                     ]),
                 SelectFilter::make('category')
                     ->label('Categoría')
+                    ->multiple()
                     ->options([
                         ...Category::options(),
                         'N/A' => 'Sin categoría',
                     ])
                     ->query(function (Builder $query, array $data) {
-                        $value = $data['value'];
-                        if ($value === 'N/A') {
-                            return $query->whereNull('category');
-                        } else if ($value) {
-                            return $query->where('category', $value);
+                        $values = $data['values'] ?? [];
+                        if (empty($values)) {
+                            return $query;
                         }
-                        return $query;
+                        if (in_array('N/A', $values, true)) {
+                            $values = array_diff($values, ['N/A']);
+                            if (empty($values)) {
+                                return $query->whereNull('category');
+                            }
+                            return $query->where(function (Builder $q) use ($values) {
+                                $q->whereNull('category')
+                                    ->orWhereIn('category', $values);
+                            });
+                        }
+                        return $query->whereIn('category', $values);
                     }),
                 ArchivedFilter::make()
                     ->hidden(function (DocumentsRelationManager|ListDocuments $livewire) {

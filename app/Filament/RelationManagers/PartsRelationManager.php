@@ -4,6 +4,7 @@ namespace App\Filament\RelationManagers;
 
 use App\Enums\Prefix;
 use App\Filament\Actions\EditAction;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Parts\Tables\PartsTable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -42,7 +43,14 @@ class PartsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return PartsTable::configure($table)
-            ->filters([])
+            ->filters([
+                ...TextFilter::forColumns([
+                    'part_number' => 'N° de parte',
+                    'catalog_number' => 'N° de catálogo',
+                    'customer_part_number' => 'N° de parte del cliente',
+                    'about' => 'Descripción',
+                ], \App\Models\Part::class),
+            ])
             ->headerActions([
                 CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('parts.create'))
                     ->mutateDataUsing(code_to_full(Prefix::Part)),

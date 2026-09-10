@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\Documents\CreateAction;
+use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Documents\Schemas\DocumentForm;
 use App\Filament\Resources\Documents\Schemas\DocumentInfolist;
 use App\Filament\Resources\Documents\Tables\DocumentsTable;
@@ -49,6 +50,11 @@ class DocumentsRelationManager extends RelationManager
                 return $query->withTrashed()
                     ->with(['documentable' => fn($query) => $query->withTrashed()]);
             })
+            ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                ], \App\Models\Document::class),
+            ])
             ->headerActions([
                 CreateAction::make()->hidden(fn() => !relation_manager_owner_is_equipment($this) || $this->getOwnerRecord()->trashed() || !currentUserHasPermission('documents.create')),
             ])

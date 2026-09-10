@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
+use App\Filament\Filters\TextFilter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -39,10 +40,16 @@ class UsersTable
                     ->timezone('America/Caracas')
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                    'email' => 'Correo electrónico',
+                    'role.name' => 'Rol',
+                ], \App\Models\User::class),
                 DateFilter::make(),
                 SelectFilter::make('role.name')
                     ->label('Rol')
-                    ->relationship('role', 'name'),
+                    ->relationship('role', 'name')
+                    ->multiple(),
             ])
             ->recordActions([
                 ActionGroup::make([

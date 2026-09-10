@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Roles\Tables;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
+use App\Filament\Filters\TextFilter;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -46,6 +47,9 @@ class RolesTable
                     ->timezone('America/Caracas')
             ])
             ->filters([
+                ...TextFilter::forColumns([
+                    'name' => 'Nombre',
+                ], \App\Models\Role::class),
                 DateFilter::make(),
             ])
             ->recordActions([

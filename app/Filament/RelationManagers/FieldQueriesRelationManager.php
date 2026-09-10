@@ -2,6 +2,7 @@
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Filters\TextFilter;
 use App\Filament\Traits\HasExportToExcel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -41,6 +42,13 @@ class FieldQueriesRelationManager extends EquipmentMetadataRelationManager
     public function table(Table $table): Table
     {
         return parent::table($table)
+            ->filters([
+                ...TextFilter::forColumns([
+                    'document_name' => 'Nombre de doc',
+                    'document_type' => 'Tipo de documento',
+                    'issuer' => 'Emisor',
+                ], \App\Models\EquipmentFieldQuery::class),
+            ])
             ->toolbarActions([static::getExportAction()]);
     }
 
