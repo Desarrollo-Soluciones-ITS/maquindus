@@ -69,22 +69,27 @@ class SuppliersRelationManager extends RelationManager
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
-                        $fileName = "{$ownerName}-proveedores.xlsx";
-                        $suppliers = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($suppliers) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $suppliers;
-                            public function __construct($suppliers) { $this->suppliers = $suppliers; }
-                            public function collection() { return $this->suppliers->map(function($supplier) {
-                                return [
-                                    'RIF' => $supplier->rif,
-                                    'Nombre' => $supplier->name,
-                                    'Correo' => $supplier->email,
-                                    'Teléfono' => $supplier->phone,
-                                ];
-                            }); }
-                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Teléfono']; }
-                        }, $fileName);
+                        $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                        $fileName = Str::slug($ownerName) . '-proveedores.xlsx';
+                        $title = $ownerName . ' — Proveedores';
+
+                        $rows = $query->get()->map(function ($supplier) {
+                            return [
+                                $supplier->rif,
+                                $supplier->name,
+                                $supplier->email,
+                                $supplier->phone,
+                            ];
+                        })->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['RIF', 'Nombre', 'Correo', 'Teléfono'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

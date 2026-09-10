@@ -119,22 +119,31 @@ class ActivitiesRelationManager extends RelationManager
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery()->with('people');
                         $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
-                        $fileName = "{$ownerName}-actividades.xlsx";
-                        $activities = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($activities) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $activities;
-                            public function __construct($activities) { $this->activities = $activities; }
-                            public function collection() { return $this->activities->map(function($activity) {
+                        $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                        $fileName = Str::slug($ownerName) . '-actividades.xlsx';
+                        $title = $ownerName . ' — Actividades';
+
+                        $rows = $query->get()
+                            ->map(function ($activity) {
                                 return [
-                                    'Título' => $activity->title,
-                                    'Comentario' => $activity->comment,
-                                    'Participantes' => $activity->people->pluck('name')->join(', '),
-                                    'Fecha' => $activity->created_at,
+                                    $activity->title,
+                                    $activity->comment,
+                                    $activity->people->pluck('name')->join(', '),
+                                    $activity->created_at
+                                        ? \Carbon\Carbon::parse($activity->created_at)->format('d/m/Y')
+                                        : null,
                                 ];
-                            }); }
-                            public function headings(): array { return ['Título', 'Comentario', 'Participantes', 'Fecha']; }
-                        }, $fileName);
+                            })
+                            ->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['Título', 'Comentario', 'Participantes', 'Fecha'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

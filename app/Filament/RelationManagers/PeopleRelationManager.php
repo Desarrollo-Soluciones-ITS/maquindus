@@ -67,23 +67,28 @@ class PeopleRelationManager extends RelationManager
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
-                        $fileName = "{$ownerName}-contactos.xlsx";
-                        $people = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($people) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $people;
-                            public function __construct($people) { $this->people = $people; }
-                            public function collection() { return $this->people->map(function($person) {
-                                return [
-                                    'Nombre' => $person->name,
-                                    'Apellido' => $person->surname,
-                                    'Correo' => $person->email,
-                                    'Teléfono' => $person->phone,
-                                    'Cargo' => $person->position,
-                                ];
-                            }); }
-                            public function headings(): array { return ['Nombre', 'Apellido', 'Correo', 'Teléfono', 'Cargo']; }
-                        }, $fileName);
+                        $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                        $fileName = Str::slug($ownerName) . '-contactos.xlsx';
+                        $title = $ownerName . ' — Contactos';
+
+                        $rows = $query->get()->map(function ($person) {
+                            return [
+                                $person->name,
+                                $person->surname,
+                                $person->email,
+                                $person->phone,
+                                $person->position,
+                            ];
+                        })->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['Nombre', 'Apellido', 'Correo', 'Teléfono', 'Cargo'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

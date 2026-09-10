@@ -59,18 +59,36 @@ class PartsTable
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $parts = $query->get();
+
+                        $title = 'Repuestos';
                         $fileName = 'repuestos.xlsx';
-                        if (method_exists($livewire, 'getOwnerRecord')) {
-                            $ownerRecord = $livewire->getOwnerRecord();
-                            $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
-                            $fileName = "{$ownerName}-repuestos.xlsx";
+                        if (method_exists($livewire, 'getOwnerRecord') && $ownerRecord = $livewire->getOwnerRecord()) {
+                            $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                            $title = $ownerName . ' — Repuestos';
+                            $fileName = \Illuminate\Support\Str::slug($ownerName) . '-repuestos.xlsx';
                         }
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($parts) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $parts;
-                            public function __construct($parts) { $this->parts = $parts; }
-                            public function collection() { return $this->parts->map(fn($part) => ['N° de parte' => $part->part_number, 'N° de catálogo' => $part->catalog_number, 'N° de parte del cliente' => $part->customer_part_number, 'Equipos relacionados' => $part->equipment->pluck('name')->join(', '), 'Descripción' => $part->about, 'Fecha' => $part->created_at]); }
-                            public function headings(): array { return ['N° de parte', 'N° de catálogo', 'N° de parte del cliente', 'Equipos relacionados', 'Descripción', 'Fecha']; }
-                        }, $fileName);
+
+                        $rows = $parts->map(function ($part) {
+                            return [
+                                $part->part_number,
+                                $part->catalog_number,
+                                $part->customer_part_number,
+                                $part->equipment->pluck('name')->join(', '),
+                                $part->about,
+                                $part->created_at
+                                    ? \Carbon\Carbon::parse($part->created_at)->format('d/m/Y')
+                                    : null,
+                            ];
+                        })->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['N° de parte', 'N° de catálogo', 'N° de parte del cliente', 'Equipos relacionados', 'Descripción', 'Fecha'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

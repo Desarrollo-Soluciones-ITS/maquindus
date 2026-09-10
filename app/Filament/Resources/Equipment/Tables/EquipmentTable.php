@@ -62,18 +62,35 @@ class EquipmentTable
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $equipments = $query->get();
+
+                        $title = 'Equipos';
                         $fileName = 'equipos.xlsx';
-                        if (method_exists($livewire, 'getOwnerRecord')) {
-                            $ownerRecord = $livewire->getOwnerRecord();
-                            $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
-                            $fileName = "{$ownerName}-equipos.xlsx";
+                        if (method_exists($livewire, 'getOwnerRecord') && $ownerRecord = $livewire->getOwnerRecord()) {
+                            $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                            $title = $ownerName . ' — Equipos';
+                            $fileName = \Illuminate\Support\Str::slug($ownerName) . '-equipos.xlsx';
                         }
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($equipments) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $equipments;
-                            public function __construct($equipments) { $this->equipments = $equipments; }
-                            public function collection() { return $this->equipments->map(fn($equipment) => ['Nombre equipo' => $equipment->name, 'Modelo' => $equipment->model, 'Serial' => $equipment->serial, 'Descripción' => $equipment->about, 'Fecha' => $equipment->created_at]); }
-                            public function headings(): array { return ['Nombre equipo', 'Modelo', 'Serial', 'Descripción', 'Fecha']; }
-                        }, $fileName);
+
+                        $rows = $equipments->map(function ($equipment) {
+                            return [
+                                $equipment->name,
+                                $equipment->model,
+                                $equipment->serial,
+                                $equipment->about,
+                                $equipment->created_at
+                                    ? \Carbon\Carbon::parse($equipment->created_at)->format('d/m/Y')
+                                    : null,
+                            ];
+                        })->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['Nombre equipo', 'Modelo', 'Serial', 'Descripción', 'Fecha'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

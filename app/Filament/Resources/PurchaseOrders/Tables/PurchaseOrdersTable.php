@@ -40,29 +40,26 @@ class PurchaseOrdersTable
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $orders = $query->get();
+
+                        $rows = $orders->map(function ($order) {
+                            return [
+                                $order->supplier?->name,
+                                $order->order_no,
+                                $order->description,
+                                $order->equipment->pluck('name')->join(', '),
+                                $order->created_at
+                                    ? \Carbon\Carbon::parse($order->created_at)->format('d/m/Y')
+                                    : null,
+                            ];
+                        })->all();
+
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new class ($orders) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $orders;
-                            public function __construct($orders)
-                            {
-                                $this->orders = $orders; }
-                            public function collection()
-                            {
-                                return $this->orders->map(function ($order) {
-                                    return [
-                                        'Proveedor' => $order->supplier?->name,
-                                        'Código de orden' => $order->order_no,
-                                        'Descripción' => $order->description,
-                                        'Equipos relacionados' => $order->equipment->pluck('name')->join(', '),
-                                        'Creado el' => $order->created_at,
-                                    ];
-                                }); }
-                            public function headings(): array
-                            {
-                                return ['Proveedor', 'Código de orden', 'Descripción', 'Equipos relacionados', 'Creado el'];
-                            }
-                            },
-                            'ordenes.xlsx'
+                            new \App\Exports\RelationManagerExcelExport(
+                                'Órdenes de compra proveedor',
+                                ['Proveedor', 'Código de orden', 'Descripción', 'Equipos relacionados', 'Creado el'],
+                                $rows,
+                            ),
+                            'ordenes-compra-proveedor.xlsx',
                         );
                     }),
             ]);

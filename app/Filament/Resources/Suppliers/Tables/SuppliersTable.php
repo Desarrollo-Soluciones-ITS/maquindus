@@ -59,21 +59,26 @@ class SuppliersTable
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $suppliers = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($suppliers) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $suppliers;
-                            public function __construct($suppliers) { $this->suppliers = $suppliers; }
-                            public function collection() { return $this->suppliers->map(function($supplier) {
-                                return [
-                                    'RIF' => $supplier->rif,
-                                    'Nombre' => $supplier->name,
-                                    'Correo' => $supplier->email,
-                                    'Equipos relacionados' => $supplier->equipment->pluck('name')->join(', '),
-                                    'Repuestos relacionados' => $supplier->parts->pluck('name')->join(', '),
-                                    'Teléfono' => $supplier->phone,
-                                ];
-                            }); }
-                            public function headings(): array { return ['RIF', 'Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono']; }
-                        }, 'proveedores.xlsx');
+
+                        $rows = $suppliers->map(function ($supplier) {
+                            return [
+                                $supplier->rif,
+                                $supplier->name,
+                                $supplier->email,
+                                $supplier->equipment->pluck('name')->join(', '),
+                                $supplier->parts->pluck('name')->join(', '),
+                                $supplier->phone,
+                            ];
+                        })->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                'Proveedores',
+                                ['RIF', 'Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono'],
+                                $rows,
+                            ),
+                            'proveedores.xlsx',
+                        );
                     }),
             ]);
     }

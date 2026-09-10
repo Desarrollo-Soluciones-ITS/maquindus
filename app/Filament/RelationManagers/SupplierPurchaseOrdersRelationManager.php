@@ -78,28 +78,29 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = Str::slug($ownerRecord->name ?? 'registro');
-                        $fileName = "{$ownerName}-ordenes-compra-proveedor.xlsx";
-                        $orders = $query->get();
+                        $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                        $fileName = Str::slug($ownerName) . '-ordenes-compra-proveedor.xlsx';
+                        $title = $ownerName . ' — Órdenes de compra proveedor';
 
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($orders) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $orders;
+                        $rows = $query->get()->map(function ($order) {
+                            return [
+                                $order->supplier?->name,
+                                $order->order_no,
+                                $order->description,
+                                $order->created_at
+                                    ? \Carbon\Carbon::parse($order->created_at)->format('d/m/Y')
+                                    : null,
+                            ];
+                        })->all();
 
-                            public function __construct($orders) { $this->orders = $orders; }
-
-                            public function collection() {
-                                return $this->orders->map(fn($order) => [
-                                    'Proveedor' => $order->supplier?->name,
-                                    'Código de orden' => $order->order_no,
-                                    'Descripción' => $order->description,
-                                    'Creado el' => $order->created_at,
-                                ]);
-                            }
-
-                            public function headings(): array {
-                                return ['Proveedor', 'Código de orden', 'Descripción', 'Creado el'];
-                            }
-                        }, $fileName);
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['Proveedor', 'Código de orden', 'Descripción', 'Creado el'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ]);
     }

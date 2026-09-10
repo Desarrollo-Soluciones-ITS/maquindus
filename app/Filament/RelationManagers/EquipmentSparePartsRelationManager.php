@@ -89,24 +89,27 @@ class EquipmentSparePartsRelationManager extends RelationManager
                     ->action(function ($livewire) {
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
-                        $ownerName = \Illuminate\Support\Str::slug($ownerRecord->name ?? 'registro');
-                        $fileName = "{$ownerName}-repuestos.xlsx";
-                        $records = $query->get();
-                        return \Maatwebsite\Excel\Facades\Excel::download(new class($records) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                            protected $records;
-                            public function __construct($records) { $this->records = $records; }
-                            public function collection() {
-                                return $this->records->map(fn($r) => [
-                                    'N° de parte' => $r->part_number,
-                                    'N° de catálogo' => $r->catalog_number,
-                                    'N° parte cliente' => $r->customer_part_number,
-                                    'Descripción' => $r->about,
-                                ]);
-                            }
-                            public function headings(): array {
-                                return ['N° de parte', 'N° de catálogo', 'N° parte cliente', 'Descripción'];
-                            }
-                        }, $fileName);
+                        $ownerName = (string) ($ownerRecord->name ?? 'registro');
+                        $fileName = \Illuminate\Support\Str::slug($ownerName) . '-repuestos.xlsx';
+                        $title = $ownerName . ' — Repuestos';
+
+                        $rows = $query->get()
+                            ->map(fn($r) => [
+                                $r->part_number,
+                                $r->catalog_number,
+                                $r->customer_part_number,
+                                $r->about,
+                            ])
+                            ->all();
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\RelationManagerExcelExport(
+                                $title,
+                                ['N° de parte', 'N° de catálogo', 'N° parte cliente', 'Descripción'],
+                                $rows,
+                            ),
+                            $fileName,
+                        );
                     }),
             ])
             ->recordActions([
