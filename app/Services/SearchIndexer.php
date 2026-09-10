@@ -10,7 +10,7 @@ class SearchIndexer
 
   public function __construct()
   {
-    $this->connection = DB::connection('search');
+    $this->connection = DB::connection();
   }
 
   /**

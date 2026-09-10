@@ -7,7 +7,6 @@ use App\Traits\Searchable;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
@@ -23,17 +22,11 @@ class ManageSearchIndex extends Command
 
     public function handle()
     {
-        $databasePath = database_path('search-index.sqlite');
-
-        // 1. Manejar creación / reconstrucción de la base de datos
-        if ($this->option('rebuild') || !File::exists($databasePath)) {
-            Log::info('Iniciando creación/reconstrucción de la base de datos del índice de búsqueda');
-            $this->info('Configurando la base de datos del índice de búsqueda...');
-            $this->createDatabase($databasePath);
+        if ($this->option('rebuild')) {
+            Log::info('Iniciando reconstrucción del índice de búsqueda');
             $this->rebuildIndex();
         }
 
-        // 2. Manejar búsqueda
         if ($this->option('search')) {
             Log::info('Ejecutando búsqueda en el índice con término: ' . $this->option('search'));
             $this->performSearch();
@@ -42,78 +35,11 @@ class ManageSearchIndex extends Command
         }
     }
 
-    protected function createDatabase(string $databasePath)
-    {
-        $this->info('Creando la base de datos del índice de búsqueda...');
-        Log::info('Creando archivo de base de datos en: ' . $databasePath);
-        // Asegurar que el directorio exista
-        $directory = dirname($databasePath);
-        if (!File::isDirectory($directory)) {
-            File::makeDirectory($directory, 0755, true);
-            Log::info('Directorio creado: ' . $directory);
-        }
-
-        // Crear archivo si no existe o si se está reconstruyendo (truncaremos tablas más tarde, pero asegurar que el archivo exista es clave)
-        if (!File::exists($databasePath)) {
-            touch($databasePath);
-            $this->info("Archivo de base de datos creado: {$databasePath}");
-            Log::info('Archivo de base de datos creado');
-        }
-
-        // Configurar conexión temporal
-        config([
-            'database.connections.search_manage' => [
-                'driver' => 'sqlite',
-                'database' => $databasePath,
-                'foreign_key_constraints' => false,
-            ]
-        ]);
-
-        $connection = DB::connection('search_manage');
-        $schema = $connection->getSchemaBuilder();
-
-        // Eliminar tablas si se está reconstruyendo
-        if ($this->option('rebuild')) {
-            $schema->dropIfExists('search_index');
-            $connection->statement('DROP TABLE IF EXISTS search_index_fts');
-            Log::info('Tablas existentes eliminadas por opción de reconstrucción');
-        }
-
-        // Crear tablas si no existen
-        if (! $schema->hasTable('search_index')) {
-            $schema->create('search_index', function ($table) {
-                $table->increments('id');
-                $table->string('model_type');
-                $table->string('model_id');
-                $table->text('searchable_content');
-                $table->text('searchable_content_normalized');
-                $table->string('result_name');
-                $table->text('result_description')->nullable();
-                $table->timestamps();
-            });
-
-            $connection->statement('CREATE INDEX idx_model_type_id ON search_index(model_type, model_id);');
-            $connection->statement('CREATE INDEX idx_normalized_content ON search_index(searchable_content_normalized);');
-
-            $connection->statement(
-                "CREATE VIRTUAL TABLE search_index_fts USING fts5(
-                    searchable_content,
-                    searchable_content_normalized,
-                    result_name,
-                    result_description,
-                    content='search_index'
-                );"
-            );
-
-            $this->info('Tablas de la base de datos creadas exitosamente.');
-            Log::info('Tablas creadas y índices configurados');
-        }
-    }
-
     protected function rebuildIndex()
     {
         $this->info('Iniciando la indexación de los modelos...');
         Log::info('Recreando índice de búsqueda');
+        DB::table('search_index')->truncate();
         $models = $this->getSearchableModels();
 
         foreach ($models as $modelClass) {

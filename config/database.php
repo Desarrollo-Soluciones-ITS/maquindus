@@ -19,14 +19,6 @@ return [
     */
 
     'connections' => [
-        'search' => [
-            'driver' => 'sqlite',
-            'database' => database_path('search-index.sqlite'),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
-
-
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL', ''),

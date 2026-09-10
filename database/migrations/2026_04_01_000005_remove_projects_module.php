@@ -93,9 +93,8 @@ return new class extends Migration {
     private function deleteProjectSearchIndexEntries(): void
     {
         try {
-            $searchConnection = DB::connection('search');
-            if ($searchConnection->getSchemaBuilder()->hasTable('search_index')) {
-                $searchConnection->table('search_index')
+            if (Schema::hasTable('search_index')) {
+                DB::table('search_index')
                     ->where('model_type', 'App\\Models\\Project')
                     ->delete();
             }
