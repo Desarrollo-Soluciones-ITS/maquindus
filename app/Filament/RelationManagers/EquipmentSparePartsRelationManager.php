@@ -97,7 +97,7 @@ class EquipmentSparePartsRelationManager extends RelationManager
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
                         $ownerName = (string) ($ownerRecord->name ?? 'registro');
-                        $fileName = \Illuminate\Support\Str::slug($ownerName) . '-repuestos.xlsx';
+                        $fileName = \App\Filament\Support\ExportFileName::make($ownerName . ' Repuestos', $livewire);
                         $title = $ownerName . ' — Repuestos';
 
                         $rows = $query->get()

@@ -65,7 +65,7 @@ class PurchaseOrdersTable
                                 ['Proveedor', 'Código de orden', 'Descripción', 'Equipos relacionados', 'Creado el'],
                                 $rows,
                             ),
-                            'ordenes-compra-proveedor.xlsx',
+                            \App\Filament\Support\ExportFileName::make('Órdenes de compra proveedor', $livewire),
                         );
                     }),
             ]);

@@ -13,7 +13,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -69,7 +68,7 @@ class DocumentsRelationManager extends RelationManager
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
                         $ownerName = (string) ($ownerRecord->name ?? 'registro');
-                        $fileName = Str::slug($ownerName) . '-documentos.xlsx';
+                        $fileName = \App\Filament\Support\ExportFileName::make($ownerName . ' Documentos', $livewire);
                         $title = $ownerName . ' — Documentos';
 
                         $rows = $query->get()->map(function ($doc) {

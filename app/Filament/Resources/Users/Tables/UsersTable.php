@@ -32,7 +32,8 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('role.name')
                     ->label('Rol')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Fecha')
                     ->sortable()

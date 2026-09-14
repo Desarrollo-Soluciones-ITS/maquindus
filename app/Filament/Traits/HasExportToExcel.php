@@ -3,8 +3,8 @@
 namespace App\Filament\Traits;
 
 use App\Exports\RelationManagerExcelExport;
+use App\Filament\Support\ExportFileName;
 use Filament\Actions\Action;
-use Illuminate\Support\Str;
 
 /**
  * Trait para agregar botón de exportación a Excel en subtabs de equipos.
@@ -28,7 +28,7 @@ trait HasExportToExcel
                 $ownerName = (string) ($owner->name ?? ($owner->part_number ?? 'registro'));
                 $sectionName = (string) (static::$title ?? 'registro');
 
-                $fileName = Str::slug($ownerName) . '-' . Str::slug($sectionName) . '.xlsx';
+                $fileName = ExportFileName::make("{$ownerName} {$sectionName}", $livewire);
                 $title = "{$ownerName} — {$sectionName}";
 
                 $columns = static::getExportColumns();

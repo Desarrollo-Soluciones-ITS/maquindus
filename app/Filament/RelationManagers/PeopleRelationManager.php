@@ -19,7 +19,6 @@ use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class PeopleRelationManager extends RelationManager
 {
@@ -77,7 +76,7 @@ class PeopleRelationManager extends RelationManager
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
                         $ownerName = (string) ($ownerRecord->name ?? 'registro');
-                        $fileName = Str::slug($ownerName) . '-contactos.xlsx';
+                        $fileName = \App\Filament\Support\ExportFileName::make($ownerName . ' Contactos', $livewire);
                         $title = $ownerName . ' — Contactos';
 
                         $rows = $query->get()->map(function ($person) {

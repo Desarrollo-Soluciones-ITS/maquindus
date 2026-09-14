@@ -69,12 +69,13 @@ class PartsTable
                         $parts = $query->get();
 
                         $title = 'Repuestos';
-                        $fileName = 'repuestos.xlsx';
+                        $tableName = 'Repuestos';
                         if (method_exists($livewire, 'getOwnerRecord') && $ownerRecord = $livewire->getOwnerRecord()) {
                             $ownerName = (string) ($ownerRecord->name ?? 'registro');
                             $title = $ownerName . ' — Repuestos';
-                            $fileName = \Illuminate\Support\Str::slug($ownerName) . '-repuestos.xlsx';
+                            $tableName = $ownerName . ' Repuestos';
                         }
+                        $fileName = \App\Filament\Support\ExportFileName::make($tableName, $livewire);
 
                         $rows = $parts->map(function ($part) {
                             return [

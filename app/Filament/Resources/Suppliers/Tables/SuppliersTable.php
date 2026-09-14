@@ -86,7 +86,7 @@ class SuppliersTable
                                 ['RIF', 'Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono'],
                                 $rows,
                             ),
-                            'proveedores.xlsx',
+                            \App\Filament\Support\ExportFileName::make('Proveedores', $livewire),
                         );
                     }),
             ]);

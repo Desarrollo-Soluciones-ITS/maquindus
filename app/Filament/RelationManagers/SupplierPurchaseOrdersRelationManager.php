@@ -15,7 +15,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class SupplierPurchaseOrdersRelationManager extends RelationManager
 {
@@ -87,7 +86,7 @@ class SupplierPurchaseOrdersRelationManager extends RelationManager
                         $query = $livewire->getFilteredTableQuery();
                         $ownerRecord = $livewire->getOwnerRecord();
                         $ownerName = (string) ($ownerRecord->name ?? 'registro');
-                        $fileName = Str::slug($ownerName) . '-ordenes-compra-proveedor.xlsx';
+                        $fileName = \App\Filament\Support\ExportFileName::make($ownerName . ' Órdenes de compra proveedor', $livewire);
                         $title = $ownerName . ' — Órdenes de compra proveedor';
 
                         $rows = $query->get()->map(function ($order) {

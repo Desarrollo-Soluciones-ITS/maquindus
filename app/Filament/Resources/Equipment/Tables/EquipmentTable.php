@@ -71,12 +71,13 @@ class EquipmentTable
                         $equipments = $query->get();
 
                         $title = 'Equipos';
-                        $fileName = 'equipos.xlsx';
+                        $tableName = 'Equipos';
                         if (method_exists($livewire, 'getOwnerRecord') && $ownerRecord = $livewire->getOwnerRecord()) {
                             $ownerName = (string) ($ownerRecord->name ?? 'registro');
                             $title = $ownerName . ' — Equipos';
-                            $fileName = \Illuminate\Support\Str::slug($ownerName) . '-equipos.xlsx';
+                            $tableName = $ownerName . ' Equipos';
                         }
+                        $fileName = \App\Filament\Support\ExportFileName::make($tableName, $livewire);
 
                         $rows = $equipments->map(function ($equipment) {
                             return [

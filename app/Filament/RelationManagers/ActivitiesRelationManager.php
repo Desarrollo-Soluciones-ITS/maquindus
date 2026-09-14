@@ -18,7 +18,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -125,7 +124,7 @@ class ActivitiesRelationManager extends RelationManager
                         $query = $livewire->getFilteredTableQuery()->with('people');
                         $ownerRecord = $livewire->getOwnerRecord();
                         $ownerName = (string) ($ownerRecord->name ?? 'registro');
-                        $fileName = Str::slug($ownerName) . '-actividades.xlsx';
+                        $fileName = \App\Filament\Support\ExportFileName::make($ownerName . ' Actividades', $livewire);
                         $title = $ownerName . ' — Actividades';
 
                         $rows = $query->get()

@@ -277,11 +277,14 @@ class DocumentsTable
                         $documents = $query->get();
 
                         $title = 'Documentos';
+                        $tableName = 'Documentos';
                         if (method_exists($livewire, 'getOwnerRecord') && $livewire->getOwnerRecord()) {
                             $owner = $livewire->getOwnerRecord();
                             $ownerName = (string) ($owner->name ?? ($owner->part_number ?? 'registro'));
                             $title = $ownerName . ' — Documentos';
+                            $tableName = $ownerName . ' Documentos';
                         }
+                        $fileName = \App\Filament\Support\ExportFileName::make($tableName, $livewire);
 
                         $headings = ['Nombre', 'Tipo de archivo', 'Categoría', 'Pertenece a', 'Última versión', 'Fecha de revisión'];
 
@@ -302,7 +305,7 @@ class DocumentsTable
 
                         return \Maatwebsite\Excel\Facades\Excel::download(
                             new \App\Exports\RelationManagerExcelExport($title, $headings, $rows),
-                            'documentos.xlsx',
+                            $fileName,
                         );
                     }),
             ]);
