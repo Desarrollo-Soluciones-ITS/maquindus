@@ -27,7 +27,9 @@ class SupplierForm
                     'J-99999999-9'
                 JS))
                 ->maxLength(12)
-                ->unique(),
+                ->unique()
+                // Oculto a nivel de módulo: el RIF no se muestra en el formulario de proveedores.
+                ->hidden(),
             TextInput::make('name')
                 ->label('Nombre')
                 ->placeholder('Ej. Suministros Industriales CA')

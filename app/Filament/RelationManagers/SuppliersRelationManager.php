@@ -45,7 +45,6 @@ class SuppliersRelationManager extends RelationManager
         return SuppliersTable::configure($table)
             ->filters([
                 ...TextFilter::forColumns([
-                    'rif' => 'RIF',
                     'name' => 'Nombre',
                     'email' => 'Correo',
                     'phone' => 'Teléfono',
@@ -80,7 +79,6 @@ class SuppliersRelationManager extends RelationManager
 
                         $rows = $query->get()->map(function ($supplier) {
                             return [
-                                $supplier->rif,
                                 $supplier->name,
                                 $supplier->email,
                                 $supplier->phone,
@@ -90,7 +88,7 @@ class SuppliersRelationManager extends RelationManager
                         return \Maatwebsite\Excel\Facades\Excel::download(
                             new \App\Exports\RelationManagerExcelExport(
                                 $title,
-                                ['RIF', 'Nombre', 'Correo', 'Teléfono'],
+                                ['Nombre', 'Correo', 'Teléfono'],
                                 $rows,
                             ),
                             $fileName,

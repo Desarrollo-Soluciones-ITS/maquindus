@@ -13,7 +13,9 @@ class SupplierInfolist
         return $schema
             ->components([
                 TextEntry::make('rif')
-                    ->label('RIF'),
+                    ->label('RIF')
+                    // Oculto a nivel de módulo: el RIF no se muestra en la vista de proveedores.
+                    ->hidden(),
                 TextEntry::make('name')
                     ->label('Nombre'),
                 TextEntry::make('email')

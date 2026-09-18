@@ -19,7 +19,8 @@ class SuppliersTable
             ->columns([
                 TextColumn::make('rif')
                     ->label('RIF')
-                    ->searchable(),
+                    // Oculto a nivel de módulo: el RIF no se muestra en la tabla de proveedores.
+                    ->hidden(),
                 TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable()
@@ -44,7 +45,6 @@ class SuppliersTable
             ])
             ->filters([
                 ...TextFilter::forColumns([
-                    'rif' => 'RIF',
                     'name' => 'Nombre',
                     'email' => 'Correo',
                     'phone' => 'Teléfono',
@@ -71,7 +71,6 @@ class SuppliersTable
 
                         $rows = $suppliers->map(function ($supplier) {
                             return [
-                                $supplier->rif,
                                 $supplier->name,
                                 $supplier->email,
                                 $supplier->equipment->pluck('name')->join(', '),
@@ -83,7 +82,7 @@ class SuppliersTable
                         return \Maatwebsite\Excel\Facades\Excel::download(
                             new \App\Exports\RelationManagerExcelExport(
                                 'Proveedores',
-                                ['RIF', 'Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono'],
+                                ['Nombre', 'Correo', 'Equipos relacionados', 'Repuestos relacionados', 'Teléfono'],
                                 $rows,
                             ),
                             \App\Filament\Support\ExportFileName::make('Proveedores', $livewire),

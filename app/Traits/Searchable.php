@@ -13,7 +13,7 @@ trait Searchable
             'App\Models\Equipment' => ['name', 'model', 'serial', 'type', 'manufacturing_date', 'about'],
             'App\Models\Part' => ['name', 'code', 'details', 'about'],
             'App\Models\Person' => ['name', 'email', 'address', 'phone', 'position'],
-            'App\Models\Supplier' => ['rif', 'name', 'email', 'phone', 'about', 'address'],
+            'App\Models\Supplier' => ['name', 'email', 'phone', 'about', 'address'],
             'App\Models\User' => ['name', 'email'],
         ];
     }
@@ -24,7 +24,7 @@ trait Searchable
             return $this->name;
         }
 
-        foreach (['title', 'code', 'rif', 'email'] as $field) {
+        foreach (['title', 'code', 'email'] as $field) {
             if (isset($this->$field) && filled($this->$field)) {
                 return $this->$field;
             }
