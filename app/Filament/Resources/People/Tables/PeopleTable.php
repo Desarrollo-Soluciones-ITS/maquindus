@@ -6,6 +6,7 @@ use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\ArchivedFilter;
 use App\Filament\Filters\TextFilter;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
+use App\Models\Person;
 use App\Models\Supplier;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -67,8 +68,22 @@ class PeopleTable
                     'email' => 'Correo',
                     'phone' => 'Teléfono',
                     'position' => 'Cargo',
-                    'personable.name' => 'Empresa',
-                ], \App\Models\Person::class),
+                ], Person::class),
+                SelectFilter::make('personable_id')
+                    ->label('Empresa')
+                    ->searchable()
+                    ->multiple()
+                    ->options(function (): array {
+                        return Person::query()
+                            ->whereNotNull('personable_id')
+                            ->with('personable')
+                            ->get()
+                            ->mapWithKeys(fn (Person $person): array => [
+                                (string) $person->personable_id => (string) ($person->personable?->name ?? $person->personable_id),
+                            ])
+                            ->sort()
+                            ->all();
+                    }),
                 ArchivedFilter::make(),
             ])
             ->recordActions([

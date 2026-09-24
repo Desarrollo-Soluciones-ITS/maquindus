@@ -49,7 +49,6 @@ class PeopleRelationManager extends RelationManager
                     'email' => 'Correo',
                     'phone' => 'Teléfono',
                     'position' => 'Cargo',
-                    'personable.name' => 'Empresa',
                 ], \App\Models\Person::class),
             ])
             ->headerActions([

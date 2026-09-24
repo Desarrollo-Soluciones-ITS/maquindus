@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ActivityLogs\Tables;
 use App\Filament\Actions\Documents\OpenFolderAction;
 use App\Filament\Filters\DateFilter;
 use App\Filament\Filters\TextFilter;
+use App\Models\User;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -12,6 +13,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogsTable
 {
@@ -89,9 +91,28 @@ class ActivityLogsTable
             ->filters([
                 ...TextFilter::forColumns([
                     'description' => 'Descripción',
-                    'causer.name' => 'Causado por',
-                ], \Spatie\Activitylog\Models\Activity::class),
+                ], Activity::class),
                 DateFilter::make(),
+                SelectFilter::make('causer_id')
+                    ->label('Causado por')
+                    ->searchable()
+                    ->multiple()
+                    ->options(function (): array {
+                        $causerIds = Activity::query()
+                            ->whereNotNull('causer_id')
+                            ->distinct()
+                            ->pluck('causer_id');
+
+                        if ($causerIds->isEmpty()) {
+                            return [];
+                        }
+
+                        return User::query()
+                            ->whereIn('id', $causerIds)
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                            ->all();
+                    }),
                 SelectFilter::make('log_name')
                     ->label('Módulo')
                     ->searchable()
