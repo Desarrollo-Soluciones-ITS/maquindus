@@ -26,3 +26,17 @@ Thumbs.db
 /.blueprint
 /draft.yaml
 todo.md
+
+# Documentación interna: no versionada (se mantiene solo en disco)
+/docs/
+
+# --- Basura de depuración en la raíz (no versionar) ---
+/d
+/tets.txt
+/directory.txt
+/tmp_debug.php
+/temp_*.bat
+/*.rar
+
+# Carpeta creada por error en DEV (STORAGE_ROOT con ruta Windows relativa)
+/C:\\Ruta\\Carpeta\\Proyecto Maquindus/
