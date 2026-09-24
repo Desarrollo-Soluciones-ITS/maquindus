@@ -16,6 +16,8 @@ class EquipmentReport extends Model
     protected $fillable = [
         'document_date',
         'document_name',
+        'revision',
+        'rqm_number',
         'document_type',
         'issuer',
     ];

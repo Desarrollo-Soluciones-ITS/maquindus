@@ -379,6 +379,16 @@ class SyncEquipmentFolder extends Command
             ];
         }
 
+        if (str_contains($normalized, '/rfq/')) {
+            return [
+                'class' => EquipmentReport::class,
+                'field' => 'document_name',
+                'category' => Category::Report,
+                'defaults' => ['document_type' => 'General', 'document_date' => now()],
+                'extra' => []
+            ];
+        }
+
         if (str_contains($normalized, '/consultas de campo/') || str_contains($normalized, '/consulta de campo/')) {
             return [
                 'class' => EquipmentFieldQuery::class,

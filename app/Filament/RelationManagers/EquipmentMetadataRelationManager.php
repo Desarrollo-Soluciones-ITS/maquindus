@@ -3,6 +3,7 @@
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Actions\Documents\OpenFolderAction;
+use App\Models\File;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
@@ -31,6 +32,12 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
     protected static bool $isLazy = false;
 
     protected const ATTACHED_DOCUMENT_FIELD = 'attached_document_path';
+
+    /**
+     * Carpeta destino dentro de la sección del equipo (ej. 'RFQ').
+     * Si es null, la carpeta se resuelve con los mapas de secciones.
+     */
+    protected static ?string $sectionFolder = null;
 
     abstract protected static function getFormComponents(): array;
 
@@ -70,7 +77,7 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                             'Reporte' => 'Reportes',
                             'Consulta De Campo' => 'Consultas de Campo',
                         ];
-                        $parts[] = $otherSectionMap[$section] ?? $section;
+                        $parts[] = static::$sectionFolder ?? $otherSectionMap[$section] ?? $section;
                     }
 
                     $parts[] = $descriptor;
@@ -156,6 +163,7 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                         ->icon('heroicon-o-eye')
                         ->url(fn(Model $record): ?string => $this->getAttachedDocumentPreviewUrl($record), shouldOpenInNewTab: true)
                         ->hidden(fn(Model $record) => !$this->hasAttachedDocument($record) || !currentUserHasPermission('documents.show_file')),
+                    ...$this->getExtraRecordActions(),
                     ViewAction::make(),
                     EditAction::make()
                         ->using(function (Model $record, array $data): Model {
@@ -176,6 +184,21 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
                         ->hidden(fn($record) => !$record->trashed() || !currentUserHasPermission('equipments.edit')),
                 ]),
             ]);
+    }
+
+    /**
+     * Acciones adicionales dentro del grupo de acciones de cada registro.
+     *
+     * @return array<int, Action>
+     */
+    protected function getExtraRecordActions(): array
+    {
+        return [];
+    }
+
+    protected function getAttachedDocumentFile(Model $record): ?File
+    {
+        return $record->documents->first()?->current;
     }
 
     protected static function resolveDescriptorFromArray(array $data): ?string
