@@ -28,7 +28,7 @@ class EditSupplier extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if ($data['country_id'] !== Country::venezuela()->id) {
+        if ($data['country_id'] !== Country::venezuelaOrNull()?->id) {
             $data['state_id'] = null;
             $data['city_id'] = null;
         }

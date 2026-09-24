@@ -17,7 +17,7 @@ class PersonForm
 {
     public static function configure(Schema $schema): Schema
     {
-        $venId = Country::venezuela()->id;
+        $venId = Country::venezuelaOrNull()?->id;
 
         return $schema
             ->components([

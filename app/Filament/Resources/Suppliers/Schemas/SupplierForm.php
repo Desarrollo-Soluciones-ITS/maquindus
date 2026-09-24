@@ -17,7 +17,7 @@ class SupplierForm
 {
     public static function getComponents(): array
     {
-        $venId = Country::venezuela()->id;
+        $venId = Country::venezuelaOrNull()?->id;
 
         return [
             TextInput::make('rif')
