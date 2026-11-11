@@ -28,13 +28,13 @@ class EquipmentForm
                     ->placeholder('Ej. MODELOX123')
                     ->alphaNum()
                     ->minLength(1)
-                    ->maxLength(80),
+                    ->maxLength(10),
                 TextInput::make('serial')
                     ->label('Serial')
                     ->placeholder('Ej. SERIAL0001')
                     ->alphaNum()
                     ->minLength(1)
-                    ->maxLength(80),
+                    ->maxLength(10),
                 TextInput::make('type')
                     ->label('Tipo')
                     ->placeholder('Ej. Bomba centrífuga vertical')
