@@ -38,6 +38,7 @@ class FilesRelationManager extends RelationManager
                 FileUpload::make('path')
                     ->label('Archivo de nueva versión')
                     ->disk('local')
+                    ->maxSize(51200)
                     ->directory(
                         function (RelationManager $livewire) {
                             $document = $livewire->getOwnerRecord();

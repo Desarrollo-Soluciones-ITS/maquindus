@@ -33,7 +33,7 @@ class EquipmentForm
                     ->label('Serial')
                     ->placeholder('Ej. SERIAL0001')
                     ->alphaNum()
-                    ->minLength(10)
+                    ->minLength(1)
                     ->maxLength(80),
                 TextInput::make('type')
                     ->label('Tipo')

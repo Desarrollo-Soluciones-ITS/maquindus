@@ -48,6 +48,7 @@ class DocumentForm
                 FileUpload::make('path')
                     ->label('Archivo')
                     ->disk('local')
+                    ->maxSize(51200)
                     ->hiddenOn(Operation::Edit)
                     ->directory(
                         function (Get $get, RelationManager $livewire) {

@@ -50,6 +50,7 @@ abstract class EquipmentMetadataRelationManager extends RelationManager
             FileUpload::make(static::ATTACHED_DOCUMENT_FIELD)
                 ->label('Documento anexo')
                 ->disk('local')
+                ->maxSize(51200)
                 ->hiddenOn(Operation::View)
                 ->directory(function (Get $get, RelationManager $livewire) {
                     $equipment = $livewire->getOwnerRecord();
