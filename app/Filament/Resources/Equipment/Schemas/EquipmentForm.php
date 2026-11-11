@@ -27,7 +27,7 @@ class EquipmentForm
                     ->label('Modelo')
                     ->placeholder('Ej. MODELOX123')
                     ->alphaNum()
-                    ->minLength(10)
+                    ->minLength(1)
                     ->maxLength(80),
                 TextInput::make('serial')
                     ->label('Serial')
