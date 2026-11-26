@@ -21,7 +21,9 @@ if ($input === '') {
 if (!preg_match('/^(?:[A-Za-z]:\\\\|\\\\\\\\)/', $input)) {
 	$root = getenv('SHELL_SHARE_ROOT');
 	if (!$root) {
-		$root = 'C:\\inetpub\\wwwroot\\gestor-archivos\\storage\\app\\private';
+		http_response_code(500);
+		echo 'SHELL_SHARE_ROOT no está configurado';
+		exit;
 	}
 	$root = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $root), DIRECTORY_SEPARATOR);
 	$input = $root . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);

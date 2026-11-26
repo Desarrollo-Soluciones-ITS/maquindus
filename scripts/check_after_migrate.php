@@ -7,6 +7,7 @@ $kernel->bootstrap();
 use App\Models\Equipment;
 use App\Models\Document;
 use App\Models\File;
+use Illuminate\Support\Facades\Storage;
 
 echo "=== ESTADO ACTUAL DEL SISTEMA ===\n\n";
 
@@ -31,8 +32,9 @@ foreach ($docs as $doc) {
 
 echo "\n--- Archivos migrados al storage ---\n";
 $storageFiles = [];
+$equiposPath = Storage::disk('local')->path('Equipos');
 $iterator = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator(storage_path('app/private/Equipos'), RecursiveDirectoryIterator::SKIP_DOTS)
+    new RecursiveDirectoryIterator($equiposPath, RecursiveDirectoryIterator::SKIP_DOTS)
 );
 foreach ($iterator as $file) {
     if ($file->isFile()) {

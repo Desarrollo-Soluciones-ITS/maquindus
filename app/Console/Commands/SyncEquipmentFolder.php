@@ -46,7 +46,7 @@ class SyncEquipmentFolder extends Command
         $folderName = trim((string) $this->argument('folder_name'));
         $rebuild = $this->option('rebuild');
 
-        $equiposPath = storage_path('app/private/Equipos');
+        $equiposPath = Storage::disk('local')->path('Equipos');
         if (!is_dir($equiposPath)) {
             $this->error("El directorio raíz de Equipos no existe en la ruta: {$equiposPath}");
             return 1;

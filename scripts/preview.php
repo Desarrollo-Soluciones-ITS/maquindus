@@ -34,7 +34,12 @@ function resolve_target_path(string $input): string
 		return $input;
 	}
 
-	$root = getenv('SHELL_SHARE_ROOT') ?: '\\\\192.168.56.10\\Proyecto Base de Datos';
+	$root = getenv('SHELL_SHARE_ROOT');
+	if (!$root) {
+		http_response_code(500);
+		echo json_encode(['error' => 'SHELL_SHARE_ROOT no está configurado']);
+		exit;
+	}
 	$root = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $root), DIRECTORY_SEPARATOR);
 
 	return $root . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);
