@@ -80,6 +80,10 @@ class Equipment extends Model
         static::deleted(function ($model) {
             $model->removeFromSearchIndex();
         });
+
+        static::restored(function ($model) {
+            $model->updateSearchIndex();
+        });
     }
 
     public function parts(): BelongsToMany

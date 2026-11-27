@@ -84,7 +84,10 @@ class SyncEquipmentFolder extends Command
             $this->info("[" . ($index + 1) . "/" . count($foldersToProcess) . "] Procesando equipo: {$targetFolder}");
 
             // 1. Buscar o crear el equipo
-            $equipment = Equipment::withTrashed()->where('name', $targetFolder)->first();
+            // Preferir el equipo activo: si hay otro archivado con el mismo
+            // nombre, no debe restaurarse automaticamente.
+            $equipment = Equipment::where('name', $targetFolder)->first()
+                ?? Equipment::withTrashed()->where('name', $targetFolder)->first();
 
             if ($equipment && $rebuild) {
                 $this->warn("Opción --rebuild activa. Eliminando registros anteriores de la base de datos para '{$targetFolder}'...");

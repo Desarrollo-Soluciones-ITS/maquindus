@@ -9,6 +9,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rules\Unique;
 
 class EquipmentForm
 {
@@ -22,7 +23,9 @@ class EquipmentForm
                     ->placeholder('Ej. Compresor Atlas')
                     ->rule(PreventIllegalCharacters::apply())
                     ->maxLength(80)
-                    ->unique(),
+                    // Solo los equipos activos bloquean el nombre; los archivados
+                    // pueden reutilizarse.
+                    ->unique(modifyRuleUsing: fn (Unique $rule): Unique => $rule->whereNull('deleted_at')),
                 TextInput::make('model')
                     ->label('Modelo')
                     ->placeholder('Ej. MODELOX123')

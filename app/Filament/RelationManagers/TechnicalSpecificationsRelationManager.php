@@ -8,6 +8,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class TechnicalSpecificationsRelationManager extends EquipmentMetadataRelationManager
 {
@@ -18,6 +19,15 @@ class TechnicalSpecificationsRelationManager extends EquipmentMetadataRelationMa
     protected static ?string $title = 'Especificación técnica · Revisiones';
 
     protected static ?string $modelLabel = 'especificación técnica';
+
+    /**
+     * La tabla de revisiones queda oculta en la UI del módulo de equipos.
+     * Los registros existentes se conservan intactos en la base de datos.
+     */
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        return false;
+    }
 
     protected static function getFormComponents(): array
     {

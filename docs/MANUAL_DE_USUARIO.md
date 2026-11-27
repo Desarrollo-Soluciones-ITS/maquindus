@@ -362,6 +362,9 @@ Registros de manuales de operación, mantenimiento, instalación, etc.
 
 Registros de las revisiones de especificaciones técnicas detalladas.
 
+> **Nota:** Esta pestaña está oculta en la interfaz del módulo de equipos.
+> Los registros existentes se conservan sin cambios en la base de datos.
+
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  Especificación técnica · Revisiones    [+ Crear revisión]      │
@@ -582,7 +585,16 @@ Para restaurar, selecciona **"Incluir archivados"** o **"Solo archivados"**:
 4. El sistema moverá los archivos de vuelta desde `Superado/` a su ubicación original.
 5. El equipo vuelve a aparecer en la lista principal cuando cambies el filtro a **"Ocultar archivados"**.
 
-**Nota importante:** Si en la carpeta original ya existe un archivo con el mismo nombre, la restauración **fallará** y recibirás una notificación de error. En ese caso, debe resolverse manualmente el conflicto de nombres.
+**Nombres reutilizados:** Ahora puedes crear un equipo activo usando el nombre de
+uno archivado. Si más adelante restauras ese equipo archivado, el sistema le
+añadirá una marca sutil al nombre, por ejemplo `Bomba centrífuga (restaurado)`,
+para indicar que hubo otro equipo con el mismo nombre. Si ya existen varias
+marcas, usará `(restaurado 2)`, `(restaurado 3)`, etc. Los archivos se moverán a
+la carpeta con ese mismo nombre modificado.
+
+**Nota importante:** Si aun así existe un conflicto real de archivos, la
+restauración fallará y recibirás una notificación de error. En ese caso, debe
+resolverse manualmente el conflicto.
 
 ---
 
