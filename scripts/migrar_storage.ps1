@@ -306,6 +306,27 @@ function Set-ShareToPath {
     Write-Log "Share '$SHARE_NAME' apuntando a: $Path"
 }
 
+function Close-OldFolderHandles {
+    try {
+        Remove-SmbShare -Name $SHARE_NAME -Force -ErrorAction SilentlyContinue | Out-Null
+        Write-Log "Share '$SHARE_NAME' quitado antes de renombrar."
+    } catch {
+        Write-Log "No se pudo quitar el share antes de renombrar: $($_.Exception.Message)" 'WARN'
+    }
+
+    try {
+        $open = @(Get-SmbOpenFile -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -like "$OLD_ROOT*" })
+
+        if ($open.Count -gt 0) {
+            $open | Close-SmbOpenFile -Force -ErrorAction SilentlyContinue
+            Write-Log "Se cerraron $($open.Count) archivos abiertos del share antiguo."
+        }
+    } catch {
+        Write-Log "No se pudieron cerrar archivos abiertos del share antiguo: $($_.Exception.Message)" 'WARN'
+    }
+}
+
 function Rebuild-Caches {
     Set-Location -LiteralPath $APP_ROOT
 
@@ -535,18 +556,35 @@ try {
     $copyDone = $true
     Write-Log "Copia final verificada con robocopy /L (sincronizada)."
 
+    # Cerrar el share antiguo y sus handles antes de renombrar
+    $shareChanged = $true
+    Close-OldFolderHandles
+
     # Renombrar antiguo
     $oldParent = Split-Path -Path $OLD_ROOT -Parent
     $oldRenamedPath = Join-Path $oldParent $OLD_RENAMED_NAME
     if (Test-Path -LiteralPath $oldRenamedPath) {
         throw "Ya existe $oldRenamedPath. No se puede renombrar la carpeta antigua."
     }
-    Rename-Item -LiteralPath $OLD_ROOT -NewName $OLD_RENAMED_NAME
+
+    $renamed = $false
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+        try {
+            Rename-Item -LiteralPath $OLD_ROOT -NewName $OLD_RENAMED_NAME -ErrorAction Stop
+            $renamed = $true
+            break
+        } catch {
+            if ($attempt -eq 5) { throw }
+            Write-Log "Reintentando renombrar ($attempt/5): $($_.Exception.Message)" 'WARN'
+            Close-OldFolderHandles
+            Start-Sleep -Seconds 2
+        }
+    }
+
     $oldRenamed = $true
     Write-Log "Carpeta antigua renombrada a: $oldRenamedPath"
 
-    # Share
-    $shareChanged = $true
+    # Share apuntando a la nueva ruta
     Set-ShareToPath -Path $NEW_ROOT
 
     # .env
