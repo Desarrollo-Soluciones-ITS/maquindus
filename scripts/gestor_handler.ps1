@@ -1,8 +1,12 @@
-param([string]$path = "")
+param(
+    [string]$path = "",
+    [string]$action = "select"
+)
 
 # Log
 "=== $(Get-Date -Format 'HH:mm:ss') ===" | Out-File "$env:TEMP\gestor_debug.log"
 "path_recibido=$path" | Out-File -Append "$env:TEMP\gestor_debug.log"
+"action=$action" | Out-File -Append "$env:TEMP\gestor_debug.log"
 
 # Extraer todo lo que viene despues de "path=" en la URL
 $i = $path.IndexOf("path=")

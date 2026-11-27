@@ -17,6 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | UNC root visible for clients (used by "Ver en carpeta")
+    |--------------------------------------------------------------------------
+    |
+    | Se guarda en la configuración para que siga disponible cuando se usa
+    | `php artisan config:cache` (dentro de `optimize`).
+    |
+    */
+
+    'network_root' => env('STORAGE_NETWORK_PATH'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

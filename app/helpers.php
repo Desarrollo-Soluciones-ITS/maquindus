@@ -358,7 +358,7 @@ if (!function_exists('gestor_net_url')) {
      */
     function gestor_net_url(string $filepath, string $action = 'select'): ?string
     {
-        $base = env('STORAGE_NETWORK_PATH');
+        $base = config('filesystems.network_root') ?: env('STORAGE_NETWORK_PATH');
         if (!$base) return null;
 
         try {
