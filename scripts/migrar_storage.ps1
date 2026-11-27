@@ -36,7 +36,7 @@ $TASK_NAME   = if ($env:TASK_NAME) { $env:TASK_NAME } else { 'Gestor de Archivos
 $MYSQLDUMP   = if ($env:MYSQLDUMP) { $env:MYSQLDUMP } else { '' }
 $PHP_EXE     = if ($env:PHP_EXE) { $env:PHP_EXE } else { '' }
 $APP_POOL_USER = if ($env:APP_POOL_USER) { $env:APP_POOL_USER } else { '' }
-$AUTO        = if ($env:AUTO) { $env:AUTO } else { '1' }
+$AUTO        = if ($null -ne $env:AUTO -and $env:AUTO -ne '') { $env:AUTO } else { '0' }
 
 $TIMESTAMP = Get-Date -Format 'yyyyMMdd_HHmmss'
 $WORK_DIR  = Join-Path $BACKUP_ROOT "MIGRACION_$TIMESTAMP"
@@ -78,10 +78,12 @@ function Write-Log {
 
 function Get-EnvValue {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Lines,
+        [string[]]$Lines,
         [Parameter(Mandatory = $true)][string]$Key,
         [string]$Default = ''
     )
+
+    if (-not $Lines) { $Lines = @() }
 
     $line = $Lines | Where-Object { $_ -match "^\s*$Key\s*=" } | Select-Object -Last 1
     if (-not $line) { return $Default }
@@ -93,10 +95,12 @@ function Get-EnvValue {
 
 function Set-EnvValue {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Lines,
+        [string[]]$Lines,
         [Parameter(Mandatory = $true)][string]$Key,
         [Parameter(Mandatory = $true)][string]$Value
     )
+
+    if (-not $Lines) { $Lines = @() }
 
     $escaped = $Value.Replace('\', '\\')
     $found = $false
@@ -365,7 +369,11 @@ try {
     Write-Log "mysqldump: $mysqldump"
 
     # Leer .env
-    $envLines = Get-Content -LiteralPath (Join-Path $APP_ROOT '.env')
+    $envLines = @(Get-Content -LiteralPath (Join-Path $APP_ROOT '.env'))
+    if ($envLines.Count -eq 0) {
+        throw "El archivo .env está vacío: $(Join-Path $APP_ROOT '.env')"
+    }
+
     $dbHost = Get-EnvValue -Lines $envLines -Key 'DB_HOST' -Default '127.0.0.1'
     $dbPort = Get-EnvValue -Lines $envLines -Key 'DB_PORT' -Default '3306'
     $dbName = Get-EnvValue -Lines $envLines -Key 'DB_DATABASE'
@@ -572,7 +580,11 @@ try {
         try { Start-Services } catch { Write-Log "Error reiniciando servicios en rollback: $($_.Exception.Message)" 'ERROR' }
     }
 
-    Write-Log '=== ROLLBACK FINALIZADO ===' 'WARN'
+    if ($servicesStopped -or $backupDone -or $copyDone -or $oldRenamed -or $shareChanged -or $envChanged) {
+        Write-Log '=== ROLLBACK FINALIZADO ===' 'WARN'
+    } else {
+        Write-Log '=== SIN CAMBIOS QUE REVERTIR ===' 'WARN'
+    }
     Write-Log "Revisa el log: $LOG_FILE" 'WARN'
     exit 1
 }
