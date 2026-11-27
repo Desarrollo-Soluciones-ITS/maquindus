@@ -540,12 +540,15 @@ try {
     & icacls $NEW_ROOT /grant 'IIS_IUSRS:(OI)(CI)M' 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'No se pudieron aplicar permisos en NEW_ROOT.' }
 
+    & icacls $NEW_ROOT /grant '*S-1-1-0:(OI)(CI)RX' 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'No se pudieron aplicar permisos de lectura para los clientes en NEW_ROOT.' }
+
     if (-not [string]::IsNullOrWhiteSpace($APP_POOL_USER)) {
         & icacls $NEW_ROOT /grant "${APP_POOL_USER}:(OI)(CI)M" 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "No se pudieron aplicar permisos a $APP_POOL_USER en NEW_ROOT." }
     }
 
-    Write-Log "Permisos aplicados en $NEW_ROOT"
+    Write-Log "Permisos aplicados en $NEW_ROOT (IIS_IUSRS: Modificar; clientes: Leer)"
 
     # Copia final
     Invoke-Robocopy -Source $OLD_ROOT -Destination $NEW_ROOT -Log (Join-Path $WORK_DIR 'robocopy_final.log')
