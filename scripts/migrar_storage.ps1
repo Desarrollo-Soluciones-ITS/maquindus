@@ -6,8 +6,8 @@
 
     El script:
       1. Valida permisos de administrador y rutas.
-      2. Hace backup en C:\Temp de la base de datos, .env y carpeta private.
-      3. Detiene sitio, Application Pool y servidor auxiliar.
+      2. Detiene sitio, Application Pool y servidor auxiliar.
+      3. Hace backup en C:\Temp de la base de datos, .env y carpeta private.
       4. Copia private a la nueva ruta y verifica cantidad/tamaño.
       5. Renombra la carpeta antigua como respaldo.
       6. Reapunta el share "private" a la nueva ruta.
@@ -387,7 +387,7 @@ try {
 
     # Espacio
     $oldStats = Get-FolderStats -Path $OLD_ROOT
-    Write-Log "Private actual: $($oldStats.Count) archivos, $($oldStats.Sum) bytes"
+    Write-Log "Private antes del corte: $($oldStats.Count) archivos, $($oldStats.Sum) bytes"
 
     $backupFree = Get-FreeSpaceBytes -Path $BACKUP_ROOT
     $newFree = Get-FreeSpaceBytes -Path $NEW_ROOT
@@ -407,6 +407,21 @@ try {
             throw "Espacio insuficiente en $NEW_ROOT. Libre: $newFree, necesario: $needNew"
         }
     }
+
+    # Confirmación antes del corte
+    if ($AUTO -ne '1' -and $AUTO.ToLower() -ne 'true') {
+        $answer = Read-Host 'Escribe SI para continuar con el corte y el backup'
+        if ($answer -ne 'SI') {
+            Write-Log 'Cancelado por el usuario antes del corte.'
+            exit 0
+        }
+    }
+
+    # Corte: se detiene IIS antes de copiar para que el backup sea coherente
+    Stop-Services
+
+    $oldStats = Get-FolderStats -Path $OLD_ROOT
+    Write-Log "Private en el momento del corte: $($oldStats.Count) archivos, $($oldStats.Sum) bytes"
 
     # Backup de .env
     Copy-Item -LiteralPath (Join-Path $APP_ROOT '.env') -Destination $ENV_BAK -Force
@@ -446,14 +461,6 @@ try {
 
     $backupDone = $true
 
-    if ($AUTO -ne '1' -and $AUTO.ToLower() -ne 'true') {
-        $answer = Read-Host 'Escribe SI para continuar con el corte'
-        if ($answer -ne 'SI') {
-            Write-Log 'Cancelado por el usuario después del backup.'
-            exit 0
-        }
-    }
-
     # Preparar destino
     New-Item -ItemType Directory -Path $NEW_ROOT -Force | Out-Null
     & icacls $NEW_ROOT /grant 'IIS_IUSRS:(OI)(CI)M' /T 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
@@ -465,9 +472,6 @@ try {
     }
 
     Write-Log "Permisos aplicados en $NEW_ROOT"
-
-    # Corte
-    Stop-Services
 
     # Copia final
     Invoke-Robocopy -Source $OLD_ROOT -Destination $NEW_ROOT -Log (Join-Path $WORK_DIR 'robocopy_final.log')
