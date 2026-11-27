@@ -223,10 +223,17 @@ function Stop-Services {
     Write-Log 'Deteniendo sitio y Application Pool...'
     $script:servicesStopped = $true
 
-    & $appcmd stop site "/site.name:$SITE_NAME" | Out-Null
-    & $appcmd stop apppool "/apppool.name:$POOL_NAME" | Out-Null
+    & $appcmd stop site $SITE_NAME 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "No se pudo detener el sitio '$SITE_NAME' (código $LASTEXITCODE)" }
 
-    & schtasks /End /TN "$TASK_NAME" 2>$null | Out-Null
+    & $appcmd stop apppool $POOL_NAME 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "No se pudo detener el Application Pool '$POOL_NAME' (código $LASTEXITCODE)" }
+
+    try {
+        & schtasks /End /TN "$TASK_NAME" 2>&1 | Out-Null
+    } catch {
+        Write-Log "No se pudo detener la tarea auxiliar '$TASK_NAME': $($_.Exception.Message)" 'WARN'
+    }
 
     try {
         $conns = Get-NetTCPConnection -LocalPort 8970 -State Listen -ErrorAction SilentlyContinue
@@ -246,10 +253,20 @@ function Stop-Services {
 function Start-Services {
     Write-Log 'Iniciando sitio y Application Pool...'
 
-    & $appcmd start apppool "/apppool.name:$POOL_NAME" | Out-Null
-    & $appcmd recycle apppool "/apppool.name:$POOL_NAME" | Out-Null
-    & $appcmd start site "/site.name:$SITE_NAME" | Out-Null
-    & schtasks /Run /TN "$TASK_NAME" 2>$null | Out-Null
+    & $appcmd start apppool $POOL_NAME 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "No se pudo iniciar el Application Pool '$POOL_NAME' (código $LASTEXITCODE)" }
+
+    & $appcmd recycle apppool $POOL_NAME 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { Write-Log "El recycle del pool devolvió código $LASTEXITCODE" 'WARN' }
+
+    & $appcmd start site $SITE_NAME 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "No se pudo iniciar el sitio '$SITE_NAME' (código $LASTEXITCODE)" }
+
+    try {
+        & schtasks /Run /TN "$TASK_NAME" 2>&1 | Out-Null
+    } catch {
+        Write-Log "No se pudo iniciar la tarea auxiliar '$TASK_NAME': $($_.Exception.Message)" 'WARN'
+    }
 
     Write-Log 'Sitio y Application Pool iniciados.'
 }
