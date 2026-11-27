@@ -180,8 +180,9 @@ function Find-Executable {
     if ($Explicit -and (Test-Path -LiteralPath $Explicit)) { return $Explicit }
 
     foreach ($name in $Names) {
-        $cmd = Get-Command $name -ErrorAction SilentlyContinue
-        if ($cmd) { return $cmd.Source }
+        $cmd = Get-Command -Name $name -CommandType Application -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+        if ($cmd) { return $cmd.Path }
     }
 
     foreach ($path in $Paths) {
