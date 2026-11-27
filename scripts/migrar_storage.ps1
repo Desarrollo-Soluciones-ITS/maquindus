@@ -537,11 +537,11 @@ try {
 
     # Preparar destino
     New-Item -ItemType Directory -Path $NEW_ROOT -Force | Out-Null
-    & icacls $NEW_ROOT /grant 'IIS_IUSRS:(OI)(CI)M' /T 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+    & icacls $NEW_ROOT /grant 'IIS_IUSRS:(OI)(CI)M' 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'No se pudieron aplicar permisos en NEW_ROOT.' }
 
     if (-not [string]::IsNullOrWhiteSpace($APP_POOL_USER)) {
-        & icacls $NEW_ROOT /grant "${APP_POOL_USER}:(OI)(CI)M" /T 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
+        & icacls $NEW_ROOT /grant "${APP_POOL_USER}:(OI)(CI)M" 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "No se pudieron aplicar permisos a $APP_POOL_USER en NEW_ROOT." }
     }
 
