@@ -219,6 +219,23 @@ function Invoke-Robocopy {
     Write-Log "robocopy completado con código $rc : $Source -> $Destination"
 }
 
+function Test-RobocopyInSync {
+    param(
+        [Parameter(Mandatory = $true)][string]$Source,
+        [Parameter(Mandatory = $true)][string]$Destination,
+        [Parameter(Mandatory = $true)][string]$Log
+    )
+
+    & robocopy $Source $Destination /E /COPY:DAT /DCOPY:DAT /R:0 /W:0 /XJ /NP /L "/LOG+:$Log" | Out-Null
+    $rc = $LASTEXITCODE
+
+    if ($rc -ge 8) {
+        throw "robocopy /L falló con código $rc. Revisa $Log"
+    }
+
+    return $rc
+}
+
 function Stop-Services {
     Write-Log 'Deteniendo sitio y Application Pool...'
     $script:servicesStopped = $true
@@ -446,11 +463,11 @@ try {
 
     # Backup de archivos private
     Invoke-Robocopy -Source $OLD_ROOT -Destination $PRIV_BAK -Log (Join-Path $WORK_DIR 'robocopy_backup.log')
-    $bakStats = Get-FolderStats -Path $PRIV_BAK
-    if ($bakStats.Count -ne $oldStats.Count -or $bakStats.Sum -ne $oldStats.Sum) {
-        throw "El backup de archivos no coincide con el origen. Origen: $($oldStats.Count)/$($oldStats.Sum); Backup: $($bakStats.Count)/$($bakStats.Sum)"
+    $bakSync = Test-RobocopyInSync -Source $OLD_ROOT -Destination $PRIV_BAK -Log (Join-Path $WORK_DIR 'robocopy_backup_check.log')
+    if ($bakSync -ne 0) {
+        throw "El backup de archivos no está sincronizado con el origen (robocopy /L código $bakSync)."
     }
-    Write-Log "Backup private verificado: $($bakStats.Count) archivos, $($bakStats.Sum) bytes"
+    Write-Log "Backup private verificado con robocopy /L (sincronizado)."
 
     # Backup de base de datos
     $dumpArgs = @(
@@ -492,13 +509,12 @@ try {
 
     # Copia final
     Invoke-Robocopy -Source $OLD_ROOT -Destination $NEW_ROOT -Log (Join-Path $WORK_DIR 'robocopy_final.log')
-    $newStats = Get-FolderStats -Path $NEW_ROOT
-
-    if ($newStats.Count -ne $oldStats.Count -or $newStats.Sum -ne $oldStats.Sum) {
-        throw "La copia final no coincide. Origen: $($oldStats.Count)/$($oldStats.Sum); Destino: $($newStats.Count)/$($newStats.Sum)"
+    $copySync = Test-RobocopyInSync -Source $OLD_ROOT -Destination $NEW_ROOT -Log (Join-Path $WORK_DIR 'robocopy_final_check.log')
+    if ($copySync -ne 0) {
+        throw "La copia final no está sincronizada con el origen (robocopy /L código $copySync)."
     }
     $copyDone = $true
-    Write-Log "Copia final verificada: $($newStats.Count) archivos, $($newStats.Sum) bytes"
+    Write-Log "Copia final verificada con robocopy /L (sincronizada)."
 
     # Renombrar antiguo
     $oldParent = Split-Path -Path $OLD_ROOT -Parent
