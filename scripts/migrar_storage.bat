@@ -17,7 +17,7 @@ set "TASK_NAME=Gestor de Archivos - Servidor Auxiliar"
 set "MYSQLDUMP=C:\Program Files\MySQL\MySQL Server 8.4\bin\mysqldump.exe"
 set "PHP_EXE="
 set "APP_POOL_USER="
-set "AUTO=1"
+set "AUTO=0"
 
 if "%NEW_ROOT%"=="" (
     echo [ERROR] Edita NEW_ROOT en este .bat con la ruta REAL del nuevo almacenamiento.
