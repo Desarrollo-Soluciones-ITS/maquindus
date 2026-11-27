@@ -470,10 +470,21 @@ try {
     Write-Log "Backup private verificado con robocopy /L (sincronizado)."
 
     # Backup de base de datos
+    $defaultsFile = Join-Path $WORK_DIR 'mysqldump.cnf'
+    $dumpErr = Join-Path $WORK_DIR 'mysqldump.err'
+    $utf8Cnf = New-Object System.Text.UTF8Encoding($false)
+
+    $cnfLines = @(
+        '[client]',
+        "user=$dbUser",
+        "password=$dbPass",
+        "host=$dbHost",
+        "port=$dbPort"
+    )
+    [IO.File]::WriteAllLines($defaultsFile, $cnfLines, $utf8Cnf)
+
     $dumpArgs = @(
-        "--host=$dbHost",
-        "--port=$dbPort",
-        "--user=$dbUser",
+        "--defaults-extra-file=$defaultsFile",
         '--single-transaction',
         '--quick',
         '--routines',
@@ -482,12 +493,20 @@ try {
         $dbName
     )
 
-    if (-not [string]::IsNullOrEmpty($dbPass)) {
-        $dumpArgs = @("--password=$dbPass") + $dumpArgs
+    & $mysqldump @dumpArgs 2> $dumpErr | Out-Null
+    $dumpRc = $LASTEXITCODE
+
+    if ($dumpRc -ne 0) {
+        $errText = ''
+        if (Test-Path -LiteralPath $dumpErr) {
+            $errText = (Get-Content -LiteralPath $dumpErr -Raw -ErrorAction SilentlyContinue).Trim()
+        }
+        throw "mysqldump falló con código $dumpRc. $errText"
     }
 
-    & $mysqldump @dumpArgs 2>&1 | Tee-Object -FilePath $LOG_FILE -Append | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "mysqldump falló con código $LASTEXITCODE" }
+    Remove-Item -LiteralPath $defaultsFile -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $dumpErr -Force -ErrorAction SilentlyContinue
+
     if (-not (Test-Path -LiteralPath $DB_DUMP) -or ((Get-Item -LiteralPath $DB_DUMP).Length -le 0)) {
         throw 'El archivo de backup de base de datos está vacío o no existe.'
     }
