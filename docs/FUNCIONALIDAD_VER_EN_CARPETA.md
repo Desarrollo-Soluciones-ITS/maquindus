@@ -97,7 +97,7 @@ public static function make(): Action
 }
 ```
 
-**Nota:** El método `record_folder_gestor_url()` devuelve `null` si `STORAGE_NETWORK_PATH` no está definida, por lo que `window.location.href` no se ejecuta y la acción no tiene efecto. Sin embargo, el botón se oculta con `hidden()` que usa `record_folder_url()` (para servidor local) — esto es correcto porque en modo LAN la visibilidad también debe verificar que el archivo existe.
+**Nota:** El método `record_folder_gestor_url()` devuelve `null` si la UNC no está disponible, por lo que `window.location.href` no se ejecuta y la acción no tiene efecto. Con `config:cache` (incluido en `php artisan optimize`) la UNC se lee desde `config('filesystems.network_root')`, no desde `env()` directo. Sin embargo, el botón se oculta con `hidden()` que usa `record_folder_url()` (para servidor local) — esto es correcto porque en modo LAN la visibilidad también debe verificar que el archivo existe.
 
 ---
 
@@ -150,7 +150,7 @@ El servidor PHP auxiliar corre en `http://127.0.0.1:8970` y es mantenido por:
 ```batch
 @echo off
 set SCRIPTS_DIR=C:\inetpub\wwwroot\gestor-archivos\scripts
-set SHELL_SHARE_ROOT=C:\inetpub\wwwroot\gestor-archivos\storage\app\private
+set SHELL_SHARE_ROOT=F:\data\Gestor de Bases de Datos\private
 REM Busca PHP y lo inicia en puerto 8970
 start /B "" "%PHP_PATH%" -S 127.0.0.1:8970 -t "%SCRIPTS_DIR%"
 ```
@@ -289,7 +289,8 @@ catch {
 ```php
 function gestor_net_url(string $filepath, string $action = 'select'): ?string
 {
-    $base = env('STORAGE_NETWORK_PATH');
+    // Con config:cache, env() puede devolver null. Leer desde config.
+    $base = config('filesystems.network_root') ?: env('STORAGE_NETWORK_PATH');
     if (!$base) return null;
 
     try {
@@ -313,6 +314,12 @@ function gestor_net_url(string $filepath, string $action = 'select'): ?string
     return "gestor://$action?path=" . rawurlencode($fullPath);
 }
 ```
+
+**Nota sobre migraciones:** cuando se mueve `STORAGE_LOCAL_PATH` a otro disco
+(por ejemplo `F:\data\Gestor de Bases de Datos\private`), la UNC de cliente no
+cambia: sigue siendo `\\192.168.0.4\private`. Después de editar `.env` hay que
+ejecutar `optimize:clear`, `optimize` y reciclar IIS; si no, `config:cache` deja
+la UNC antigua o vacía y el botón no hace nada.
 
 **Nota importante:** Se usa `rawurlencode()` en lugar de `urlencode()` porque:
 - `urlencode()` codifica espacios como `+`
@@ -424,7 +431,8 @@ SHELL_API_URL=http://127.0.0.1:8970
 
 # Ruta fisica del storage en el servidor
 # Usada por path() helper para convertir rutas relativas a absolutas
-STORAGE_LOCAL_PATH=C:/inetpub/wwwroot/gestor-archivos/storage/app/private
+STORAGE_LOCAL_PATH="F:\\data\\Gestor de Bases de Datos\\private"
+STORAGE_ROOT="F:\\data\\Gestor de Bases de Datos\\private"
 
 # Ruta UNC de la carpeta compartida via SMB
 # SI esta definida → Activa MODO LAN
@@ -438,13 +446,17 @@ NETWORK_SHARE_ROOT=\\\\192.168.0.4\\private
 
 ### 7.2. Explicación de `STORAGE_NETWORK_PATH`
 
+La ruta local (`STORAGE_LOCAL_PATH`) puede cambiar de disco sin que los clientes
+noten nada: la UNC publicada siempre es `\\192.168.0.4\private`. No se debe
+publicar la letra `F:` ni una UNC administrativa (`F$`).
+
 El valor en el `.env` se escribe con **doble escape** porque el parser de dotenv interpreta las barras invertidas:
 
 | En `.env` | Valor real |
 |---|---|
 | `\\\\192.168.0.4\\\\private` | `\\192.168.0.4\private` |
 
-Pero debido a cómo PHP procesa las variables de entorno, el valor puede llegar con escapes adicionales. La función `gestor_net_url()` normaliza esto:
+Pero debido a cómo PHP procesa las variables de entorno, el valor puede llegar con escapes adicionales. La función `gestor_net_url()` normaliza esto. Además, con `config:cache` se lee desde `config('filesystems.network_root')` para que el valor siga disponible cuando `.env` ya no se carga:
 
 ```php
 $base = preg_replace('/\\\\+/', '\\', $base);  // \\\\... → \
@@ -475,7 +487,9 @@ O simplemente dejar la variable vacía o comentada.
 - PowerShell 5.0+ (viene instalado)
 - **No requiere PHP**
 - Acceso de red a `\\192.168.0.4\private` (recurso compartido SMB)
-- Permisos de **Administrador** para la instalación
+- Permisos de **Administrador** solo para `deploy_user.bat` (registro `HKCR`).
+  Para instalar solo para el usuario actual sin Administrador usar
+  `scripts\instalar_protocolo_cliente.bat` (registro `HKCU`).
 
 ### 8.2. Instalación
 
@@ -556,6 +570,15 @@ OK: explorer /select
 
 Si la ruta es muy larga, `Shell.Application.Open()` es el único método que funciona.
 
+#### No aparece `%TEMP%\gestor_debug.log`
+
+**Causa:** el navegador no llegó a lanzar `gestor://`; normalmente el protocolo
+no está registrado para ese usuario o el navegador se abrió antes de instalarlo.
+
+**Solución:** ejecutar `scripts\instalar_protocolo_cliente.bat` con el usuario
+que abre el navegador, cerrar y volver a abrir el navegador. El flujo de la
+aplicación no cambia.
+
 #### El navegador muestra "No se puede abrir esta página"
 
 **Causa:** El protocolo `gestor://` no está registrado o el script no se encuentra.
@@ -575,6 +598,25 @@ Debe mostrar:
 powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "...\gestor_handler.ps1" -path "%1"
 ```
 
+#### Tras mover el storage a otro disco el botón no hace nada
+
+**Causa:** quedó una caché de configuración con la UNC antigua (o sin ella).
+`php artisan optimize` ejecuta `config:cache`, y en ese modo Laravel no lee
+`.env` desde `env()`.
+
+**Solución:** en el servidor:
+
+```powershell
+php artisan optimize:clear
+php artisan optimize
+php artisan filament:optimize
+& "$env:windir\System32\inetsrv\appcmd.exe" recycle apppool "Gestor de Archivos"
+php artisan tinker --execute="echo config('filesystems.network_root');"
+```
+
+La última línea debe devolver `\\192.168.0.4\private`. No cambiar el nombre del
+share ni la letra de la unidad mapeada de los clientes.
+
 #### El botón "Ver en carpeta" no aparece
 
 **Causa:** La función `hidden()` devuelve `true` porque no se pudo resolver el archivo o `record_folder_url()` / `record_folder_gestor_url()` devolvieron `null`.
@@ -582,7 +624,8 @@ powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "...\gestor_han
 **Solución:** Verificar que:
 - El registro (Document, File, Equipment, etc.) tiene al menos un archivo asociado
 - El archivo tiene una ruta (`path`) no vacía
-- `STORAGE_LOCAL_PATH` está correctamente configurado en el `.env`
+- `STORAGE_LOCAL_PATH` está correctamente configurado en el `.env` (puede estar en
+  `F:\data\Gestor de Bases de Datos\private`)
 
 #### Error 500 al hacer clic
 
@@ -738,7 +781,7 @@ function path(string $path, $asFolder = false, $base = true)
 **Ejemplos:**
 ```php
 path('Equipos/Taladro/doc.pdf', base: true);
-// → C:\inetpub\wwwroot\gestor-archivos\storage\app\private\Equipos\Taladro\doc.pdf
+// → F:\data\Gestor de Bases de Datos\private\Equipos\Taladro\doc.pdf
 
 path('Equipos/Taladro/doc.pdf', base: false);
 // → Equipos\Taladro\doc.pdf

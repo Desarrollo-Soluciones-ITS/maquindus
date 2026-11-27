@@ -27,6 +27,11 @@
 | **PowerShell** | 5.0 o superior (viene instalado con Windows) |
 | **PHP** | **NO REQUERIDO** |
 | **Red** | Acceso al recurso compartido `\\192.168.0.4\private` |
+
+El nombre del recurso `private` y su UNC `\\192.168.0.4\private` son fijos.
+Aunque en el servidor los archivos se movieron a
+`F:\data\Gestor de Bases de Datos\private`, los clientes no deben cambiar nada:
+la unidad mapeada `M:\private` y los permisos de solo lectura se mantienen.
 | **Permisos** | Ser **Administrador** de la PC para la instalación |
 
 ### 1.2. Requisitos del Servidor
@@ -90,6 +95,13 @@ D:\scripts\deploy_user.bat
 ```cmd
 \\192.168.0.4\gestor-archivos\scripts\deploy_user.bat
 ```
+
+### Alternativa sin Administrador (recomendada para un usuario)
+
+Si el protocolo falta para el usuario que abre el navegador, copiar y ejecutar
+`scripts\instalar_protocolo_cliente.bat` con ese usuario. Registra `gestor://`
+en `HKCU`, no pide Administrador y no modifica el flujo de la aplicación.
+Después **cerrar y volver a abrir el navegador**.
 
 ### 3.3. Lo que Verás
 
@@ -298,8 +310,12 @@ Win + X → "Terminal (Administrador)"
 **Solución:** Esto es un problema del servidor, no del cliente. Verificar en el servidor:
 
 - Que el documento tenga al menos un archivo (versión) subido
-- Que `STORAGE_NETWORK_PATH` esté definido en el `.env`
-- Que `STORAGE_LOCAL_PATH` apunte a la ruta correcta
+- Que `STORAGE_NETWORK_PATH` esté definido en el `.env` y, si se usa
+  `config:cache`, que `config('filesystems.network_root')` devuelva
+  `\\192.168.0.4\private` en el servidor
+- Que `STORAGE_LOCAL_PATH` apunte a la ruta correcta del servidor
+  (`F:\data\Gestor de Bases de Datos\private`)
+- Que el protocolo `gestor://` esté registrado para el usuario del navegador
 
 ### 5.6. Error 500 al hacer clic en "Ver en carpeta"
 

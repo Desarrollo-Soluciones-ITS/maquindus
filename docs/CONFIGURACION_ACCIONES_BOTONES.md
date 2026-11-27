@@ -87,18 +87,20 @@ El sistema Maquindus tiene dos acciones principales para interactuar con los arc
 - **Laravel:** 11+
 - **Servidor Web:** IIS con PHP habilitado (o Laragon en desarrollo)
 - **Storage:** Disco local con los archivos físicos almacenados
-- **Red (LAN):** Recurso compartido SMB accesible desde PCs cliente (`\\servidor\private`)
+- **Red (LAN):** Recurso compartido SMB accesible desde PCs cliente (`\\192.168.0.4\private`)
 
 ### Archivos físicos
 
-Los archivos deben existir en el disco local del servidor en la ruta:
+Los archivos deben existir en el disco local del servidor en la ruta configurada
+en `STORAGE_LOCAL_PATH`. En producción, después de la migración:
 ```
-C:\inetpub\wwwroot\gestor-archivos\storage\app\private\...
+F:\data\Gestor de Bases de Datos\private\...
 ```
+La ruta UNC que ven los clientes no cambia: `\\192.168.0.4\private`.
 
 Ejemplo de estructura:
 ```
-C:\inetpub\wwwroot\gestor-archivos\storage\app\private\
+F:\data\Gestor de Bases de Datos\private\
 ├── Equipos\
 │   ├── Alimentador AF 60 in\
 │   │   └── Especificaciones Tecnicas\
@@ -123,25 +125,30 @@ Las siguientes variables son **ESENCIALES** para el funcionamiento:
 # ============================================
 
 # Ruta raíz del storage (usada como fallback)
-STORAGE_ROOT=C:/inetpub/wwwroot/gestor-archivos/storage
+STORAGE_ROOT="F:\\data\\Gestor de Bases de Datos\\private"
 
 # URL del servidor PHP auxiliar para abrir carpetas/archivos (SOLO SERVIDOR LOCAL)
 SHELL_API_URL=http://127.0.0.1:8970
 
 # Ruta LOCAL física donde están los archivos (para el disco de Laravel)
-STORAGE_LOCAL_PATH=C:/inetpub/wwwroot/gestor-archivos/storage/app/private
+STORAGE_LOCAL_PATH="F:\\data\\Gestor de Bases de Datos\\private"
 
 # Ruta UNC (red) para acceso desde PCs en la LAN (para protocolo gestor://)
 STORAGE_NETWORK_PATH=\\\\192.168.0.4\\private
 
 # Recurso compartido para el protocolo gestor:// (debe coincidir con STORAGE_NETWORK_PATH)
 NETWORK_SHARE_ROOT=\\\\192.168.0.4\\private
+SHELL_SHARE_ROOT=\\\\192.168.0.4\\private
 ```
 
 > **⚠️ IMPORTANTE:** 
-> - Las rutas LOCALES usan `/` (slash normal)
-> - Las rutas UNC (red) usan `\\` (doble backslash escapado)
-> - `STORAGE_NETWORK_PATH` debe coincidir con el recurso compartido SMB en Windows
+> - La ruta local puede cambiar de disco (`F:\...`) sin afectar a los clientes
+> - Las rutas UNC (red) usan `\\` (doble backslash escapado en `.env`)
+> - `STORAGE_NETWORK_PATH` debe seguir siendo `\\192.168.0.4\private` aunque
+>   `STORAGE_LOCAL_PATH` apunte a otro disco
+> - `php artisan optimize` incluye `config:cache`; por eso la UNC se lee desde
+>   `config('filesystems.network_root')` y hay que regenerar cachés + reciclar
+>   IIS después de editar `.env`
 
 ---
 
@@ -150,6 +157,8 @@ NETWORK_SHARE_ROOT=\\\\192.168.0.4\\private
 El disco `local` de Laravel debe apuntar a la carpeta donde están los archivos físicos:
 
 ```php
+'network_root' => env('STORAGE_NETWORK_PATH'),
+
 'disks' => [
     'local' => [
         'driver' => 'local',
@@ -162,7 +171,7 @@ El disco `local` de Laravel debe apuntar a la carpeta donde están los archivos 
 ],
 ```
 
-> **Nota:** La variable `STORAGE_LOCAL_PATH` tiene prioridad sobre `STORAGE_ROOT`. Esto permite que el disco `local` apunte a `storage/app/private` en lugar de solo `storage/`.
+> **Nota:** La variable `STORAGE_LOCAL_PATH` tiene prioridad sobre `STORAGE_ROOT`. En producción apunta a `F:\data\Gestor de Bases de Datos\private`, no a `storage/app/private`.
 
 ---
 
@@ -189,7 +198,7 @@ $input = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $input);
 
 // Si es ruta absoluta, úsala directamente
 if (!preg_match('/^(?:[A-Za-z]:\\\\|\\\\\\\\)/', $input)) {
-    $root = getenv('SHELL_SHARE_ROOT') ?: 'C:\\inetpub\\wwwroot\\gestor-archivos\\storage\\app\\private';
+    $root = getenv('SHELL_SHARE_ROOT') ?: 'F:\\data\\Gestor de Bases de Datos\\private';
     $input = $root . DIRECTORY_SEPARATOR . ltrim($input, DIRECTORY_SEPARATOR);
 }
 
@@ -204,7 +213,7 @@ exec('cmd /c explorer /select,' . $arg, $out, $code);
 ```bat
 @echo off
 set SCRIPTS_DIR=C:\inetpub\wwwroot\gestor-archivos\scripts
-set SHELL_SHARE_ROOT=C:\inetpub\wwwroot\gestor-archivos\storage\app\private
+set SHELL_SHARE_ROOT=F:\data\Gestor de Bases de Datos\private
 
 REM Busca PHP en rutas comunes
 if exist "C:\laragon\bin\php\php8.3.0\php.exe" set PHP_PATH=C:\laragon\bin\php\php8.3.0\php.exe
@@ -341,7 +350,8 @@ function exec_url(string $filepath, string $endpoint): ?string
 // Para clientes LAN: genera URL del protocolo gestor:// con ruta UNC
 function gestor_net_url(string $filepath, string $action = 'select'): ?string
 {
-    $base = env('STORAGE_NETWORK_PATH');
+    // Con config:cache, env() puede devolver null.
+    $base = config('filesystems.network_root') ?: env('STORAGE_NETWORK_PATH');
     if (!$base) return null;
 
     try {
@@ -353,7 +363,7 @@ function gestor_net_url(string $filepath, string $action = 'select'): ?string
 
     $fullPath = rtrim($base, '\\/') . '\\' . str_replace('/', '\\', $relativePath);
 
-    return "gestor://$action?path=" . urlencode($fullPath);
+    return "gestor://$action?path=" . rawurlencode($fullPath);
 }
 
 // Obtiene URL para "Ver en carpeta" según el tipo de registro
@@ -552,11 +562,11 @@ Crear acceso directo a `scripts\start-server.bat` en `shell:startup`.
 
 ### 10.3 Compartir la carpeta en red (LAN)
 
-Para que clientes LAN puedan acceder a los archivos, la carpeta `storage/app/private` debe estar compartida en red:
+Para que clientes LAN puedan acceder a los archivos, la carpeta configurada en `STORAGE_LOCAL_PATH` debe estar compartida en red con el nombre `private`:
 
 1. Abrir **Administración de equipos** > **Recursos compartidos**
-2. Compartir `C:\inetpub\wwwroot\gestor-archivos\storage\app\private` como `private`
-3. Asignar permisos de lectura a los usuarios de red
+2. Compartir `F:\data\Gestor de Bases de Datos\private` como `private`
+3. Asignar permisos de lectura a los usuarios de red (`icacls ... /grant '*S-1-1-0:(OI)(CI)RX'`, sin `/T`)
 
 ### 10.4 Verificar funcionamiento (Servidor)
 
@@ -578,7 +588,7 @@ php tmp_debug.php
 Salida esperada:
 ```
 SHELL_API_URL: http://127.0.0.1:8970
-STORAGE_LOCAL_PATH: C:/inetpub/wwwroot/gestor-archivos/storage/app/private
+STORAGE_LOCAL_PATH: F:\data\Gestor de Bases de Datos\private
 Servidor PHP: HTTP 200 ✅
 Archivo existe en Storage: SI ✅
 exec_url: http://127.0.0.1:8970/folder.php?path=... ✅
@@ -594,7 +604,7 @@ Para que los usuarios de la LAN puedan usar "Ver en carpeta" desde sus propias P
 
 - Windows 7/10/11 o Windows Server
 - PowerShell 5.0+
-- Acceso a la carpeta compartida `\\servidor\private`
+- Acceso a la carpeta compartida `\\192.168.0.4\private`
 
 ### 11.2 Instalación automática
 
@@ -650,9 +660,10 @@ php tmp_debug.php
 ```
 
 **Posibles causas:**
-- Archivo físico no existe en `storage/app/private/`
+- Archivo físico no existe en la ruta de `STORAGE_LOCAL_PATH`
 - Variables de entorno no están definidas o no se cargan
-- Caché de configuración no limpiada después de cambios en `.env`
+- Caché de configuración no limpiada después de cambios en `.env` (con
+  `config:cache`, revisar `config('filesystems.network_root')`)
 
 ### 12.2 El botón "Ver en carpeta" aparece pero no pasa nada (Servidor)
 
@@ -669,9 +680,12 @@ scripts\start-server.bat
 
 ### 12.3 El botón "Ver en carpeta" no funciona (Cliente LAN)
 
-**Causa:** El protocolo `gestor://` no está registrado
+**Causa:** El protocolo `gestor://` no está registrado para el usuario del
+navegador. Si no aparece `%TEMP%\gestor_debug.log`, el navegador no lo lanzó.
 
-**Solución:** Ejecutar como Administrador:
+**Solución:** ejecutar `scripts\instalar_protocolo_cliente.bat` con ese usuario
+(sin Administrador) y reiniciar el navegador. O la opción anterior con
+Administrador:
 ```cmd
 regedit /s \\servidor\gestor-archivos\scripts\open_in_explorer.reg
 ```
@@ -698,7 +712,7 @@ php artisan tinker
 
 **Causa:** La función `path()` verifica que el archivo exista en Storage y no lo encuentra.
 
-**Solución:** Verificar que el archivo físico esté en `storage/app/private/` y que el path en la BD coincida exactamente.
+**Solución:** Verificar que el archivo físico esté en `F:\data\Gestor de Bases de Datos\private` y que el path en la BD coincida exactamente.
 
 ### 12.7 Las variables de entorno no se cargan
 
@@ -732,7 +746,7 @@ Debe mostrar al menos un proceso `php.exe`. Si no está, ejecutar `start-server.
 
 Asegurarse de que los archivos subidos a través del sistema se almacenen correctamente en:
 ```
-C:\inetpub\wwwroot\gestor-archivos\storage\app\private\...
+F:\data\Gestor de Bases de Datos\private\...
 ```
 
 ### 13.4 Recomendaciones para producción
@@ -740,8 +754,8 @@ C:\inetpub\wwwroot\gestor-archivos\storage\app\private\...
 1. **Configurar el servidor auxiliar como tarea programada** (`scripts/task.xml`) para que inicie automáticamente al iniciar sesión
 2. **Monitorear el puerto 8970** con un chequeo periódico
 3. **Mantener los logs de Laravel** visibles para detectar errores de `path()`
-4. **Compartir la carpeta `private` en red** con permisos de solo lectura para usuarios LAN
-5. **Para nuevas PCs cliente**, distribuir `deploy_user.bat` a través de la red
+4. **Compartir la carpeta `private` en red** con permisos de solo lectura para usuarios LAN; no cambiar el nombre del share al mover de disco
+5. **Para nuevas PCs cliente**, distribuir `instalar_protocolo_cliente.bat` (HKCU, sin Administrador) o `deploy_user.bat` a través de la red
 
 ---
 

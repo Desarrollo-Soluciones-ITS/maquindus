@@ -67,7 +67,7 @@
 - MySQL 8.0+ en puerto 3307
 - Node.js 20+ (para compilar assets)
 - Git (para actualizaciones)
-- Acceso compartido SMB a `C:\inetpub\wwwroot\gestor-archivos\storage\app\private`
+- Acceso compartido SMB a `\\192.168.0.4\private` (la ruta local del servidor es `F:\data\Gestor de Bases de Datos\private`)
 
 ---
 
@@ -302,8 +302,9 @@ El botón **"Ver en carpeta"** permite abrir el Explorador de Windows en la ubic
 
 ```ini
 SHELL_API_URL=http://127.0.0.1:8970
-STORAGE_LOCAL_PATH=C:/inetpub/wwwroot/gestor-archivos/storage/app/private
-STORAGE_NETWORK_PATH=\\\\192.168.0.4\\private    # ← Activa modo LAN
+STORAGE_LOCAL_PATH="F:\\data\\Gestor de Bases de Datos\\private"
+STORAGE_ROOT="F:\\data\\Gestor de Bases de Datos\\private"
+STORAGE_NETWORK_PATH=\\\\192.168.0.4\\private    # ← Activa modo LAN (no cambia con el disco)
 NETWORK_SHARE_ROOT=\\\\192.168.0.4\\private
 ```
 
